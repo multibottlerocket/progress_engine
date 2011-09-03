@@ -3,6 +3,8 @@
 
 #p::Pause ;useful to stop all that clicking when you're done
 
+#b::Send {Click 850, 740}
+
 #s:: ;this will just spam right clicks - useful for afking in game
 while true
 {
@@ -23,23 +25,23 @@ while true
 	Sleep, 2000
 	Send {Click 1000, 700};Create Game
 	Sleep, 2000
-	Send {Click 500, 600};select game name entry box
+	Send {Click 500, 640};select game name entry box
 	Sleep, 2000
 	Send {z 4} ;add random stuff for name
 	Send {r 2}
 	Send {e 2}
 	Sleep, 2000
-	Send {Click 440, 650} ;and for password
+	Send {Click 500, 680} ;and for password
 	Send {z 4}
 	Send {r 2}
 	Send {e 2}
 	Sleep, 3000
-	Send {Click 250, 725} ;go to add bots screen
+	Send {Click 650, 725} ;go to add bots screen
 	Sleep, 2000
 	Send {Click 980, 120} ;click 'x' on rune alert
-    Sleep, 1000    	
+        Sleep, 1000    	
 	Send {Click 1100, 120} ;click 'x' on level up alert
-    Sleep, 1000
+        Sleep, 1000
 	Send {Click 850, 170} ;add random bot
 	Sleep, 2000
 	Send {Click 900, 500} ;go to champ select
@@ -86,7 +88,7 @@ while true
 	}
 	Send {Click 600, 500} ;click on "continue' button after defeat
 	Sleep, 15000
-	Send {Click 1020, 735} ;click on 'return to lobby' button 
+	Send {Click 850, 735} ;click on 'return to lobby' button 
 	Sleep, 1000
 }
 return	

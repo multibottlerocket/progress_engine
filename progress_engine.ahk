@@ -3,7 +3,7 @@
 
 #p::Pause ;useful to stop all that clicking when you're done
 
-#b::Send {Click 850, 740}
+#b::Send {Click 860, 735}
 
 #s:: ;this will just spam right clicks - useful for afking in game
 while true
@@ -88,7 +88,7 @@ while true
 	}
 	Send {Click 600, 500} ;click on "continue' button after defeat
 	Sleep, 15000
-	Send {Click 850, 735} ;click on 'return to lobby' button 
+	Send {Click 870, 735} ;click on 'return to lobby' button 
 	Sleep, 1000
 }
 return	

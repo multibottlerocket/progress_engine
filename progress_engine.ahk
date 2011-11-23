@@ -10,6 +10,34 @@ SkillUp()
 Abilities()
 return
 
+#c::
+
+SelectTrist()
+{
+Send {Click 935, 130} ;click on search box
+Sleep, 500
+Send {t}
+Sleep, 100
+Send {r}
+Sleep, 100
+Send {i}
+Sleep, 100
+Send {s}
+Sleep, 100
+Send {t}
+Sleep, 2000
+Send {click 325, 200} ;click on top left champ space
+Sleep, 2000
+Send {click 651, 501} ;click on summoner spells
+Sleep, 1000
+Send {click 475, 275} ;click on revive
+Sleep, 1000
+Send {click 475, 450} ;click on promote
+Sleep, 1000
+Send {Click 900, 500} ;start game
+return
+}
+
 Shop()
 {
 Send {p} ;open shop
@@ -30,6 +58,11 @@ Send {Esc} ;close shop
 Sleep, 500
 return
 }
+
+Send {Click 935, 130} ;click on search box
+Sleep, 500
+Send {trist}
+Sleep, 500
 
 Abilities()
 {
@@ -110,39 +143,45 @@ if (nowTime > 4)
 
 }
 */
-
-#w::  ; this is the main progress engine loop
+#w::  ; this is the main progress engine loop FOR WINNERS 
 while true
 {
 ;starts from LoL client lobby
-	Send {Click 650, 50} ;click 'Play' button
-	Sleep, 2000
-	Send {Click 300, 220} ;click 'Custom' button
-	Sleep, 2000
-	Send {Click 1000, 700} ;Create Game
-	Sleep, 2000
-	Send {Click 500, 640} ;select game name entry box
-	Sleep, 2000
-	Send {z 4} ;add random stuff for name
-	Send {m 2}
-	Send {e 2}
-	Sleep, 2000
-	Send {Click 500, 680} ;and for password
-	Send {z 4}
-	Send {r 2}
-	Send {e 2}
-	Sleep, 3000
-	Send {Click 650, 725} ;go to add bots screen
-	Sleep, 2000
-	Send {Click 980, 120} ;click 'x' on rune alert
-        Sleep, 1000    	
-	Send {Click 1010, 120} ;click 'x' on new champ alert
+    CreateCustomGame()
+    SelectTrist()
+    Sleep, 20000 ;wait for loading screen to come up before spamming
+    startTime := A_Now
+	while true
+	{
+        Suicide()
+        Shop()
+        SkillUp()
+        Abilities()
+        nowTime := A_Now
+        EnvSub, nowTime, %startTime%, Minutes
+        if (nowTime > 4)
+        {
+            Send {d} ;try to revive
+            Sleep, 1000
+        }
+    	Send {Click 600, 500} ;click on "continue' button after defeat
+    	Sleep, 15000
+        IfWinExist, PVP.net Client
+        {
+            WinActivate
+            break        
+        }
+	}
+	Send {Click 870, 735} ;click on 'return to lobby' button 
 	Sleep, 1000
-	Send {Click 1100, 120} ;click 'x' on level up alert
-        Sleep, 1000
-	Send {Click 850, 170} ;add random bot
-	Sleep, 2000
-	Send {Click 900, 500} ;go to champ select
+}
+return	
+
+#l::  ; this is the main progress engine loop FOR LOSERS
+while true
+{
+;starts from LoL client lobby
+    CreateCustomGame()
 	Sleep, 3000
 	Send {Click 900, 200} ;pick some dude
 	Sleep, 2000

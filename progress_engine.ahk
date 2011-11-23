@@ -3,7 +3,57 @@
 
 #p::Pause ;useful to stop all that clicking when you're done
 
-#b::Send {Click 1010, 120}
+#b::
+Suicide()
+Shop()
+SkillUp()
+Abilities()
+return
+
+Shop()
+{
+Send {p} ;open shop
+Sleep, 500
+Send {Click 698, 212} ;click on Doran's blade rec item
+Sleep, 500
+Send {Click 700, 700} ;buy
+Sleep, 500
+Send {Click 267, 700} ;click on leftmost inventory item
+Sleep, 500
+Send {Click 700, 700} ;buy
+Sleep, 500
+Send {Click 700, 700} ;buy
+Sleep, 500
+Send {Click 700, 700} ;buy
+Sleep, 500
+Send {Esc} ;close shop
+Sleep, 500
+return
+}
+
+Abilities()
+{
+Send {q} ;AS boost
+Sleep, 500
+Send {f} ;promote
+Sleep, 500
+}
+
+Suicide()
+{
+Send {a} ;issue attack move command
+Sleep, 500
+Send {Click 1262, 586}  ; click on enemy fountain via minimap
+Sleep, 500
+}
+
+SkillUp()
+{
+Send ^e ;skill up e
+Sleep, 500
+Send ^q ;skill up q
+Sleep, 500
+}
 
 #s:: ;this will just spam right clicks - useful for afking in game
 while true
@@ -14,6 +64,52 @@ while true
 	Sleep, 5000
 }
 return
+
+CreateCustomGame()
+{
+	Send {Click 650, 50} ;click 'Play' button
+	Sleep, 2000
+	Send {Click 300, 220} ;click 'Custom' button
+	Sleep, 2000
+	Send {Click 1000, 700} ;Create Game
+	Sleep, 2000
+	Send {Click 500, 640} ;select game name entry box
+	Sleep, 2000
+	Send {z 4} ;add random stuff for name
+	Send {m 2}
+	Send {e 2}
+	Sleep, 2000
+	Send {Click 500, 680} ;and for password
+	Send {z 4}
+	Send {r 2}
+	Send {e 2}
+	Sleep, 3000
+	Send {Click 650, 725} ;go to add bots screen
+	Sleep, 2000
+	Send {Click 980, 120} ;click 'x' on rune alert
+    Sleep, 1000    	
+	Send {Click 1010, 120} ;click 'x' on new champ alert
+	Sleep, 1000
+	Send {Click 1100, 120} ;click 'x' on level up alert
+    Sleep, 1000
+	Send {Click 850, 170} ;add random bot
+	Sleep, 2000
+	Send {Click 900, 500} ;go to champ select
+}
+return
+
+/*
+startTime := A_Now
+nowTime := A_Now
+
+;check how much time has elapsed
+nowTime := A_Now
+EnvSub, nowTime, %startTime%, Minutes
+if (nowTime > 4)
+{
+
+}
+*/
 
 #w::  ; this is the main progress engine loop
 while true
@@ -28,7 +124,7 @@ while true
 	Send {Click 500, 640} ;select game name entry box
 	Sleep, 2000
 	Send {z 4} ;add random stuff for name
-	Send {r 2}
+	Send {m 2}
 	Send {e 2}
 	Sleep, 2000
 	Send {Click 500, 680} ;and for password

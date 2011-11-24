@@ -36,7 +36,11 @@ Send {click 475, 275} ;click on revive
 Sleep, 1000
 Send {click 475, 450} ;click on promote
 Sleep, 1000
+Send {click 552, 374} ;click on surge if no promote
+Sleep, 1000
 Send {Click 900, 500} ;start game
+Sleep, 2000
+Send {click 581, 501} ;select random if no trist
 return
 }
 
@@ -44,8 +48,14 @@ Shop()
 {
 Send {p} ;open shop
 Sleep, 500
-Send {Click 698, 212} ;click on Doran's blade rec item
+Send {Click 420, 381} ;click on attack items
+Sleep, 1000
+Send {Click 420, 317} ;click on damage
+Sleep, 1000
+Send {Click 323, 346} ;click on Doran's blade
 Sleep, 500
+;Send {Click 698, 212} ;click on Doran's blade rec item
+;Sleep, 500
 Send {Click 700, 700} ;buy
 Sleep, 500
 Send {Click 267, 700} ;click on leftmost inventory item
@@ -129,50 +139,6 @@ CreateCustomGame()
 }
 return
 
-
-#s::  ; this is the main progress engine loop for a low level account
-while true
-{
-;starts from LoL client lobby
-    CreateCustomGame()
-    Sleep, 3000
-    Send {Click 900, 200} ;pick some dude
-    Sleep, 2000
-    Send {click 651, 501} ;click on summoner spells
-    Sleep, 1000
-    Send {click 475, 275} ;click on revive
-    Sleep, 1000
-    Send {click 554, 375} ;click on promote
-    Sleep, 1000
-    Send {Click 900, 500} ;start game
-    Sleep, 100000 ;wait for loading screen to come up before spamming
-    startTime := A_Now
-	while true
-	{
-        Suicide()
-        Shop()
-        SkillUp()
-        Abilities()
-    	Send {Click 600, 500} ;click on "continue' button after defeat
-    	Sleep, 15000
-        IfWinExist, PVP.net Client
-        {
-            WinActivate
-            break        
-        }
-        nowTime := A_Now
-        EnvSub, nowTime, %startTime%, Minutes
-        if (nowTime > 4)
-        {
-            Send {d} ;try to revive
-            Sleep, 1000
-        }
-	}
-	Send {Click 870, 735} ;click on 'return to lobby' button 
-	Sleep, 5000
-}
-return	
-
 #w::  ; this is the main progress engine loop for an account with trist	
 while true
 {
@@ -207,7 +173,7 @@ while true
 }
 return	
 
-#l::  ; this is the main progress engine loop FOR LOSERS
+#k::  ; this is the main progress engine loop FOR LOSERS (useful if you don't want to burn boosts)
 while true
 {
 ;starts from LoL client lobby

@@ -1,3 +1,7 @@
+#NoEnv
+#InstallKeybdHook
+SetKeyDelay, 30, 30
+
 ;delays should be increased for slower computers, ideally all parameterized to one variable
 ;# = windows key; press it with whatever letter to start that function
 
@@ -9,8 +13,6 @@ Shop()
 SkillUp()
 Abilities()
 return
-
-#c::
 
 SelectTrist()
 {
@@ -59,11 +61,6 @@ Sleep, 500
 return
 }
 
-Send {Click 935, 130} ;click on search box
-Sleep, 500
-Send {trist}
-Sleep, 500
-
 Abilities()
 {
 Send {q} ;AS boost
@@ -74,6 +71,7 @@ Sleep, 500
 
 Suicide()
 {
+Sleep, 500
 Send {a} ;issue attack move command
 Sleep, 500
 Send {Click 1262, 586}  ; click on enemy fountain via minimap
@@ -88,7 +86,7 @@ Send ^q ;skill up q
 Sleep, 500
 }
 
-#s:: ;this will just spam right clicks - useful for afking in game
+#c:: ;this will just spam right clicks - useful for afking in game
 while true
 {
 	Send {Click right 600, 350}
@@ -108,9 +106,8 @@ CreateCustomGame()
 	Sleep, 2000
 	Send {Click 500, 640} ;select game name entry box
 	Sleep, 2000
-	Send {z 4} ;add random stuff for name
-	Send {m 2}
-	Send {e 2}
+	Random, stupidName, 11111111, 99999999
+	SendInput, %stupidName%
 	Sleep, 2000
 	Send {Click 500, 680} ;and for password
 	Send {z 4}
@@ -128,28 +125,27 @@ CreateCustomGame()
 	Send {Click 850, 170} ;add random bot
 	Sleep, 2000
 	Send {Click 900, 500} ;go to champ select
+    Sleep, 5000
 }
 return
 
-/*
-startTime := A_Now
-nowTime := A_Now
 
-;check how much time has elapsed
-nowTime := A_Now
-EnvSub, nowTime, %startTime%, Minutes
-if (nowTime > 4)
-{
-
-}
-*/
-#w::  ; this is the main progress engine loop FOR WINNERS 
+#s::  ; this is the main progress engine loop for a low level account
 while true
 {
 ;starts from LoL client lobby
     CreateCustomGame()
-    SelectTrist()
-    Sleep, 20000 ;wait for loading screen to come up before spamming
+    Sleep, 3000
+    Send {Click 900, 200} ;pick some dude
+    Sleep, 2000
+    Send {click 651, 501} ;click on summoner spells
+    Sleep, 1000
+    Send {click 475, 275} ;click on revive
+    Sleep, 1000
+    Send {click 554, 375} ;click on promote
+    Sleep, 1000
+    Send {Click 900, 500} ;start game
+    Sleep, 100000 ;wait for loading screen to come up before spamming
     startTime := A_Now
 	while true
 	{
@@ -157,13 +153,6 @@ while true
         Shop()
         SkillUp()
         Abilities()
-        nowTime := A_Now
-        EnvSub, nowTime, %startTime%, Minutes
-        if (nowTime > 4)
-        {
-            Send {d} ;try to revive
-            Sleep, 1000
-        }
     	Send {Click 600, 500} ;click on "continue' button after defeat
     	Sleep, 15000
         IfWinExist, PVP.net Client
@@ -171,9 +160,50 @@ while true
             WinActivate
             break        
         }
+        nowTime := A_Now
+        EnvSub, nowTime, %startTime%, Minutes
+        if (nowTime > 4)
+        {
+            Send {d} ;try to revive
+            Sleep, 1000
+        }
 	}
 	Send {Click 870, 735} ;click on 'return to lobby' button 
-	Sleep, 1000
+	Sleep, 5000
+}
+return	
+
+#w::  ; this is the main progress engine loop for an account with trist	
+while true
+{
+;starts from LoL client lobby
+    CreateCustomGame()
+    SelectTrist()
+    Sleep, 100000 ;wait for loading screen to come up before spamming
+    startTime := A_Now
+	while true
+	{
+        Suicide()
+        Shop()
+        SkillUp()
+        Abilities()
+    	Send {Click 600, 500} ;click on "continue' button after defeat
+    	Sleep, 15000
+        IfWinExist, PVP.net Client
+        {
+            WinActivate
+            break        
+        }
+        nowTime := A_Now
+        EnvSub, nowTime, %startTime%, Minutes
+        if (nowTime > 4)
+        {
+            Send {d} ;try to revive
+            Sleep, 1000
+        }
+	}
+	Send {Click 870, 735} ;click on 'return to lobby' button 
+	Sleep, 5000
 }
 return	
 

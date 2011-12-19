@@ -1,6 +1,6 @@
 #NoEnv
 #InstallKeybdHook
-SetKeyDelay, 30, 30
+SetKeyDelay, 100, 30
 
 ;delays should be increased for slower computers, ideally all parameterized to one variable
 ;# = windows key; press it with whatever letter to start that function
@@ -8,11 +8,159 @@ SetKeyDelay, 30, 30
 #p::Pause ;useful to stop all that clicking when you're done
 
 #b::
-Suicide()
-Shop()
-SkillUp()
-Abilities()
+PlayNGames(4)
 return
+
+DoBattleTraining() ;run battle training automatically
+{
+	Send {Click 650, 50} ;click 'Play' button
+	Sleep, 2000
+	Send {Click 325, 296} ;click 'Tutorials' button
+	Sleep, 1000
+	Send {Click 512, 206} ;click 'Battle Training" button
+	Sleep, 2000
+	Send {Click 843, 682} ;click 'Launch' button
+	Sleep, 6000
+	Send {Click 663, 389} ;click 'Continue' button
+	Sleep, 2000
+	Send {Click 663, 389} ;click 'Continue' button again
+	Sleep, 2000
+	Send {Click 306, 246} ;click 'Continue' button for time limit
+	Sleep, 2000
+	Send {Click 375, 375} ;click 'Continue' button for champs
+	Sleep, 2000
+	Send {Click 311, 375} ;click 'Continue' button for ashe
+	Sleep, 2000
+	Send {Click 375, 375} ;click 'Continue' button for garen
+	Sleep, 2000
+	Send {Click 448, 375} ;click 'Continue' button for ryze
+	Sleep, 2000
+	Send {Click 318, 215} ;select Ashe
+	Sleep, 2000
+	Send {Click 402, 334} ;click 'Continue' button for allies selection
+	Sleep, 2000
+	Send {Click 755, 488} ;click 'Continue' button for chat box
+	Sleep, 2000
+	Send {Click 639, 505} ;click on summoner spells
+	Sleep, 2000
+	Send {Click 799, 589} ;close summoner spells box
+	Sleep, 2000
+	Send {Click 381, 387} ;click 'Continue' for runes and masteries
+	Sleep, 2000
+	Send {Click 384, 429} ;click 'Continue' button for masteries
+	Sleep, 2000
+	Send {Click 381, 398} ;click 'Continue' for runes
+	Sleep, 2000
+	Send {Click 652, 533} ;click 'Continue' button for skins
+	Sleep, 2000
+	Send {Click 888, 391} ;click 'Continue' for lock in
+	Sleep, 2000
+	Send {Click 876, 501} ;lock in
+	Sleep, 90000 ;big pause here to count down and let game load
+	Send {Click 824, 430} ;click 'Continue' button
+	Sleep, 50000 ;long pause while lady talks
+	Send {Click 1183, 259} ;move mouse cursor over seconday quests
+	Sleep, 5000
+	Send {Click 1253, 509} ;click hint above minimap
+	Sleep, 3000
+	Send {Click 985, 615} ;close hint window
+	Sleep, 20000 ;wait for lady to talk
+	startTime := A_Now
+	while true ;spam right clicks for 19 minutes, then surrender and click continue button
+	{
+		Send {Click right 600, 350}
+		Sleep, 5000
+		Send {Click right 600, 500}
+		Sleep, 5000
+        	nowTime := A_Now
+        	EnvSub, nowTime, %startTime%, Minutes
+        	if (nowTime > 19) ;after 19 minutes, surrender
+        	{
+			Send {Enter}
+			Sleep, 100
+			Send {/}
+			Sleep, 100
+			Send {f}
+			Sleep, 100
+			Send {f}
+			Sleep, 100
+			Send {Enter}
+			Sleep, 20000 ;give lots of time for nexus to blow up and 'continue' button to appear
+			break
+		}
+	}
+
+    	Send {Click 600, 500} ;click on "continue' button after defeat
+    	Sleep, 15000 ;let game close and pvp.net client load
+	Send {Click 640, 385} ;click continue on post battle screen
+	Sleep, 2000
+	Send {Click 439, 312} ;click continue for ip
+	Sleep, 2000
+	Send {Click 923, 739} ;click 'home'
+	Sleep, 2000
+	Send {Click 700, 509} ;decline co op vs ai inv
+	Sleep, 2000
+	Send {Click 700, 509} ;decline co op vs ai inv again
+	Sleep, 2000 
+	;should be back at lobby again
+return
+}
+
+GameLoop()
+{
+games = 0
+while True
+{
+   games := games + 1
+   Sleep, 100
+   if games > 5
+   {
+      break
+   }
+}
+SendInput, %games%
+return
+}
+
+
+CloseLoLClient()
+{
+IfWinExist, PVP.net Client
+{
+	WinKill
+}
+return
+}
+
+LogIn(username, password)
+{
+Run, C:\Riot Games\League of Legends\lol.launcher.exe
+Sleep, 15000
+IfWinExist, Error
+{
+	WinActivate
+	Send {Enter}
+}
+
+WinWait, PVP.net Patcher
+WinActivate
+Sleep, 2000
+Send {click 701, 549} ;click on orange "play" button
+
+WinWait, PVP.net Client
+WinActivate
+Sleep, 2000
+Send {click 992, 334} ;username
+Sleep, 1000
+SendInput, %username%
+Sleep, 1000
+Send {click 975, 385} ;pw
+SendInput, %password%
+Sleep, 1000
+Send {click 1108, 428} ;log in
+Sleep, 15000
+return
+}
 
 SelectTrist()
 {
@@ -138,6 +286,46 @@ CreateCustomGame()
     Sleep, 5000
 }
 return
+
+PlayNGames(nGames) ;will create and play N custom games, attempting to win
+{
+games_played = 0
+while (games_played < nGames)
+    {
+    games_played := games_played + 1
+    ;starts from LoL client lobby
+        CreateCustomGame()
+        SelectTrist()
+        Sleep, 100000 ;wait for loading screen to come up before spamming
+        startTime := A_Now
+    	while true
+    	{
+            Suicide()
+            Shop()
+            SkillUp()
+            Abilities()
+        	Send {Click 600, 500} ;click on "continue' button after defeat
+        	Sleep, 15000
+            IfWinExist, PVP.net Client
+            {
+                WinActivate
+                break        
+            }
+            nowTime := A_Now
+            EnvSub, nowTime, %startTime%, Minutes
+            if (nowTime > 4)
+            {
+                Send {d} ;try to revive
+                Sleep, 1000
+            }
+    	}
+    	Send {Click 870, 735} ;click on 'return to lobby' button 
+    	Sleep, 5000
+
+    }
+}
+return
+
 
 #w::  ; this is the main progress engine loop for an account with trist	
 while true

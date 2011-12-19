@@ -327,37 +327,15 @@ while (games_played < nGames)
 return
 
 
-#w::  ; this is the main progress engine loop for an account with trist	
-while true
+#w::  ;this should start from a fresh smurf in the lobby- it will grind it to 5 (with high probability) and then log into your main and grind there 
 {
-;starts from LoL client lobby
-    CreateCustomGame()
-    SelectTrist()
-    Sleep, 100000 ;wait for loading screen to come up before spamming
-    startTime := A_Now
-	while true
-	{
-        Suicide()
-        Shop()
-        SkillUp()
-        Abilities()
-    	Send {Click 600, 500} ;click on "continue' button after defeat
-    	Sleep, 15000
-        IfWinExist, PVP.net Client
-        {
-            WinActivate
-            break        
-        }
-        nowTime := A_Now
-        EnvSub, nowTime, %startTime%, Minutes
-        if (nowTime > 4)
-        {
-            Send {d} ;try to revive
-            Sleep, 1000
-        }
-	}
-	Send {Click 870, 735} ;click on 'return to lobby' button 
-	Sleep, 5000
+    ;DoBattleTraining()
+    ;PlayNGames(8)
+    CloseLoLClient()
+    Sleep, 2000
+    LogIn("put_username_here", "put_password_here")
+    PlayNGames(18)
+
 }
 return	
 

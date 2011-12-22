@@ -8,8 +8,30 @@ SetKeyDelay, 100, 30
 #p::Pause ;useful to stop all that clicking when you're done
 
 #b::
-PlayNGames(4)
+Shop()
 return
+
+BuyMasterYi() ;run from lobby screen to buy master yi
+{
+	Send {Click 860, 52} ;click shop button
+	Sleep, 10000
+	Send {Click 77, 230} ;click 'champions'
+	Sleep, 5000
+	Send {Click 256, 167} ;select search box
+	Sleep, 2000
+	Send {y}
+	Sleep, 200
+	Send {i}
+	Sleep, 2000
+	Send {Click 406, 291} ;click 'unlock'
+	Sleep, 2000
+	Send {Click 697, 612} ;buy with ip
+	Sleep, 2000	
+	Send {Click 621, 658} ;click 'done'
+	Sleep, 2000
+
+return
+}
 
 DoBattleTraining() ;run battle training automatically
 {
@@ -103,6 +125,7 @@ DoBattleTraining() ;run battle training automatically
 	Send {Click 700, 509} ;decline co op vs ai inv again
 	Sleep, 2000 
 	;should be back at lobby again
+	BuyMasterYi()
 return
 }
 
@@ -162,7 +185,7 @@ Sleep, 15000
 return
 }
 
-SelectTrist()
+SelectTristYi()
 {
 Send {Click 935, 130} ;click on search box
 Sleep, 500
@@ -186,9 +209,25 @@ Send {click 475, 450} ;click on promote
 Sleep, 1000
 Send {click 552, 374} ;click on surge if no promote
 Sleep, 1000
-Send {Click 900, 500} ;start game
+Send {Click 900, 500} ;attempt to start game
+Sleep, 30000 ;wait for load screen to pop up if successful
+IfWinExist ahk_class LeagueOfLegendsWindowClass ;if client launched, return
+{
+	return
+}
+Send {click 693, 501} ;if not, dismiss the random select window
 Sleep, 2000
-Send {click 581, 501} ;select random if no trist
+Send {Click 935, 130} ;click on search box
+Sleep, 500
+Send {y}
+Sleep, 100
+Send {i}
+Sleep, 2000
+Send {click 325, 200} ;click on top left champ space
+Sleep, 2000
+Send {Click 900, 500} ;attempt to start game
+Sleep, 2000
+Send {click 581, 501} ;if there was no trist OR yi, go random
 return
 }
 
@@ -196,6 +235,8 @@ Shop()
 {
 Send {p} ;open shop
 Sleep, 500
+Send {Click 257, 269} ;click on home button
+Sleep, 1000
 Send {Click 420, 381} ;click on attack items
 Sleep, 1000
 Send {Click 420, 317} ;click on damage
@@ -214,8 +255,32 @@ Send {Click 700, 700} ;buy
 Sleep, 500
 Send {Click 700, 700} ;buy
 Sleep, 500
+Send {Click 257, 269} ;click on home button
+Sleep, 1000
+Send {Click 440, 566} ;click on consumables
+Sleep, 1000
+Send {Click 377, 388} ;click on red pot
+Sleep, 50
+Send {Click 377, 388} ;buy red pot
+Sleep, 500
+Send {Click 509, 388} ;click on green pot
+Sleep, 50
+Send {Click 509, 388} ;buy green pot
+Sleep, 500
 Send {Esc} ;close shop
 Sleep, 500
+Send {1} ;spam all item actives to eat elixirs
+Sleep, 100
+Send {2} 
+Sleep, 100
+Send {3} 
+Sleep, 100
+Send {4} 
+Sleep, 100
+Send {5} 
+Sleep, 100
+Send {6} 
+Sleep, 100
 return
 }
 
@@ -223,7 +288,7 @@ Abilities()
 {
 Send {q} ;AS boost
 Sleep, 500
-Send {f} ;promote
+Send {f} ;promote/surge
 Sleep, 500
 }
 
@@ -282,6 +347,13 @@ CreateCustomGame()
     Sleep, 1000
 	Send {Click 850, 170} ;add random bot
 	Sleep, 2000
+	Send {Click 728, 154} ;click dropdown menu
+	Sleep, 2000
+	Send {Click 727, 201} ;scroll to top
+	Sleep, 2000
+	Send {Click 649, 363} ;pick malphite (worst pusher)
+	Sleep, 2000
+
 	Send {Click 900, 500} ;go to champ select
     Sleep, 5000
 }
@@ -295,7 +367,7 @@ while (games_played < nGames)
     games_played := games_played + 1
     ;starts from LoL client lobby
         CreateCustomGame()
-        SelectTrist()
+        SelectTristYi()
         Sleep, 100000 ;wait for loading screen to come up before spamming
         startTime := A_Now
     	while true
@@ -329,12 +401,13 @@ return
 
 #w::  ;this should start from a fresh smurf in the lobby- it will grind it to 5 (with high probability) and then log into your main and grind there 
 {
-    ;DoBattleTraining()
-    ;PlayNGames(8)
+    DoBattleTraining()
+    PlayNGames(7)
     CloseLoLClient()
     Sleep, 2000
-    LogIn("put_username_here", "put_password_here")
-    PlayNGames(18)
+    LogIn("account_name_here", "password_here")
+    PlayNGames(12)
+
 
 }
 return	

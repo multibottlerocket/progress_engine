@@ -690,16 +690,12 @@ return
 
 #w::  ;this should start from a fresh smurf in the lobby- it will grind it to 5 and then log into your main and grind there 
 {
-    PlayNGames(8)
-    ;FreshToFive()
+;    PlayNGames(8)
+    FreshToFive()
     ;CustomsToFive()
     CloseLoLClient()
     Sleep, 2000
-    LogIn("sabamackerel", "random17")
-    FreshToFive()
-    CloseLoLClient()
-    Sleep, 2000
-    LogIn("bottlerockette", "random17")
+    LogIn("account_name", "password")
     SetPushMasteries()
     PlayNGames(9)
 

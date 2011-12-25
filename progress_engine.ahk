@@ -1,6 +1,7 @@
 #NoEnv
 #InstallKeybdHook
 SetKeyDelay, 100, 30
+SetWorkingDir, C:\Users\Jon\Documents\Code\progress_engine ;put script and other files here
 
 ;delays should be increased for slower computers, ideally all parameterized to one variable
 ;# = windows key; press it with whatever letter to start that function
@@ -8,8 +9,229 @@ SetKeyDelay, 100, 30
 #p::Pause ;useful to stop all that clicking when you're done
 
 #b::
-Shop()
+PlayNGames(1)
 return
+
+
+SetPushMasteries()
+{
+MouseClick, left,  970,  63
+Sleep, 4000
+MouseClick, left,  758,  185
+Sleep, 4000
+MouseClick, left,  362,  221
+Sleep, 2000
+MouseClick, left,  283,  264
+Sleep, 1000
+Send, super{SPACE}push{ENTER}
+MouseClick, left,  279,  400
+Sleep, 300
+MouseClick, left,  462,  270
+Sleep, 300
+MouseClick, left,  462,  270
+Sleep, 300
+MouseClick, left,  462,  270
+Sleep, 300
+MouseClick, left,  575,  278
+Sleep, 300
+MouseClick, left,  571,  352
+Sleep, 300
+MouseClick, left,  460,  358
+Sleep, 300
+MouseClick, left,  460,  358
+Sleep, 300
+MouseClick, left,  460,  358
+Sleep, 300
+MouseClick, left,  460,  358
+Sleep, 300
+MouseClick, left,  456,  430
+Sleep, 300
+MouseClick, left,  400,  429
+Sleep, 300
+MouseClick, left,  783,  279
+Sleep, 300
+MouseClick, left,  783,  279
+Sleep, 300
+MouseClick, left,  783,  279
+Sleep, 300
+MouseClick, left,  852,  279
+Sleep, 300
+MouseClick, left,  852,  279
+Sleep, 300
+MouseClick, left,  675,  284
+Sleep, 300
+MouseClick, left,  728,  350
+Sleep, 300
+MouseClick, left,  728,  350
+Sleep, 300
+MouseClick, left,  673,  425
+Sleep, 300
+MouseClick, left,  673,  425
+Sleep, 300
+MouseClick, left,  859,  430
+Sleep, 300
+MouseClick, left,  724,  359
+Sleep, 300
+MouseClick, left,  662,  503
+Sleep, 300
+MouseClick, left,  935,  271
+Sleep, 300
+MouseClick, left,  993,  272
+Sleep, 300
+MouseClick, left,  993,  272
+Sleep, 300
+MouseClick, left,  993,  272
+Sleep, 300
+MouseClick, left,  726,  358
+Sleep, 300
+MouseClick, left,  727,  423
+Sleep, 300
+MouseClick, left,  274,  379
+Sleep, 300
+
+
+return
+}
+
+BetterShop(ByRef lastElixir) ;for 1280x800, upper left hand corner of shop should be put @ ~210, 126
+{
+Send {p} ;open shop
+Sleep, 500
+if (DontHaveItem("wriggles.bmp"))
+{
+	Send {Click 257, 269} ;click on home button
+	Sleep, 1000
+	Send {Click 420, 381} ;click on attack items
+	Sleep, 1000
+	Send {Click 420, 317} ;click on damage
+	Sleep, 1000
+	Send {Click 329, 469} ;click on wriggles
+	Sleep, 50
+	Send {Click 329, 469} ;double click to buy
+}
+Sleep, 1000
+if (DontHaveItem("wriggles.bmp")) ;still no wriggles?
+{
+	if (DontHaveItem("razors.bmp"))	
+	{
+		Send {Click 302, 392} ;click on razors
+		Sleep, 50
+		Send {Click 302, 392} ;double click to buy
+	}
+	Sleep, 1000
+	if (DontHaveItem("razors.bmp")) ;still no razors?
+	{
+		if (DontHaveItem("longsword.bmp"))
+		{
+			Send {Click 499, 307} ;click on longsword
+			Sleep, 50
+			Send {Click 499, 307} ;double click to buy
+		}
+	}
+}
+Sleep, 1000
+if (DontHaveItem("tiamat.bmp"))
+{
+	Send {Click 257, 269} ;click on home button
+	Sleep, 1000
+	Send {Click 420, 381} ;click on attack items
+	Sleep, 1000
+	Send {Click 420, 317} ;click on damage
+	Sleep, 1000
+	Send {Click 351, 540} ;click on tiamat
+	Sleep, 50
+	Send {Click 351, 540} ;double click to buy
+}
+Sleep, 1000
+if (DontHaveItem("tiamat.bmp")) ;still no tiamat?
+{
+	if (DontHaveItem("pickaxe.bmp"))
+	{
+		Send {Click 515, 348} ;click on pickaxe
+		Sleep, 50
+		Send {Click 515, 348} ;double click to buy
+	}
+}
+
+if (DontHaveItem("tiamat.bmp") OR DontHaveItem("wriggles.bmp"))
+{
+	Send {Esc} ;close shop
+	Sleep, 500
+	return ;save money if we don't have core items
+}
+else
+{		
+	Send {Click 257, 269} ;click on home button
+	Sleep, 1000
+	Send {Click 440, 566} ;click on consumables
+	Sleep, 1000
+	if (lastElixir = "red")
+	{
+		lastElixir := "green"
+		Send {Click 509, 388} ;click on green pot
+		Sleep, 50
+		Send {Click 509, 388} ;buy green pot
+		Sleep, 500
+		Send {Click 377, 388} ;click on red pot
+		Sleep, 50
+		Send {Click 377, 388} ;buy red pot
+		Sleep, 500
+	}
+	else
+	{
+		lastElixir := "red"
+		Send {Click 377, 388} ;click on red pot
+		Sleep, 50
+		Send {Click 377, 388} ;buy red pot
+		Sleep, 500
+		Send {Click 509, 388} ;click on green pot
+		Sleep, 50
+		Send {Click 509, 388} ;buy green pot
+		Sleep, 500
+	}
+
+	Send {Esc} ;close shop
+	Sleep, 500
+	Send {1} ;spam all item actives to eat elixirs
+	Sleep, 100
+	Send {2} 
+	Sleep, 100
+	Send {3} 
+	Sleep, 100
+	Send {4} 
+	Sleep, 100
+	Send {5} 
+	Sleep, 100
+	Send {6} 
+	Sleep, 100
+	return
+}
+
+return ;just in case
+}
+
+
+DontHaveItem(itemPic)
+{
+	ImageSearch, FoundX, FoundY, 230, 663, 606, 736, %itemPic% ;function is dependent on shop position - @ 1280x800, upper right corner of shop wants to be approx 210, 126
+	if ErrorLevel ;could not find
+    		return true	
+	else
+		return false
+}
+
+CheckIfFive() ;check if acct is level 5 ;make sure you have level5.bmp from the git repository in your working directory
+{
+	Send {Click 954, 57} ;view profile
+	Sleep, 5000
+	ImageSearch, FoundX, FoundY, 250, 316, 339, 353, level5.bmp ;scan for "level 5" with image
+	if ErrorLevel ;could not find
+    		return false	
+	else
+    		;MsgBox The icon was found at %FoundX%x%FoundY%.
+		return true
+return
+}
 
 BuyMasterYi() ;run from lobby screen to buy master yi
 {
@@ -187,6 +409,10 @@ return
 
 SelectTristYi()
 {
+MouseClick, left,  480,  528 ;set to first mastery page - push masteries should have been set by SetPushMasteries()
+Sleep, 1000
+MouseClick, left,  436,  554
+Sleep, 1000
 Send {Click 935, 130} ;click on search box
 Sleep, 500
 Send {t}
@@ -231,7 +457,7 @@ Send {click 581, 501} ;if there was no trist OR yi, go random
 return
 }
 
-Shop()
+Shop(ByRef lastElixir) ;upper left hand corner of shop located @ 210, 126
 {
 Send {p} ;open shop
 Sleep, 500
@@ -259,14 +485,31 @@ Send {Click 257, 269} ;click on home button
 Sleep, 1000
 Send {Click 440, 566} ;click on consumables
 Sleep, 1000
-Send {Click 377, 388} ;click on red pot
-Sleep, 50
-Send {Click 377, 388} ;buy red pot
-Sleep, 500
-Send {Click 509, 388} ;click on green pot
-Sleep, 50
-Send {Click 509, 388} ;buy green pot
-Sleep, 500
+if (lastElixir = "red")
+{
+	lastElixir := "green"
+	Send {Click 509, 388} ;click on green pot
+	Sleep, 50
+	Send {Click 509, 388} ;buy green pot
+	Sleep, 500
+	Send {Click 377, 388} ;click on red pot
+	Sleep, 50
+	Send {Click 377, 388} ;buy red pot
+	Sleep, 500
+}
+else
+{
+	lastElixir := "red"
+	Send {Click 377, 388} ;click on red pot
+	Sleep, 50
+	Send {Click 377, 388} ;buy red pot
+	Sleep, 500
+	Send {Click 509, 388} ;click on green pot
+	Sleep, 50
+	Send {Click 509, 388} ;buy green pot
+	Sleep, 500
+}
+
 Send {Esc} ;close shop
 Sleep, 500
 Send {1} ;spam all item actives to eat elixirs
@@ -345,6 +588,10 @@ CreateCustomGame()
 	Sleep, 1000
 	Send {Click 1100, 120} ;click 'x' on level up alert
     Sleep, 1000
+	Send {Click 1010, 120} ;click 'x' on new champ alert
+	Sleep, 1000
+	Send {Click 1100, 120} ;click 'x' on level up alert
+    Sleep, 1000
 	Send {Click 850, 170} ;add random bot
 	Sleep, 2000
 	Send {Click 728, 154} ;click dropdown menu
@@ -368,12 +615,26 @@ while (games_played < nGames)
     ;starts from LoL client lobby
         CreateCustomGame()
         SelectTristYi()
-        Sleep, 100000 ;wait for loading screen to come up before spamming
+;        Sleep, 100000 ;wait for loading screen to come up before spamming
+	gameNotStarted := true
+	while (gameNotStarted)
+	{
+		IfWinExist ahk_class LeagueOfLegendsWindowClass ;if game launches, focus on it
+		{
+			WinActivate
+		}
+		Sleep, 2000
+		ImageSearch, FoundX, FoundY, 175, 668, 310, 763, start_items.bmp
+		if ErrorLevel ;could not find
+    			gameNotStarted := true	
+		else
+			gameNotStarted := false
+	}
         startTime := A_Now
+	lastElixir := "green"
     	while true
     	{
             Suicide()
-            Shop()
             SkillUp()
             Abilities()
         	Send {Click 600, 500} ;click on "continue' button after defeat
@@ -383,6 +644,8 @@ while (games_played < nGames)
                 WinActivate
                 break        
             }
+;            Shop(lastElixir)
+	    BetterShop(lastElixir)
             nowTime := A_Now
             EnvSub, nowTime, %startTime%, Minutes
             if (nowTime > 4)
@@ -398,15 +661,48 @@ while (games_played < nGames)
 }
 return
 
-
-#w::  ;this should start from a fresh smurf in the lobby- it will grind it to 5 (with high probability) and then log into your main and grind there 
+FreshToFive() ;start with a fresh acct and grind it to 5
+		; should start from the lobby
 {
-    DoBattleTraining()
-    PlayNGames(7)
+	DoBattleTraining()
+	notFive = true
+	while notFive
+	{
+		PlayNGames(1)
+		amIFive := CheckIfFive()
+		notFive := 1 - amIFive ;ahk has retarded boolean negation
+	}
+return
+}
+
+CustomsToFive() ;start with an acct that's done battle training and grind it to 5
+		; should start from the lobby
+{
+	notFive = true
+	while notFive
+	{
+		PlayNGames(1)
+		amIFive := CheckIfFive()
+		notFive := 1 - amIFive ;ahk has retarded boolean negation
+	}
+return
+}
+
+#w::  ;this should start from a fresh smurf in the lobby- it will grind it to 5 and then log into your main and grind there 
+{
+    PlayNGames(8)
+    ;FreshToFive()
+    ;CustomsToFive()
     CloseLoLClient()
     Sleep, 2000
-    LogIn("account_name_here", "password_here")
-    PlayNGames(12)
+    LogIn("sabamackerel", "random17")
+    FreshToFive()
+    CloseLoLClient()
+    Sleep, 2000
+    LogIn("bottlerockette", "random17")
+    SetPushMasteries()
+    PlayNGames(9)
+
 
 
 }

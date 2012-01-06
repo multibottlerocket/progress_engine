@@ -9,9 +9,47 @@ SetWorkingDir, C:\Users\Jon\Documents\Code\progress_engine ;put script and other
 #p::Pause ;useful to stop all that clicking when you're done
 
 #b::
-PlayNGames(1)
+Sleep, 500
+FillReferralForm("smurf_name_here")
+;SetPushMasteries()
+;PlayNGamesTest(12)
 return
 
+FillReferralForm(smurfName) ;fill out referral form on website - make sure captcha is typed in first!
+{
+Random, emailSuffix, 1, 999
+Random, month, 1, 12
+Random, day, 1, 30
+Random, year, 1981, 1992
+MouseClick, left,  853,  269
+Sleep, 100
+Send, %smurfName%{TAB}password{TAB}password{TAB}%smurfName%%emailSuffix%{SHIFTDOWN}2{SHIFTUP}gmail.com{TAB}%month%{TAB}%day%{TAB}%year%
+MouseClick, left,  729,  559
+Sleep, 100
+MouseClick, left,  729,  575
+Sleep, 100
+MouseClick, left,  887,  675
+Sleep, 4000
+LogIn(smurfName, "password")
+Send, %smurfName%
+MouseClick, left,  780,  513
+Sleep, 5000
+MouseClick, left,  596,  405
+Sleep, 1000
+MouseClick, left,  955,  534
+Sleep, 2000
+MouseClick, left,  421,  401
+Sleep, 2000
+MouseClick, left,  894,  550
+Sleep, 2000
+MouseClick, left,  666,  507
+Sleep, 1000
+MouseClick, left,  666,  507
+Sleep, 3000
+CloseLoLClient()
+
+return
+}
 
 SetPushMasteries()
 {
@@ -97,7 +135,7 @@ BetterShop(ByRef lastElixir) ;for 1280x800, upper left hand corner of shop shoul
 {
 Send {p} ;open shop
 Sleep, 500
-if (DontHaveItem("wriggles.bmp"))
+if (DontHaveItem("wriggles.bmp") AND DontHaveItem("wriggles_hi.bmp"))
 {
 	Send {Click 257, 269} ;click on home button
 	Sleep, 1000
@@ -110,18 +148,18 @@ if (DontHaveItem("wriggles.bmp"))
 	Send {Click 329, 469} ;double click to buy
 }
 Sleep, 1000
-if (DontHaveItem("wriggles.bmp")) ;still no wriggles?
+if (DontHaveItem("wriggles.bmp") AND DontHaveItem("wriggles_hi.bmp")) ;still no wriggles?
 {
-	if (DontHaveItem("razors.bmp"))	
+	if (DontHaveItem("razors.bmp") AND DontHaveItem("razors_hi.bmp"))	
 	{
 		Send {Click 302, 392} ;click on razors
 		Sleep, 50
 		Send {Click 302, 392} ;double click to buy
 	}
 	Sleep, 1000
-	if (DontHaveItem("razors.bmp")) ;still no razors?
+	if (DontHaveItem("razors.bmp") AND DontHaveItem("razors_hi.bmp")) ;still no razors?
 	{
-		if (DontHaveItem("longsword.bmp"))
+		if (DontHaveItem("longsword.bmp") AND DontHaveItem("longsword_hi.bmp"))
 		{
 			Send {Click 499, 307} ;click on longsword
 			Sleep, 50
@@ -130,7 +168,7 @@ if (DontHaveItem("wriggles.bmp")) ;still no wriggles?
 	}
 }
 Sleep, 1000
-if (DontHaveItem("tiamat.bmp"))
+if ((HaveItem("wriggles.bmp") OR HaveItem("wriggles_hi.bmp")) AND (DontHaveItem("tiamat.bmp") AND DontHaveItem("tiamat_hi.bmp")))
 {
 	Send {Click 257, 269} ;click on home button
 	Sleep, 1000
@@ -143,9 +181,9 @@ if (DontHaveItem("tiamat.bmp"))
 	Send {Click 351, 540} ;double click to buy
 }
 Sleep, 1000
-if (DontHaveItem("tiamat.bmp")) ;still no tiamat?
+if ((HaveItem("wriggles.bmp") OR HaveItem("wriggles_hi.bmp")) AND (DontHaveItem("tiamat.bmp") AND DontHaveItem("tiamat_hi.bmp"))) ;still no tiamat?
 {
-	if (DontHaveItem("pickaxe.bmp"))
+	if (DontHaveItem("pickaxe.bmp") AND DontHaveItem("pickaxe_hi.bmp"))
 	{
 		Send {Click 515, 348} ;click on pickaxe
 		Sleep, 50
@@ -153,7 +191,7 @@ if (DontHaveItem("tiamat.bmp")) ;still no tiamat?
 	}
 }
 
-if (DontHaveItem("tiamat.bmp") OR DontHaveItem("wriggles.bmp"))
+if ((DontHaveItem("wriggles.bmp") AND DontHaveItem("wriggles_hi.bmp")) OR (DontHaveItem("tiamat.bmp") AND DontHaveItem("tiamat_hi.bmp")))
 {
 	Send {Esc} ;close shop
 	Sleep, 500
@@ -191,19 +229,7 @@ else
 	}
 
 	Send {Esc} ;close shop
-	Sleep, 500
-	Send {1} ;spam all item actives to eat elixirs
-	Sleep, 100
-	Send {2} 
-	Sleep, 100
-	Send {3} 
-	Sleep, 100
-	Send {4} 
-	Sleep, 100
-	Send {5} 
-	Sleep, 100
-	Send {6} 
-	Sleep, 100
+	Sleep, 1000
 	return
 }
 
@@ -215,9 +241,18 @@ DontHaveItem(itemPic)
 {
 	ImageSearch, FoundX, FoundY, 230, 663, 606, 736, %itemPic% ;function is dependent on shop position - @ 1280x800, upper right corner of shop wants to be approx 210, 126
 	if ErrorLevel ;could not find
-    		return true	
+   		return true	
 	else
 		return false
+}
+
+HaveItem(itemPic)
+{
+	ImageSearch, FoundX, FoundY, 230, 663, 606, 736, %itemPic% ;function is dependent on shop position - @ 1280x800, upper right corner of shop wants to be approx 210, 126
+	if ErrorLevel ;could not find
+   		return false 
+	else
+		return true 
 }
 
 CheckIfFive() ;check if acct is level 5 ;make sure you have level5.bmp from the git repository in your working directory
@@ -394,9 +429,10 @@ Send {click 701, 549} ;click on orange "play" button
 
 WinWait, PVP.net Client
 WinActivate
-Sleep, 2000
-Send {click 992, 334} ;username
+Sleep, 3000
+Send {click 992, 330} ;username
 Sleep, 1000
+Send {ctrl down}a{ctrl up}
 SendInput, %username%
 Sleep, 1000
 Send {click 975, 385} ;pw
@@ -512,6 +548,15 @@ else
 
 Send {Esc} ;close shop
 Sleep, 500
+return
+}
+
+Abilities()
+{
+Send {q} ;AS boost
+Sleep, 200
+Send {f} ;promote/surge
+Sleep, 200
 Send {1} ;spam all item actives to eat elixirs
 Sleep, 100
 Send {2} 
@@ -524,43 +569,24 @@ Send {5}
 Sleep, 100
 Send {6} 
 Sleep, 100
-return
-}
-
-Abilities()
-{
-Send {q} ;AS boost
-Sleep, 500
-Send {f} ;promote/surge
-Sleep, 500
 }
 
 Suicide()
 {
 Sleep, 500
 Send {a} ;issue attack move command
-Sleep, 500
-Send {Click 1262, 586}  ; click on enemy fountain via minimap
+Sleep, 200
+Send {Click 1262, 593}  ; click on enemy fountain via minimap
 Sleep, 500
 }
 
 SkillUp()
 {
 Send ^e ;skill up e
-Sleep, 500
+Sleep, 300
 Send ^q ;skill up q
-Sleep, 500
+Sleep, 300
 }
-
-#c:: ;this will just spam right clicks - useful for afking in game
-while true
-{
-	Send {Click right 600, 350}
-	Sleep, 5000
-	Send {Click right 600, 500}
-	Sleep, 5000
-}
-return
 
 CreateCustomGame()
 {
@@ -605,6 +631,98 @@ CreateCustomGame()
     Sleep, 5000
 }
 return
+PlayNGamesTest(nGames) ;will create and play N custom games, attempting to win
+{
+games_played = 0
+while (games_played < nGames)
+{
+    games_played := games_played + 1
+    ;starts from LoL client lobby
+    CreateCustomGame()
+    SelectTristYi()
+;        Sleep, 100000 ;wait for loading screen to come up before spamming
+	gameNotStarted := true
+	while (gameNotStarted)
+	{
+		IfWinExist ahk_class LeagueOfLegendsWindowClass ;if game launches, focus on it
+		{
+			WinActivate
+		}
+		Sleep, 1000
+		ImageSearch, FoundX, FoundY, 175, 668, 310, 763, start_items.bmp
+		if ErrorLevel ;could not find
+        	    gameNotStarted := true	
+		else
+		    gameNotStarted := false
+		ImageSearch, FoundX, FoundY, 175, 668, 310, 763, start_items_hi.bmp
+		if ErrorLevel ;could not find
+        	    gameNotStarted := true	
+		else
+		    gameNotStarted := false
+	}
+    startTime := A_Now
+	lastElixir := "green"
+    gameOngoing := true
+    minionsHaventSpawned := true 
+
+    BetterShop(lastElixir)
+    Suicide() ;tower dive once 'cause there's nothing better to do
+    while minionsHaventSpawned
+    {
+        curTime := A_Now
+        EnvSub curTime, %startTime%, Seconds
+        if curTime > 85
+        {
+            minionsHaventSpawned := false
+            break
+        }
+        Sleep, 1000
+    }
+    
+	while gameOngoing
+	{
+        Suicide() 
+        SkillUp()
+        Abilities()
+        Send {Click 600, 500} ;click on "continue' button after defeat
+        IfWinExist, PVP.net Client
+        {
+            gameOngoing := false
+            WinActivate
+            break        
+        }
+;        Shop(lastElixir)
+        ImageSearch, FoundX, FoundY, 16, 725, 46, 763, dead.bmp
+        if ErrorLevel ;didn't find integrated gfx skull
+            ImageSearch, FoundX, FoundY, 16, 725, 46, 763, dead_hi.bmp
+	if ErrorLevel ;didn't find discrete gfx skull
+	    Sleep, 10
+        else
+	{
+            BetterShop(lastElixir)
+            Send {d} ;try to revive
+	}
+        nowTime := A_Now
+        EnvSub, nowTime, %startTime%, Seconds
+        nowTime2 := A_Now
+        EnvSub, nowTime2, %startTime%, Minutes
+        if (mod(nowTime, 180) > 120 AND mod(nowTime, 180) < 130 AND nowTime2 < 10) ;prepare to sync w/ siege creep for promote
+        {
+	    Send {Click right 1087, 763} ;retreat
+            Sleep, 2000
+            Send {b} ;return to base
+            Sleep, 8200
+            BetterShop(lastElixir)
+            Suicide()
+            Sleep, 10000
+        }
+	}
+	Send {Click 870, 735} ;click on 'return to lobby' button 
+	Sleep, 5000
+
+    }
+}
+return
 
 PlayNGames(nGames) ;will create and play N custom games, attempting to win
 {
@@ -629,33 +747,37 @@ while (games_played < nGames)
     			gameNotStarted := true	
 		else
 			gameNotStarted := false
+		ImageSearch, FoundX, FoundY, 175, 668, 310, 763, start_items_hi.bmp
+		if ErrorLevel ;could not find
+    			gameNotStarted := true	
+		else
+			gameNotStarted := false
 	}
-        startTime := A_Now
+    startTime := A_Now
 	lastElixir := "green"
-    	while true
-    	{
-            Suicide()
-            SkillUp()
-            Abilities()
-        	Send {Click 600, 500} ;click on "continue' button after defeat
-        	Sleep, 15000
-            IfWinExist, PVP.net Client
-            {
-                WinActivate
-                break        
-            }
-;            Shop(lastElixir)
-	    BetterShop(lastElixir)
-            nowTime := A_Now
-            EnvSub, nowTime, %startTime%, Minutes
-            if (nowTime > 4)
-            {
-                Send {d} ;try to revive
-                Sleep, 1000
-            }
-    	}
-    	Send {Click 870, 735} ;click on 'return to lobby' button 
-    	Sleep, 5000
+	while true
+	{
+        Suicide()
+        SkillUp()
+        Abilities()
+        Send {Click 600, 500} ;click on "continue' button after defeat
+        IfWinExist, PVP.net Client
+        {
+            WinActivate
+            break        
+        }
+        Shop(lastElixir)
+;        BetterShop(lastElixir)
+        nowTime := A_Now
+        EnvSub, nowTime, %startTime%, Minutes
+        if (nowTime > 4)
+        {
+            Send {d} ;try to revive
+            Sleep, 1000
+        }
+	}
+	Send {Click 870, 735} ;click on 'return to lobby' button 
+	Sleep, 5000
 
     }
 }
@@ -688,21 +810,17 @@ CustomsToFive() ;start with an acct that's done battle training and grind it to 
 return
 }
 
-#w::  ;this should start from a fresh smurf in the lobby- it will grind it to 5 and then log into your main and grind there 
+#c:: ;this will just spam right clicks - useful for afking in game
+while true
 {
-;    PlayNGames(8)
-    FreshToFive()
-    ;CustomsToFive()
-    CloseLoLClient()
-    Sleep, 2000
-    LogIn("account_name", "password")
-    SetPushMasteries()
-    PlayNGames(9)
-
-
-
+	Send {Click right 600, 350}
+	Sleep, 5000
+	Send {Click right 600, 500}
+	Sleep, 5000
 }
-return	
+return
+
+#q::Send {Click right 1020, 735} ;for testing where stuff clicks
 
 #k::  ; this is the main progress engine loop FOR LOSERS (useful if you don't want to burn boosts)
 while true
@@ -757,4 +875,27 @@ while true
 }
 return	
 
-#q::Send {Click right 1020, 735} ;for testing where stuff clicks
+#w::  ;this should start from a fresh smurf in the lobby- it will grind it to 5 and then log into another acct and grind there 
+{
+
+    LogIn("main_account", "password")
+    SetPushMasteries()
+    PlayNGamesTest(7) ;optimized for trist on my personal comp; probably wont work unless you re-grab the pics on your rig
+			;you can just use PlayNGames instead - not as efficient but more generally usable
+    CloseLoLClient()
+    Sleep, 2000
+
+    LogIn("smurf1", "password")
+    FreshToFive()    
+    ;CustomsToFive() ;comment FreshToFive() and uncomment this if it's done battle training and has Yi
+    CloseLoLClient()
+    Sleep, 2000
+    LogIn("smurf2", "password")
+    FreshToFive()
+    ;CustomsToFive()
+    CloseLoLClient()
+    Sleep, 2000
+}
+return	
+
+

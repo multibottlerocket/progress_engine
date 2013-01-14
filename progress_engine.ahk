@@ -1,19 +1,106 @@
 #NoEnv
 #InstallKeybdHook
 SetKeyDelay, 100, 30
-SetWorkingDir, C:\Users\Jon\Documents\Code\progress_engine ;put script and other files here
+;SetWorkingDir, C:\Users\VM1\Dropbox\progress_engine ;put script and other files here
+
+;TODO: 
+;	FillReferralList - read smurf names from text file and create them/set them up
+;			 - also make it spit out .ahk code we can cut+paste into ion cannon
+;            - needs to hang until user acknowledges they've entered captcha
+;	Make LogIn read username/pw from a file
 
 ;delays should be increased for slower computers, ideally all parameterized to one variable
 ;# = windows key; press it with whatever letter to start that function
 
 #p::Pause ;useful to stop all that clicking when you're done
 
+#y::Shop800()
+
+#s::Reload
+
+#q::PlayMaxGames800()
+
+#w::  ;this should start from a fresh smurf in the lobby- it will grind it to 5 and then log into another acct and grind there 
+{
+    DoMain("accountname", "password")
+
+}
+return	
+
+
 #b::
-Sleep, 500
-FillReferralForm("smurf_name_here")
 ;SetPushMasteries()
-;PlayNGamesTest(12)
+;BurnNBoosts(1)
+CreateCustomGame()
+;BurnMaxBoosts()
+;CustomsToFive()
 return
+
+DoModSquadMaster(name, pw, summoner1, summoner2, summoner3, summoner4)
+{
+    LogIn(name, pw)
+    ModSquadMaster(summoner1, summoner2, summoner3, summoner4)
+    CloseLoLClient()
+    Sleep, 2000
+    return	
+}
+
+DoModSquadSlave(name, pw)
+{
+    LogIn(name, pw)
+    ModSquadSlave()
+    CloseLoLClient()
+    Sleep, 2000
+    return	
+}
+
+LoseMain(name, pw)
+{
+    LogIn(name, pw)
+    LoseMaxGames()
+    CloseLoLClient()
+    Sleep, 2000
+    return
+}
+
+DoMain(name, pw)
+{
+    LogIn(name, pw)
+    ;SetPushMasteries()
+    PlayMaxGames()
+    CloseLoLClient()
+    Sleep, 2000
+    return
+}
+    
+DoSmurf(name, pw)
+{
+    LogIn(name, pw)
+    SmurfToFive()
+    CloseLoLClient()
+    Sleep, 2000
+    return
+}
+    
+SmurfToFive()
+{
+    if CheckIfOne()
+        FreshToFive()
+    else
+        CustomsToFive()
+    return
+}
+
+CheckIfOne() ;check if acct is level 1; needs level1.bmp
+{
+    Send {Click 954, 57} ;view profile
+    Sleep, 5000
+    ImageSearch, FoundX, FoundY, 250, 316, 339, 353, level1.bmp ;scan for "level 1" with image
+    if ErrorLevel ;could not find
+        return false    
+    else
+        return true
+}
 
 FillReferralForm(smurfName) ;fill out referral form on website - make sure captcha is typed in first!
 {
@@ -32,7 +119,7 @@ MouseClick, left,  887,  675
 Sleep, 4000
 LogIn(smurfName, "password")
 Send, %smurfName%
-MouseClick, left,  780,  513
+MouseClick, left,  650,  570
 Sleep, 5000
 MouseClick, left,  596,  405
 Sleep, 1000
@@ -62,7 +149,7 @@ Sleep, 2000
 MouseClick, left,  283,  264
 Sleep, 1000
 Send, super{SPACE}push{ENTER}
-MouseClick, left,  279,  400
+MouseClick, left,  216,  421
 Sleep, 300
 MouseClick, left,  462,  270
 Sleep, 300
@@ -125,13 +212,15 @@ Sleep, 300
 MouseClick, left,  727,  423
 Sleep, 300
 MouseClick, left,  274,  379
-Sleep, 300
+Sleep, 2000
+MouseClick, left,  650,  530
+Sleep, 2000
 
 
 return
 }
 
-BetterShop(ByRef lastElixir) ;for 1280x800, upper left hand corner of shop should be put @ ~210, 126
+BestShop(ByRef lastElixir) ;for 1280x800, upper left hand corner of shop should be put @ ~210, 126
 {
 Send {p} ;open shop
 Sleep, 500
@@ -147,7 +236,7 @@ if (DontHaveItem("wriggles.bmp") AND DontHaveItem("wriggles_hi.bmp"))
 	Sleep, 50
 	Send {Click 329, 469} ;double click to buy
 }
-Sleep, 1000
+Sleep, 500
 if (DontHaveItem("wriggles.bmp") AND DontHaveItem("wriggles_hi.bmp")) ;still no wriggles?
 {
 	if (DontHaveItem("razors.bmp") AND DontHaveItem("razors_hi.bmp"))	
@@ -167,8 +256,38 @@ if (DontHaveItem("wriggles.bmp") AND DontHaveItem("wriggles_hi.bmp")) ;still no 
 		}
 	}
 }
-Sleep, 1000
-if ((HaveItem("wriggles.bmp") OR HaveItem("wriggles_hi.bmp")) AND (DontHaveItem("tiamat.bmp") AND DontHaveItem("tiamat_hi.bmp")))
+Sleep, 500
+if ((HaveItem("wriggles.bmp") OR HaveItem("wriggles_hi.bmp")) AND (DontHaveItem("sotd_hi.bmp"))) ;need low gfx version
+{
+	Send {Click 257, 269} ;click on home button
+	Sleep, 1000
+	Send {Click 420, 381} ;click on attack items
+	Sleep, 1000
+	Send {Click 406, 444} ;click on attack speed 
+	Sleep, 1000
+	Send {Click 312, 460} ;click on sword of the divine 
+	Sleep, 50
+	Send {Click 312, 460} ;double click to buy
+}
+Sleep, 500
+if ((HaveItem("wriggles.bmp") OR HaveItem("wriggles_hi.bmp")) AND (DontHaveItem("sotd_hi.bmp"))) ;still no sotd?
+{
+	if (DontHaveItem("recurve2_hi.bmp") AND DontHaveItem("recurve3_hi.bmp")) ;need low gfx version
+	{
+		Send {Click 515, 348} ;click on recurve 
+		Sleep, 50
+		Send {Click 515, 348} ;double click to buy
+	}
+    Sleep, 300
+	if (DontHaveItem("dagger2_hi.bmp") AND DontHaveItem("dagger3_hi.bmp")) ;need low gfx version
+	{
+		Send {Click 499, 307} ;click on dagger 
+		Sleep, 50
+		Send {Click 499, 307} ;double click to buy
+	}
+}
+Sleep, 500
+if ((HaveItem("wriggles.bmp") OR HaveItem("wriggles_hi.bmp")) AND (HaveItem("sotd_hi.bmp"))) ;need low gfx version
 {
 	Send {Click 257, 269} ;click on home button
 	Sleep, 1000
@@ -180,18 +299,26 @@ if ((HaveItem("wriggles.bmp") OR HaveItem("wriggles_hi.bmp")) AND (DontHaveItem(
 	Sleep, 50
 	Send {Click 351, 540} ;double click to buy
 }
-Sleep, 1000
-if ((HaveItem("wriggles.bmp") OR HaveItem("wriggles_hi.bmp")) AND (DontHaveItem("tiamat.bmp") AND DontHaveItem("tiamat_hi.bmp"))) ;still no tiamat?
+if ((HaveItem("wriggles.bmp") OR HaveItem("wriggles_hi.bmp")) AND (HaveItem("sotd_hi.bmp")) AND (DontHaveItem("tiamat3_hi.bmp"))) ; still no tiamat? ;need low gfx version
 {
-	if (DontHaveItem("pickaxe.bmp") AND DontHaveItem("pickaxe_hi.bmp"))
+	if (DontHaveItem("pickaxe3_hi.bmp") AND DontHaveItem("pickaxe4_hi.bmp")) ;need low gfx version
 	{
-		Send {Click 515, 348} ;click on pickaxe
+		Send {Click 515, 348} ;click on pickaxe 
 		Sleep, 50
 		Send {Click 515, 348} ;double click to buy
 	}
+    Sleep, 300
+	if (DontHaveItem("longsword3_hi.bmp") AND DontHaveItem("longsword4_hi.bmp")) ;need low gfx version
+	{
+		Send {Click 499, 307} ;click on longsword 
+		Sleep, 50
+		Send {Click 499, 307} ;double click to buy
+	}
 }
 
-if ((DontHaveItem("wriggles.bmp") AND DontHaveItem("wriggles_hi.bmp")) OR (DontHaveItem("tiamat.bmp") AND DontHaveItem("tiamat_hi.bmp")))
+if ((DontHaveItem("wriggles.bmp") AND DontHaveItem("wriggles_hi.bmp"))
+    OR (DontHaveItem("tiamat3_hi.bmp")) ;need low gfx version
+    OR (DontHaveItem("sotd_hi.bmp"))) ;need low gfx version
 {
 	Send {Esc} ;close shop
 	Sleep, 500
@@ -237,6 +364,153 @@ return ;just in case
 }
 
 
+BetterShop(ByRef lastElixir) ;for 1280x800, upper left hand corner of shop should be put @ ~210, 126
+{
+Send {Click 250, 775} ;open shop
+Sleep, 500
+if (DontHaveItem("dblade5_hi.bmp"))
+{
+    Send {Click 257, 269} ;click on home button
+    Sleep, 1000
+    Send {Click 420, 381} ;click on attack items
+    Sleep, 1000
+    Send {Click 420, 317} ;click on damage
+    Sleep, 1000
+    Send {Click 320, 350} ;click on Doran's blade
+    Sleep, 500
+    Send {Click 700, 700} ;buy
+    Sleep, 200
+}
+if (DontHaveItem("dblade5_hi.bmp"))
+{
+    Send {Click 700, 700} ;buy
+    Sleep, 200
+}
+if (DontHaveItem("dblade5_hi.bmp"))
+{
+    Send {Click 700, 700} ;buy
+    Sleep, 200
+}
+if (HaveItem("dblade5_hi.bmp") AND DontHaveItem("rageblade6_hi.bmp"))
+{
+    Send {Click 300, 348} ;click on pickaxe 
+    Sleep, 50
+    Send {Click 300, 348} ;double click to buy
+    Sleep, 100
+    Send {Click 500, 550} ;click on rageblade
+    Sleep, 50
+    Send {Click 500, 550} ;double click to buy
+}
+Sleep, 1000
+
+if (DontHaveItem("rageblade6_hi.bmp")) ;save money if we don't have core items
+{
+	Send {Click 1050, 140} ;close shop
+	Sleep, 500
+	return 
+}
+else ;otherwise, burn money on elixirs
+{		
+	Sleep, 10000
+	Send {Click 257, 269} ;click on home button
+	Sleep, 1000
+	Send {Click 440, 566} ;click on consumables
+	Sleep, 1000
+	if (lastElixir = "red")
+	{
+		lastElixir := "green"
+		Send {Click 509, 388} ;click on green pot
+		Sleep, 50
+		Send {Click 509, 388} ;buy green pot
+		Sleep, 500
+		Send {Click 377, 388} ;click on red pot
+		Sleep, 50
+		Send {Click 377, 388} ;buy red pot
+		Sleep, 500
+	}
+	else
+	{
+		lastElixir := "red"
+		Send {Click 377, 388} ;click on red pot
+		Sleep, 50
+		Send {Click 377, 388} ;buy red pot
+		Sleep, 500
+		Send {Click 509, 388} ;click on green pot
+		Sleep, 50
+		Send {Click 509, 388} ;buy green pot
+		Sleep, 500
+	}
+
+	Send {Click 1050, 140} ;close shop
+	Sleep, 1000
+	return
+}
+
+return ;just in case
+}
+
+Shop800() ;for 1280x800; upper left hand corner of shop should be put @ ~1102, 37
+{
+Send, p
+Sleep, 2000
+MouseClick, left,  438,  112 ;click on "all items"
+Sleep, 1000                                            
+MouseClick, left,  430,  158 ;click on text search box
+Sleep, 200                                             
+Send, hydra                  ;serach for hydra
+MouseClick, left,  235,  198 ;select item
+Sleep, 1000                                           
+MouseClick, left,  878,  251 ;try to buy hydra
+Sleep, 20                                             
+MouseClick, left,  878,  251
+Sleep, 500                                            
+MouseClick, left,  785,  318 ;try to buy tiamat
+Sleep, 20                                             
+MouseClick, left,  785,  318
+Sleep, 500                                            
+MouseClick, left,  698,  391 ;try to buy pickaxe
+Sleep, 20                                             
+MouseClick, left,  698,  391
+Sleep, 500                                            
+MouseClick, left,  1057,  57 ;close shop
+Sleep, 2000
+return
+}
+
+Shop() ;for 1920x1080; upper left hand corner of shop should be put @ ~1538, 81
+{
+;MouseMove,  249,  1050 ;open shop
+;Sleep, 500
+;MouseClick, left,  249,  1050 ;open shop
+Send, p
+Sleep, 1000
+MouseClick, left,  739,  187 ;click on "all items"
+Sleep, 1000
+MouseClick, left,  687,  238 ;click on text search box
+Sleep, 500
+;Send, doran's{SPACE}blade ;serach for doran's blade
+;Send, recurve{SPACE}bow ;serach for recuve bow
+Send, hydra ;serach for hydra
+MouseClick, left,  493,  288 ;select item
+Sleep, 1000
+;MouseClick, left,  1401,  662 ;buy item
+MouseClick, left,  1254,  351 ;try to buy hydra
+Sleep, 20
+MouseClick, left,  1254,  351
+Sleep, 20
+MouseClick, left,  1127,  440 ;try to buy tiamat
+Sleep, 20
+MouseClick, left,  1124,  439
+Sleep, 20
+MouseClick, left,  1040,  526 ;try to buy pickaxe
+Sleep, 20
+MouseClick, left,  1040,  526
+Sleep, 20
+MouseClick, left,  1507,  111 ;close shop
+Sleep, 2000
+return
+}
+
 DontHaveItem(itemPic)
 {
 	ImageSearch, FoundX, FoundY, 230, 663, 606, 736, %itemPic% ;function is dependent on shop position - @ 1280x800, upper right corner of shop wants to be approx 210, 126
@@ -263,7 +537,6 @@ CheckIfFive() ;check if acct is level 5 ;make sure you have level5.bmp from the 
 	if ErrorLevel ;could not find
     		return false	
 	else
-    		;MsgBox The icon was found at %FoundX%x%FoundY%.
 		return true
 return
 }
@@ -280,7 +553,7 @@ BuyMasterYi() ;run from lobby screen to buy master yi
 	Sleep, 200
 	Send {i}
 	Sleep, 2000
-	Send {Click 406, 291} ;click 'unlock'
+	Send {Click 406, 310} ;click 'unlock'
 	Sleep, 2000
 	Send {Click 697, 612} ;buy with ip
 	Sleep, 2000	
@@ -373,6 +646,16 @@ DoBattleTraining() ;run battle training automatically
     	Sleep, 15000 ;let game close and pvp.net client load
 	Send {Click 640, 385} ;click continue on post battle screen
 	Sleep, 2000
+        statsNotLoaded := true
+        while statsNotLoaded
+        {
+		ImageSearch, FoundX, FoundY, 847, 715, 973, 755, home.bmp
+		if ErrorLevel ;could not find
+    	        	statsNotLoaded := true	
+		else
+			statsNotLoaded := false
+                Sleep, 1000
+        }
 	Send {Click 439, 312} ;click continue for ip
 	Sleep, 2000
 	Send {Click 923, 739} ;click 'home'
@@ -383,6 +666,7 @@ DoBattleTraining() ;run battle training automatically
 	Sleep, 2000 
 	;should be back at lobby again
 	BuyMasterYi()
+
 return
 }
 
@@ -416,30 +700,36 @@ LogIn(username, password)
 {
 Run, C:\Riot Games\League of Legends\lol.launcher.exe
 Sleep, 15000
-IfWinExist, Error
+While 1
 {
-	WinActivate
-	Send {Enter}
+    IfWinExist, Error
+    {
+        WinActivate
+        Send {Enter}
+        Break
+    }
+    IfWinExist, PVP.net Patcher
+        Break
 }
 
 WinWait, PVP.net Patcher
 WinActivate
-Sleep, 2000
+Sleep, 5000
 Send {click 701, 549} ;click on orange "play" button
 
 WinWait, PVP.net Client
 WinActivate
-Sleep, 3000
-Send {click 992, 330} ;username
+Sleep, 7000
+Send {click 293,  320} ;username
 Sleep, 1000
-Send {ctrl down}a{ctrl up}
+Send {ctrl down}a{ctrl up} ;select all previously existing text to overwrite
 SendInput, %username%
 Sleep, 1000
-Send {click 975, 385} ;pw
+Send {click 284, 379} ;pw
 SendInput, %password%
-Sleep, 1000
-Send {click 1108, 428} ;log in
-Sleep, 15000
+Sleep, 1000s
+Send {click 336,  431} ;log in
+Sleep, 20000
 return
 }
 
@@ -449,36 +739,12 @@ MouseClick, left,  480,  528 ;set to first mastery page - push masteries should 
 Sleep, 1000
 MouseClick, left,  436,  554
 Sleep, 1000
-Send {Click 935, 130} ;click on search box
-Sleep, 500
-Send {t}
-Sleep, 100
-Send {r}
-Sleep, 100
-Send {i}
-Sleep, 100
-Send {s}
-Sleep, 100
-Send {t}
-Sleep, 2000
-Send {click 325, 200} ;click on top left champ space
-Sleep, 2000
-Send {click 651, 501} ;click on summoner spells
+MouseClick, left,  368,  497 ;set to Dat AS(S) super AS page from jungling
 Sleep, 1000
-Send {click 475, 275} ;click on revive
+MouseClick, left,  497,  530
 Sleep, 1000
-Send {click 475, 450} ;click on promote
+MouseClick, left,  403,  702
 Sleep, 1000
-Send {click 552, 374} ;click on surge if no promote
-Sleep, 1000
-Send {Click 900, 500} ;attempt to start game
-Sleep, 30000 ;wait for load screen to pop up if successful
-IfWinExist ahk_class LeagueOfLegendsWindowClass ;if client launched, return
-{
-	return
-}
-Send {click 693, 501} ;if not, dismiss the random select window
-Sleep, 2000
 Send {Click 935, 130} ;click on search box
 Sleep, 500
 Send {y}
@@ -489,74 +755,69 @@ Send {click 325, 200} ;click on top left champ space
 Sleep, 2000
 Send {Click 900, 500} ;attempt to start game
 Sleep, 2000
-Send {click 581, 501} ;if there was no trist OR yi, go random
-return
-}
-
-Shop(ByRef lastElixir) ;upper left hand corner of shop located @ 210, 126
-{
-Send {p} ;open shop
-Sleep, 500
-Send {Click 257, 269} ;click on home button
-Sleep, 1000
-Send {Click 420, 381} ;click on attack items
-Sleep, 1000
-Send {Click 420, 317} ;click on damage
-Sleep, 1000
-Send {Click 323, 346} ;click on Doran's blade
-Sleep, 500
-;Send {Click 698, 212} ;click on Doran's blade rec item
+;Send {Click 935, 130} ;click on search box
 ;Sleep, 500
-Send {Click 700, 700} ;buy
-Sleep, 500
-Send {Click 267, 700} ;click on leftmost inventory item
-Sleep, 500
-Send {Click 700, 700} ;buy
-Sleep, 500
-Send {Click 700, 700} ;buy
-Sleep, 500
-Send {Click 700, 700} ;buy
-Sleep, 500
-Send {Click 257, 269} ;click on home button
+;Send {t}
+;Sleep, 100
+;Send {r}
+;Sleep, 100
+;Send {i}
+;Sleep, 100
+;Send {s}
+;Sleep, 100
+;Send {t}
+;Sleep, 2000
+;Send {click 325, 200} ;click on top left champ space
+;Sleep, 2000
+Send {click 623, 528} ;click on summoner spells
 Sleep, 1000
-Send {Click 440, 566} ;click on consumables
+Send {click 475, 245} ;click on revive
 Sleep, 1000
-if (lastElixir = "red")
+Send {click 809, 213} ;click on ghost
+Sleep, 1000
+Send {Click 900, 500} ;attempt to start game
+Sleep, 30000 ;wait for load screen to pop up if successful
+IfWinExist ahk_class LeagueOfLegendsWindowClass ;if client launched, return
 {
-	lastElixir := "green"
-	Send {Click 509, 388} ;click on green pot
-	Sleep, 50
-	Send {Click 509, 388} ;buy green pot
-	Sleep, 500
-	Send {Click 377, 388} ;click on red pot
-	Sleep, 50
-	Send {Click 377, 388} ;buy red pot
-	Sleep, 500
+	return
 }
-else
-{
-	lastElixir := "red"
-	Send {Click 377, 388} ;click on red pot
-	Sleep, 50
-	Send {Click 377, 388} ;buy red pot
-	Sleep, 500
-	Send {Click 509, 388} ;click on green pot
-	Sleep, 50
-	Send {Click 509, 388} ;buy green pot
-	Sleep, 500
+Send {click 693, 501} ;if not, dismiss the random select window
+Sleep, 2000
+Send {click 581, 501} ;if there was no yi, go random
+return
 }
 
-Send {Esc} ;close shop
-Sleep, 500
-return
+CheckIfLow()
+{
+PixelGetColor, health_px, 803, 755
+if (health_px = 0x000000) {
+	return true
+}
+else {
+	return false
+}
+}
+
+CheckIfDead()
+{
+PixelGetColor, skull_px, 35, 757
+if (skull_px = 0x000000) {
+	return true
+}
+else {
+	return false
+}
 }
 
 Abilities()
 {
-Send {q} ;AS boost
-Sleep, 200
-Send {f} ;promote/surge
-Sleep, 200
+Send {r} ;AS boost
+Sleep, 100
+Send {d} ;revive
+Sleep, 100
+Send {f} ;heal
+Sleep, 100
+/*
 Send {1} ;spam all item actives to eat elixirs
 Sleep, 100
 Send {2} 
@@ -569,23 +830,35 @@ Send {5}
 Sleep, 100
 Send {6} 
 Sleep, 100
+*/
 }
 
-Suicide()
+Suicide() ;only works on 1920x1080 res
 {
-Sleep, 500
+Sleep, 100
 Send {a} ;issue attack move command
-Sleep, 200
-Send {Click 1262, 593}  ; click on enemy fountain via minimap
-Sleep, 500
+Sleep, 1000
+Send {Click 1906, 832}  ; click on enemy fountain via minimap
+Sleep, 1000
+}
+
+Suicide800() ;tweaked to work on 1280x800
+{
+Sleep, 100
+Send {a} ;issue attack move command
+Sleep, 1000
+Send {Click 1265, 618}  ; click on enemy fountain via minimap
+Sleep, 1000
 }
 
 SkillUp()
 {
+Send ^r ;skill up r
+Sleep, 100
 Send ^e ;skill up e
-Sleep, 300
+Sleep, 100
 Send ^q ;skill up q
-Sleep, 300
+Sleep, 100
 }
 
 CreateCustomGame()
@@ -617,30 +890,158 @@ CreateCustomGame()
 	Send {Click 1010, 120} ;click 'x' on new champ alert
 	Sleep, 1000
 	Send {Click 1100, 120} ;click 'x' on level up alert
-    Sleep, 1000
+        Sleep, 1000
 	Send {Click 850, 170} ;add random bot
 	Sleep, 2000
 	Send {Click 728, 154} ;click dropdown menu
 	Sleep, 2000
-	Send {Click 727, 201} ;scroll to top
+	Send {Click 729, 192} ;scroll to top
+	Sleep, 400
+	Send {Click 729, 192} ;scroll to top
+	Sleep, 400
+	Send {Click 729, 192} ;scroll to top
+	Sleep, 400
+	Send {Click 729, 192} ;scroll to top
+	Sleep, 400
+	Send {Click 729, 192} ;scroll to top
+	Sleep, 400
+	Send {Click 700, 180} ;pick annie
+	Sleep, 4000
+	Send {Click 728, 154} ;click dropdown menu
 	Sleep, 2000
-	Send {Click 649, 363} ;pick malphite (worst pusher)
-	Sleep, 2000
-
+	Send {Click 729, 330} ;scroll to leona
+	Sleep, 1000
+	Send {Click 650, 235} ;pick leona (worst pusher)
+	Sleep, 4000
 	Send {Click 900, 500} ;go to champ select
     Sleep, 5000
 }
 return
-PlayNGamesTest(nGames) ;will create and play N custom games, attempting to win
+
+MasterCreateGame(summoner1, summoner2, summoner3, summoner4)
 {
-games_played = 0
-while (games_played < nGames)
+	MouseClick, left,  669,  33 ;click orange "Play" button
+	Sleep, 2000
+	MouseClick, left,  303,  175 ;co-op vs ai
+	Sleep, 1000
+	MouseClick, left,  541,  150 ;classic
+	Sleep, 1000
+	MouseClick, left,  700,  150 ;summoner's rift
+	Sleep, 1000
+	MouseClick, left,  891,  152 ;beginner
+	Sleep, 1000
+	MouseClick, left,  928,  708 ;invite my own teammates
+	Sleep, 2000
+	MouseClick, left,  958,  543 ;invite
+	Sleep, 2000
+	MouseClick, left,  726,  200 ;click on text box
+	Sleep, 500
+	Send {ctrl down}a{ctrl up} ;select all previously existing text to overwrite
+	Sleep, 500
+	Send, %summoner1%	;type in summoner1's name
+	Sleep, 500
+	MouseClick, left,  1098,  207 ;add to invite list
+	Sleep, 500
+	MouseClick, left,  726,  200 ;click on text box
+	Sleep, 500
+	Send {ctrl down}a{ctrl up} ;select all previously existing text to overwrite
+	Sleep, 500
+	Send, %summoner2%	;type in summoner2's name
+	Sleep, 500
+	MouseClick, left,  1098,  207 ;add to invite list
+	Sleep, 500
+	MouseClick, left,  726,  200 ;click on text box
+	Sleep, 500
+	Send {ctrl down}a{ctrl up} ;select all previously existing text to overwrite
+	Sleep, 500
+	Send, %summoner3%	;type in summoner3's name
+	Sleep, 500
+	MouseClick, left,  1098,  207 ;add to invite list
+	Sleep, 500
+	MouseClick, left,  726,  200 ;click on text box
+	Sleep, 500
+	Send {ctrl down}a{ctrl up} ;select all previously existing text to overwrite
+	Sleep, 500
+	Send, %summoner4%	;type in summoner4's name
+	Sleep, 500
+	MouseClick, left,  1098,  207 ;add to invite list
+	Sleep, 500
+	MouseClick, left,  925,  719 ;click "Invite players"
+	Sleep, 1000
+	while True		;check that first player has joined
+		{
+		Sleep, 500
+		PixelSearch, FoundX, FoundY, 989, 383, 1006, 403, 0x01BC04 ;search for the green of "Accepted"
+		if ErrorLevel ;could not find
+       		    Sleep, 10	
+		else
+		    break	
+		}
+	Sleep, 1000
+	while True		;check that second player has joined
+		{
+		Sleep, 500
+		PixelSearch, FoundX, FoundY, 989, 403, 1006, 429, 0x01BC04 ;search for the green of "Accepted"
+		if ErrorLevel ;could not find
+       		    Sleep, 10	
+		else
+		    break	
+		}
+	Sleep, 1000
+	while True		;check that third player has joined
+		{
+		Sleep, 500
+		PixelSearch, FoundX, FoundY, 989, 429, 1006, 456, 0x01BC04 ;search for the green of "Accepted"
+		if ErrorLevel ;could not find
+       		    Sleep, 10	
+		else
+		    break	
+		}
+	Sleep, 1000
+	while True		;check that fourth player has joined
+		{
+		Sleep, 500
+		PixelSearch, FoundX, FoundY, 989, 456, 1006, 480, 0x01BC04 ;search for the green of "Accepted"
+		if ErrorLevel ;could not find
+       		    Sleep, 10	
+		else
+		    break	
+		}
+	Sleep, 1000
+	MouseClick, left, 650, 550 ;start game
+	Sleep, 7000
+	MouseClick, left, 548, 445 ;click "accept" when match is made
+}
+return
+
+SlaveJoinGame()
 {
-    games_played := games_played + 1
+MouseClick, left, 950, 50
+Sleep, 2000
+while True
+	{
+	Sleep, 1000
+;	ImageSearch, FoundX, FoundY, 950, 550, 1279, 775, romancandle_invite.bmp
+	PixelSearch, FoundX, FoundY, 950, 550, 1100, 700, 0xFEFEFE
+	if ErrorLevel ;could not find
+       	    Sleep, 10	
+	else
+	    break	
+	}
+MouseClick, left, 1077, 741
+Sleep, 13000
+MouseClick, left, 548, 445 ;click "accept" when match is made
+}
+return
+
+BurnMaxBoosts() ;will create and play custom games until custom minutes are exhausted
+{
+minutesRemain := true
+while (minutesRemain)
+{
     ;starts from LoL client lobby
     CreateCustomGame()
     SelectTristYi()
-;        Sleep, 100000 ;wait for loading screen to come up before spamming
 	gameNotStarted := true
 	while (gameNotStarted)
 	{
@@ -651,21 +1052,151 @@ while (games_played < nGames)
 		Sleep, 1000
 		ImageSearch, FoundX, FoundY, 175, 668, 310, 763, start_items.bmp
 		if ErrorLevel ;could not find
-        	    gameNotStarted := true	
+       	    gameNotStarted := true	
 		else
 		    gameNotStarted := false
 		ImageSearch, FoundX, FoundY, 175, 668, 310, 763, start_items_hi.bmp
 		if ErrorLevel ;could not find
-        	    gameNotStarted := true	
+       	    gameNotStarted := true	
 		else
 		    gameNotStarted := false
 	}
     startTime := A_Now
-	lastElixir := "green"
+    lastElixir := "green"
     gameOngoing := true
     minionsHaventSpawned := true 
+    Sleep, 15000
 
     BetterShop(lastElixir)
+    ;BestShop(lastElixir)
+    Suicide() ;tower dive once 'cause there's nothing better to do
+    lastLow := A_Now
+    while minionsHaventSpawned
+    {
+        curTime := A_Now
+        EnvSub curTime, %startTime%, Seconds
+        if curTime > 85
+        {
+            minionsHaventSpawned := false
+            break
+        }
+        Sleep, 1000
+    }
+    
+    while gameOngoing
+    {
+        Suicide() 
+        SkillUp()
+        Abilities()
+        Send {Click 600, 500} ;click on "continue' button after defeat
+        IfWinExist, PVP.net Client
+        {
+            gameOngoing := false
+            WinActivate
+            break        
+        }
+	if (CheckIfDead()) {
+	    BetterShop(lastElixir)
+	    Send {d}
+	}
+	else {
+	    Sleep, 10
+	}
+;        ImageSearch, FoundX, FoundY, 16, 725, 46, 763, dead.bmp ;check if dead ;possibly deprecated due to patch
+;        ImageSearch, FoundX, FoundY, 16, 725, 46, 763, dead_new.bmp ;check if dead
+;        if ErrorLevel ;didn't find integrated gfx skull
+;            ImageSearch, FoundX, FoundY, 16, 725, 46, 763, dead_hi.bmp
+;        	if ErrorLevel ;didn't find discrete gfx skull
+;    	    Sleep, 10
+;            else
+;    	    {
+;                BetterShop(lastElixir)
+;                ;BestShop(lastElixir)
+;                Send {d} ;try to revive
+;    	    }
+        nowTime := A_Now
+        EnvSub, nowTime, %startTime%, Seconds
+        nowTime2 := A_Now
+        EnvSub, nowTime2, %startTime%, Minutes
+        if (mod(nowTime, 180) > 120 AND mod(nowTime, 180) < 130 AND nowTime2 < 10) ;prepare to sync w/ siege creep for promote
+        {
+	    Send {Click right 1087, 763} ;retreat
+            Sleep, 2000
+            Send {b} ;return to base
+            Sleep, 8200
+            BetterShop(lastElixir)
+            ;BestShop(lastElixir)
+            Suicide()
+            Sleep, 10000
+        }
+        nowTime := A_Now
+        EnvSub, nowTime, %lastLow%, Seconds
+        if (CheckIfLow() AND (nowTime > 20)) {
+            lastLow := A_Now
+            Send {Click right 1087, 763} ;retreat
+            Sleep, 2000
+        }
+	}
+    statsNotLoaded := true
+    while statsNotLoaded
+    {
+		ImageSearch, FoundX, FoundY, 847, 715, 973, 755, home.bmp
+		if ErrorLevel ;could not find
+    		statsNotLoaded := true	
+		else
+			statsNotLoaded := false
+        Sleep, 1000
+    }
+	ImageSearch, FoundX, FoundY, 14, 231, 137, 281, 0minutes.bmp
+	if ErrorLevel ;could not find
+		minutesRemain := true	
+	else
+		minutesRemain := false
+
+	Send {Click 870, 735} ;click on 'return to lobby' button 
+	Sleep, 5000
+
+}
+}
+return
+
+
+BurnNBoosts(nGames) ;will create and play N custom games, attempting to win
+{
+games_played = 0
+while (games_played < nGames)
+{
+    games_played := games_played + 1
+    ;starts from LoL client lobby
+    CreateCustomGame()
+    SelectTristYi()
+	gameNotStarted := true
+	while (gameNotStarted)
+	{
+		IfWinExist ahk_class LeagueOfLegendsWindowClass ;if game launches, focus on it
+		{
+			WinActivate
+		}
+		Sleep, 1000
+		ImageSearch, FoundX, FoundY, 175, 668, 310, 763, start_items.bmp
+		if ErrorLevel ;could not find
+       	    gameNotStarted := true	
+		else
+		    gameNotStarted := false
+		ImageSearch, FoundX, FoundY, 175, 668, 310, 763, start_items_hi.bmp
+		if ErrorLevel ;could not find
+       	    gameNotStarted := true	
+		else
+		    gameNotStarted := false
+	}
+    startTime := A_Now
+    lastElixir := "green"
+    gameOngoing := true
+    minionsHaventSpawned := true 
+    Sleep, 15000
+
+    BetterShop(lastElixir)
+    ;BestShop(lastElixir)
     Suicide() ;tower dive once 'cause there's nothing better to do
     while minionsHaventSpawned
     {
@@ -679,8 +1210,8 @@ while (games_played < nGames)
         Sleep, 1000
     }
     
-	while gameOngoing
-	{
+    while gameOngoing
+    {
         Suicide() 
         SkillUp()
         Abilities()
@@ -691,17 +1222,17 @@ while (games_played < nGames)
             WinActivate
             break        
         }
-;        Shop(lastElixir)
         ImageSearch, FoundX, FoundY, 16, 725, 46, 763, dead.bmp
         if ErrorLevel ;didn't find integrated gfx skull
             ImageSearch, FoundX, FoundY, 16, 725, 46, 763, dead_hi.bmp
-	if ErrorLevel ;didn't find discrete gfx skull
-	    Sleep, 10
-        else
-	{
-            BetterShop(lastElixir)
-            Send {d} ;try to revive
-	}
+        	if ErrorLevel ;didn't find discrete gfx skull
+    	    Sleep, 10
+            else
+    	    {
+                BetterShop(lastElixir)
+                ;BestShop(lastElixir)
+                Send {d} ;try to revive
+    	    }
         nowTime := A_Now
         EnvSub, nowTime, %startTime%, Seconds
         nowTime2 := A_Now
@@ -713,27 +1244,134 @@ while (games_played < nGames)
             Send {b} ;return to base
             Sleep, 8200
             BetterShop(lastElixir)
+            ;BestShop(lastElixir)
             Suicide()
             Sleep, 10000
         }
 	}
+    statsNotLoaded := true
+    while statsNotLoaded
+    {
+		ImageSearch, FoundX, FoundY, 847, 715, 973, 755, home.bmp
+		if ErrorLevel ;could not find
+    		statsNotLoaded := true	
+		else
+			statsNotLoaded := false
+        Sleep, 1000
+    }
 	Send {Click 870, 735} ;click on 'return to lobby' button 
 	Sleep, 5000
 
+}
+}
+return
+
+PlayMaxGames800() ;will create and play custom games, attempting to win, until custom minutes expire
+                  ;works on 1280x800 res
+{
+;    minutesRemain := true
+;    while (minutesRemain)
+;    {
+;        ;starts from LoL client lobby
+;        CreateCustomGame()
+;        SelectTristYi()
+;        Sleep, 20000 ;open-loop wait for countdown and loading of game
+    	while true
+    	{
+            Suicide800()
+            SkillUp()
+            Abilities()
+            Sleep, 1000
+            Send {Click 600, 500} ;click on "continue' button after defeat
+            IfWinExist, PVP.net Client
+            {
+                WinActivate
+                break        
+            }
+            Sleep, 2000
+            Shop800()
+        }
+;        statsNotLoaded := true
+;        while statsNotLoaded
+;        {
+;    		ImageSearch, FoundX, FoundY, 847, 715, 973, 755, home.bmp
+;    		if ErrorLevel ;could not find
+;        		statsNotLoaded := true	
+;    		else
+;    			statsNotLoaded := false
+;            Sleep, 1000
+;        }
+;    	ImageSearch, FoundX, FoundY, 14, 231, 137, 281, 0minutes.bmp
+;    	if ErrorLevel ;could not find
+;    		minutesRemain := true	
+;    	else
+;    		minutesRemain := false
+;    
+;    	Send {Click 870, 735} ;click on 'return to lobby' button 
+;    	Sleep, 5000
+;    }
+}
+return
+
+
+
+PlayMaxGames() ;will create and play custom games, attempting to win, until custom minutes expire
+               ;works on 1920x1080 res
+{
+    minutesRemain := true
+    while (minutesRemain)
+    {
+        ;starts from LoL client lobby
+        CreateCustomGame()
+        SelectTristYi()
+        Sleep, 20000 ;open-loop wait for countdown and loading of game
+    	while true
+    	{
+            Suicide()
+            SkillUp()
+            Abilities()
+            Sleep, 1000
+            Send {Click 965, 733} ;click on "continue' button after defeat
+            IfWinExist, PVP.net Client
+            {
+                WinActivate
+                break        
+            }
+            Sleep, 2000
+            Shop()
+        }
+        statsNotLoaded := true
+        while statsNotLoaded
+        {
+    		ImageSearch, FoundX, FoundY, 847, 715, 973, 755, home.bmp
+    		if ErrorLevel ;could not find
+        		statsNotLoaded := true	
+    		else
+    			statsNotLoaded := false
+            Sleep, 1000
+        }
+    	ImageSearch, FoundX, FoundY, 14, 231, 137, 281, 0minutes.bmp
+    	if ErrorLevel ;could not find
+    		minutesRemain := true	
+    	else
+    		minutesRemain := false
+    
+    	Send {Click 870, 735} ;click on 'return to lobby' button 
+    	Sleep, 5000
     }
 }
 return
+
 
 PlayNGames(nGames) ;will create and play N custom games, attempting to win
 {
 games_played = 0
 while (games_played < nGames)
-    {
+{
     games_played := games_played + 1
     ;starts from LoL client lobby
-        CreateCustomGame()
-        SelectTristYi()
-;        Sleep, 100000 ;wait for loading screen to come up before spamming
+    CreateCustomGame()
+    SelectTristYi()
 	gameNotStarted := true
 	while (gameNotStarted)
 	{
@@ -753,8 +1391,9 @@ while (games_played < nGames)
 		else
 			gameNotStarted := false
 	}
-    startTime := A_Now
+        startTime := A_Now
 	lastElixir := "green"
+        lastLow := A_Now
 	while true
 	{
         Suicide()
@@ -766,22 +1405,109 @@ while (games_played < nGames)
             WinActivate
             break        
         }
-        Shop(lastElixir)
-;        BetterShop(lastElixir)
+        ;Shop(lastElixir)
+        ImageSearch, FoundX, FoundY, 16, 725, 46, 763, dead.bmp ;check if dead
+        if ErrorLevel ;didn't find integrated gfx skull
+            ImageSearch, FoundX, FoundY, 16, 725, 46, 763, dead_yi_hi.png
+        	if ErrorLevel ;didn't find discrete gfx skullaa
+    	    Sleep, 10
+            else
+    	    {
+                BetterShop(lastElixir)
+                ;BestShop(lastElixir)
+		nowTime := A_Now
+		EnvSub, nowTime, %startTime%, Minutes
+		If (nowTime > 4){
+	                Send {d} ;try to revive
+		}
+    	    }
         nowTime := A_Now
-        EnvSub, nowTime, %startTime%, Minutes
-        if (nowTime > 4)
-        {
-            Send {d} ;try to revive
-            Sleep, 1000
+        EnvSub, nowTime, %lastLow%, Seconds
+        if (CheckIfLow() AND (nowTime > 30)) {
+            lastLow := A_Now
+            Send {Click right 1087, 763} ;retreat
+            Sleep, 2500
         }
-	}
+    }
+    statsNotLoaded := true
+    while statsNotLoaded
+    {
+		ImageSearch, FoundX, FoundY, 847, 715, 973, 755, home.bmp
+		if ErrorLevel ;could not find
+    		statsNotLoaded := true	
+		else
+			statsNotLoaded := false
+        Sleep, 1000
+    }
 	Send {Click 870, 735} ;click on 'return to lobby' button 
 	Sleep, 5000
 
-    }
+}
 }
 return
+
+LoseMaxGames() ;will create and lose custom games until custom minutes are exhausted
+{
+minutesRemain := true
+while (minutesRemain)
+{
+    CreateCustomGame()
+	Sleep, 3000
+	Send {Click 900, 200} ;pick some dude
+	Sleep, 2000
+	Send {Click 900, 500} ;start game
+	Sleep, 20000
+	;spam clicks inside of game
+	while true
+	{
+		Send {Click right 600, 350}
+		Sleep, 5000
+		Send {Click right 600, 500}
+		Sleep, 5000
+		if a_index > 150 ;after 25 min, surrender
+		{
+			Send {Enter}
+			Sleep, 100
+			Send {/}
+			Sleep, 100
+			Send {f}
+			Sleep, 100
+			Send {f}
+			Sleep, 100
+			Send {Enter}
+		        Send {Click 600, 500} ;click on "continue' button after defeat
+        		IfWinExist, PVP.net Client
+        		{
+            			WinActivate
+            			break        
+        		}
+
+		}
+	}
+    statsNotLoaded := true
+    while statsNotLoaded
+    {
+		ImageSearch, FoundX, FoundY, 847, 715, 973, 755, home.bmp
+		if ErrorLevel ;could not find
+    		statsNotLoaded := true	
+		else
+			statsNotLoaded := false
+        Sleep, 1000
+    }
+	ImageSearch, FoundX, FoundY, 14, 231, 137, 281, 0minutes.bmp
+	if ErrorLevel ;could not find
+		minutesRemain := true	
+	else
+		minutesRemain := false
+
+	Send {Click 870, 735} ;click on 'return to lobby' button 
+	Sleep, 5000
+
+}
+}
+return
+
+
 
 FreshToFive() ;start with a fresh acct and grind it to 5
 		; should start from the lobby
@@ -790,7 +1516,7 @@ FreshToFive() ;start with a fresh acct and grind it to 5
 	notFive = true
 	while notFive
 	{
-		PlayNGames(1)
+		BurnNBoosts(1)
 		amIFive := CheckIfFive()
 		notFive := 1 - amIFive ;ahk has retarded boolean negation
 	}
@@ -820,8 +1546,6 @@ while true
 }
 return
 
-#q::Send {Click right 1020, 735} ;for testing where stuff clicks
-
 #k::  ; this is the main progress engine loop FOR LOSERS (useful if you don't want to burn boosts)
 while true
 {
@@ -845,23 +1569,9 @@ while true
 			Sleep, 100
 			Send {/}
 			Sleep, 100
-			Send {s}
+			Send {f}
 			Sleep, 100
-			Send {u}
-			Sleep, 100
-			Send {r}
-			Sleep, 100
-			Send {r}
-			Sleep, 100
-			Send {e}
-			Sleep, 100
-			Send {n}
-			Sleep, 100
-			Send {d}
-			Sleep, 100
-			Send {e}
-			Sleep, 100
-			Send {r}
+			Send {f}
 			Sleep, 100
 			Send {Enter}
 			Sleep, 20000 ;give lots of time for nexus to blow up
@@ -875,27 +1585,85 @@ while true
 }
 return	
 
-#w::  ;this should start from a fresh smurf in the lobby- it will grind it to 5 and then log into another acct and grind there 
+ModSquadMaster(summoner1, summoner2, summoner3, summoner4) ;will beast the shit out of Co-op vs AI
 {
+while True
+{
+    ;starts from LoL client lobby
+    MasterCreateGame(summoner1, summoner2, summoner3, summoner4)
+    SelectTristYi()
+    Sleep, 95000
+    Shop()
+    Suicide() ;tower dive once 'cause there's nothing better to do
+    while True
+    {
+        Suicide() 
+        SkillUp()
+        Abilities()
+	Shop()
+        Send {Click 600, 500} ;click on "continue' button after defeat
+        IfWinExist, PVP.net Client
+        {
+            gameOngoing := false
+            WinActivate
+            break        
+        }
 
-    LogIn("main_account", "password")
-    SetPushMasteries()
-    PlayNGamesTest(7) ;optimized for trist on my personal comp; probably wont work unless you re-grab the pics on your rig
-			;you can just use PlayNGames instead - not as efficient but more generally usable
-    CloseLoLClient()
-    Sleep, 2000
-
-    LogIn("smurf1", "password")
-    FreshToFive()    
-    ;CustomsToFive() ;comment FreshToFive() and uncomment this if it's done battle training and has Yi
-    CloseLoLClient()
-    Sleep, 2000
-    LogIn("smurf2", "password")
-    FreshToFive()
-    ;CustomsToFive()
-    CloseLoLClient()
-    Sleep, 2000
+    }
+    statsNotLoaded := true
+    while statsNotLoaded
+    {
+		ImageSearch, FoundX, FoundY, 847, 715, 973, 755, home.bmp
+		if ErrorLevel ;could not find
+    		statsNotLoaded := true	
+		else
+			statsNotLoaded := false
+        Sleep, 1000
+    }
+	Send {Click 870, 735} ;click on 'return to lobby' button 
+	Sleep, 5000
 }
-return	
+}
+return
 
+ModSquadSlave() ;will beast the shit out of Co-op vs AI
+{
+while True
+{
+    ;starts from LoL client lobby
+    SlaveJoinGame()
+    SelectTristYi() ;need a 'SelectModSquad' that just goes through 5 desired champs sequentially
+    Sleep, 95000 ;might need to increase this
+    Shop()
+    Suicide() ;tower dive once 'cause there's nothing better to do
+    while True
+    {
+        Suicide() 
+        SkillUp()
+        Abilities()
+	Shop()
+        Send {Click 600, 500} ;click on "continue' button after defeat
+        IfWinExist, PVP.net Client
+        {
+            gameOngoing := false
+            WinActivate
+            break        
+        }
+
+    }
+    statsNotLoaded := true
+    while statsNotLoaded
+    {
+		ImageSearch, FoundX, FoundY, 847, 715, 973, 755, home.bmp
+		if ErrorLevel ;could not find
+    		statsNotLoaded := true	
+		else
+			statsNotLoaded := false
+        Sleep, 1000
+    }
+	Send {Click 870, 735} ;click on 'return to lobby' button 
+	Sleep, 5000
+}
+}
+return
 

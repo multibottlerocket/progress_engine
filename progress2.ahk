@@ -10,10 +10,25 @@ SetKeyDelay, 100, 30
 PlayMaxGames(true)
 return
 
+#x::
+LoseMaxGames()
+return
+
 ;Creates and plays games until there are no custom minutes remaining.
 ;Starts from client.
 ;Meant for 1024x768 resolution.
-;use waitLong = true if you want to wait 90 extra seconds (for random choice to work)
+LoseMaxGames()
+{
+    done := false
+    while (!done)
+    {
+        done := LoseGame()
+    }
+}
+
+;Creates and plays games until there are no custom minutes remaining.
+;Starts from client.
+;Meant for 1024x768 resolution.
 PlayMaxGames(waitLong)
 {
     done := false
@@ -21,6 +36,22 @@ PlayMaxGames(waitLong)
     {
         done := PlayGame(waitLong)
     }
+}
+
+;Creates and loses a game by surrender.
+;Starts from client.
+;Meant for 1024x768 resolution.
+;returns true if 0 minutes found, or false otherwise
+LoseGame()
+{
+    CreateCustomGame()
+    SelectFirstChamp()
+    Sleep, 20000 ;open-loop wait for countdown and loading of game
+    WaitGameStart()
+    LoseGameLoop()
+    
+    x := CleanupGame()
+    return x
 }
 
 ;Creates and plays a game.
@@ -55,6 +86,36 @@ WaitGameStart()
     }
 }
 
+;In-game loop of walking around. Surrenders after a while.
+LoseGameLoop()
+{
+    while true
+    {
+        Send {Click right 600, 350}
+        Sleep, 5000
+        Send {Click right 600, 500}
+        Sleep, 5000
+        if a_index > 150 ;after 25 min, surrender
+        {
+            Send {Enter}
+            Sleep, 100
+            Send {/}
+            Sleep, 100
+            Send {f}
+            Sleep, 100
+            Send {f}
+            Sleep, 100
+            Send {Enter}
+        }
+        Send {Click 510, 416} ;click on "continue' button after defeat
+        IfWinExist, PVP.net Client
+        {
+            WinActivate
+            return       
+        }
+    }
+}
+
 ;In-game loop of pushing/shopping.
 GameLoop()
 {
@@ -64,7 +125,7 @@ GameLoop()
         SkillUp()
         Abilities()
         Sleep, 1000
-        Send {Click 510, 416} ;click on "continue' button after defeat
+        Send {Click 510, 416} ;click on "continue' button after defeat/victory
         IfWinExist, PVP.net Client
         {
             WinActivate
@@ -92,7 +153,7 @@ StatsCheck()
     {
         ImageSearch, FoundX, FoundY, 676, 570, 783, 607, home.png
         if ErrorLevel ;could not find
-            statsNotLoaded := true	
+            statsNotLoaded := true  
         else
             statsNotLoaded := false
         Sleep, 1000
@@ -150,7 +211,7 @@ Sleep, 100
 
 Shop()
 {
-Send, p
+MouseClick, left, 137,  754
 Sleep, 1000
 Send, {CTRLDOWN}l{CTRLUP}hydra
 Sleep, 500
@@ -171,25 +232,25 @@ return
 CreateCustomGame()
 {
     Send {Click 478, 32} ;click 'Play' button
-	Sleep, 2000
-	Send {Click 238, 186} ;click 'Custom' button
-	Sleep, 2000
-	Send {Click 753, 562} ;Create Game
-	Sleep, 2000
-	Send {Click 353, 516} ;select game name entry box
-	Sleep, 2000
-	Random, stupidName, 11111111, 99999999
-	SendInput, %stupidName%
-	Sleep, 2000
-	Send {Click 353, 546} ;and for password
-	Send {z 4}
-	Send {r 2}
-	Send {e 2}
-	Sleep, 3000
-	Send {Click 476, 588} ;go to add bots screen
+    Sleep, 2000
+    Send {Click 238, 186} ;click 'Custom' button
+    Sleep, 2000
+    Send {Click 753, 562} ;Create Game
+    Sleep, 2000
+    Send {Click 353, 516} ;select game name entry box
+    Sleep, 2000
+    Random, stupidName, 11111111, 99999999
+    SendInput, %stupidName%
+    Sleep, 2000
+    Send {Click 353, 546} ;and for password
+    Send {z 4}
+    Send {r 2}
+    Send {e 2}
+    Sleep, 3000
+    Send {Click 476, 588} ;go to add bots screen
         ;Sleep, 2000
         ;Send {Click 980, 120} ;click 'x' on rune alert
-        ;Sleep, 1000    	
+        ;Sleep, 1000        
         ;Send {Click 1010, 120} ;click 'x' on new champ alert
         ;Sleep, 1000
         ;Send {Click 1100, 120} ;click 'x' on level up alert
@@ -199,30 +260,38 @@ CreateCustomGame()
         ;Send {Click 1100, 120} ;click 'x' on level up alert
         ;Sleep, 1000
     Sleep, 2000
-	Send {Click 727, 130} ;add random bot
-	Sleep, 2000
-	Send {Click 576, 126} ;click dropdown menu
-	Sleep, 2000
-	Send {Click 580, 150} ;scroll to top
-	Sleep, 400
-	Send {Click 580, 150} ;scroll to top
-	Sleep, 400
-	Send {Click 580, 150} ;scroll to top
-	Sleep, 400
-	Send {Click 580, 150} ;scroll to top
-	Sleep, 400
-	Send {Click 580, 150} ;scroll to top
-	Sleep, 400
-	Send {Click 554, 155} ;pick annie
-	Sleep, 4000
-	Send {Click 584, 132} ;click dropdown menu
-	Sleep, 2000
-	Send {Click 584, 248} ;scroll to leona
-	Sleep, 1000
-	Send {Click 520, 193} ;pick leona (worst pusher)
-	Sleep, 4000
-	Send {Click 687, 392} ;go to champ select
+    Send {Click 727, 130} ;add random bot
+    Sleep, 2000
+    Send {Click 576, 126} ;click dropdown menu
+    Sleep, 2000
+    Send {Click 580, 150} ;scroll to top
+    Sleep, 400
+    Send {Click 580, 150} ;scroll to top
+    Sleep, 400
+    Send {Click 580, 150} ;scroll to top
+    Sleep, 400
+    Send {Click 580, 150} ;scroll to top
+    Sleep, 400
+    Send {Click 580, 150} ;scroll to top
+    Sleep, 400
+    Send {Click 554, 155} ;pick annie
+    Sleep, 4000
+    Send {Click 584, 132} ;click dropdown menu
+    Sleep, 2000
+    Send {Click 584, 248} ;scroll to leona
+    Sleep, 1000
+    Send {Click 520, 193} ;pick leona (worst pusher)
+    Sleep, 4000
+    Send {Click 687, 392} ;go to champ select
     Sleep, 5000
+}
+
+SelectFirstChamp()
+{
+    Send {click 274, 174} ;click on top left champ space
+    Sleep, 2000
+    Send {Click 702, 410} ;attempt to start game
+    Sleep, 30000 ;wait for load screen to pop up if successful
 }
 
 SelectYi()

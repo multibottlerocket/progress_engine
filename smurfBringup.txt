@@ -1,0 +1,109 @@
+;starts right after login of new account
+MouseClick, left,  470,  392 ;click name entry box
+Sleep, 100
+Send, {SHIFTDOWN}c{SHIFTUP}herry{SHIFTDOWN}h{SHIFTUP}i{SHIFTDOWN}c{SHIFTUP}hew
+MouseClick, left,  494,  451 ;confirm name entry
+Sleep, 100
+MouseClick, left,  365,  327 ;select summoner icon
+Sleep, 100
+MouseClick, left,  775,  430 ;confirm icon
+Sleep, 100
+MouseClick, left,  311,  320 ;pick noob tier
+Sleep, 100
+MouseClick, left,  724,  439 ;confirm tier
+Sleep, 100
+MouseClick, left,  555,  405 ;decline tutorial
+Sleep, 100
+MouseClick, left,  555,  405 ;decline battle trainig
+Sleep, 100
+
+;battle training
+MouseClick, left,  510,  35 ;click Play
+Sleep, 100
+MouseClick, left,  278,  233 ;tutorials
+Sleep, 100
+MouseClick, left,  390,  165 ;battle trainig
+Sleep, 100
+MouseClick, left,  679,  542 ;start
+Sleep, 100
+MouseClick, left,  657,  384
+Sleep, 100
+MouseClick, left,  651,  384
+Sleep, 100
+MouseClick, left,  285,  243
+Sleep, 100
+MouseClick, left,  348,  381
+Sleep, 100
+MouseClick, left,  300,  371
+Sleep, 100
+MouseClick, left,  358,  370
+Sleep, 100
+MouseClick, left,  424,  382 ;jesus christ lady, i just want some IP
+Sleep, 100
+MouseClick, left,  256,  167
+Sleep, 100
+MouseClick, left,  392,  331
+Sleep, 100
+MouseClick, left,  742,  488
+Sleep, 100
+MouseClick, left,  502,  429
+Sleep, 100
+MouseClick, left,  466,  167
+Sleep, 100
+MouseClick, left,  519,  179
+Sleep, 100
+MouseClick, left,  366,  380
+Sleep, 100
+MouseClick, left,  384,  421
+Sleep, 100
+MouseClick, left,  386,  390
+Sleep, 100
+MouseClick, left,  627,  535
+Sleep, 100
+MouseClick, left,  862,  391
+Sleep, 100
+MouseClick, left,  701,  400
+Sleep, 100
+;game starts loading here
+MouseClick, left,  652,  408 ;click "continue"
+Sleep, 100
+MouseClick, left,  971,  211 ;move mouse to quests
+Sleep, 100
+MouseClick, left,  1004,  486 ;click info thing
+Sleep, 100
+MouseClick, left,  783,  550 ;dismiss info thing
+Sleep, 100
+
+;idle and forfeit here, clicking continue button after defeat
+
+;post-battle screen
+MouseClick, left,  645,  387
+Sleep, 100
+MouseClick, left,  432,  313
+Sleep, 100
+MouseClick, left,  171,  273
+Sleep, 100
+MouseClick, left,  696,  456
+Sleep, 100
+MouseClick, left,  693,  277
+Sleep, 100
+MouseClick, left,  725,  592
+Sleep, 100
+MouseClick, left,  559,  407
+Sleep, 100
+MouseClick, left,  561,  403
+Sleep, 100
+
+
+;buying yi logic
+MouseClick, left,  690,  46
+Sleep, 100
+MouseClick, left,  62,  262
+Sleep, 100
+MouseClick, left,  238,  157
+Sleep, 100
+Send, yi
+MouseClick, left,  440,  291
+Sleep, 100
+MouseClick, left,  687,  585
+Sleep, 100

@@ -213,7 +213,7 @@ Shop()
 {
 MouseClick, left, 137,  754
 Sleep, 1000
-Send, {CTRLDOWN}l{CTRLUP}hydra
+Send, {CTRLDOWN}l{CTRLUP}hydr
 Sleep, 500
 MouseClick, left,  203, 189
 Sleep, 300
@@ -267,15 +267,15 @@ CreateCustomGame()
     Sleep, 2000
     Send {Click 576, 126} ;click dropdown menu
     Sleep, 2000
-    Send {Click 580, 150} ;scroll to top
+    Send {Click 582, 153} ;scroll to top
     Sleep, 400
-    Send {Click 580, 150} ;scroll to top
+    Send {Click 582, 153} ;scroll to top
     Sleep, 400
-    Send {Click 580, 150} ;scroll to top
+    Send {Click 582, 153} ;scroll to top
     Sleep, 400
-    Send {Click 580, 150} ;scroll to top
+    Send {Click 582, 153} ;scroll to top
     Sleep, 400
-    Send {Click 580, 150} ;scroll to top
+    Send {Click 582, 153} ;scroll to top
     Sleep, 400
     Send {Click 554, 155} ;pick annie
     Sleep, 4000

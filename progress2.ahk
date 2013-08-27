@@ -91,9 +91,9 @@ LoseGameLoop()
 {
     while true
     {
-        Send {Click right 600, 350}
+        Send {Click right 300, 350}
         Sleep, 5000
-        Send {Click right 600, 500}
+        Send {Click right 300, 500}
         Sleep, 5000
         if a_index > 150 ;after 25 min, surrender
         {

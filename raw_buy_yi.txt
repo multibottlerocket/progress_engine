@@ -1,0 +1,13 @@
+MouseClick, left,  684,  51
+Sleep, 100
+MouseClick, left,  68,  270
+Sleep, 100
+MouseClick, left,  190,  160
+Sleep, 100
+Send, yi
+MouseClick, left,  423,  289
+Sleep, 100
+MouseClick, left,  690,  584
+Sleep, 100
+MouseClick, left,  84,  42
+Sleep, 100

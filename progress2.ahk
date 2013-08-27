@@ -213,7 +213,7 @@ Shop()
 {
 MouseClick, left, 137,  754
 Sleep, 1000
-Send, {CTRLDOWN}l{CTRLUP}hydr
+Send, {CTRLDOWN}l{CTRLUP}ydr
 Sleep, 500
 MouseClick, left,  203, 189
 Sleep, 300

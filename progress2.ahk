@@ -217,11 +217,14 @@ Send, {CTRLDOWN}l{CTRLUP}hydra
 Sleep, 500
 MouseClick, left,  203, 189
 Sleep, 300
-MouseClick, right,  730,  253
+MouseClick, left,  730,  253
+MouseClick, left,  730,  253
 Sleep, 300
-MouseClick, right,  640,  311
+MouseClick, left,  640,  311
+MouseClick, left,  640,  311
 Sleep, 300
-MouseClick, right,  570,  375
+MouseClick, left,  570,  375
+MouseClick, left,  570,  375
 Sleep, 300
 MouseClick, left,  923, 64
 Sleep, 100

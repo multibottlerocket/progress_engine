@@ -6,12 +6,18 @@ SetKeyDelay, 100, 30
 
 #t::Pause
 
+;this is a utility testing method - feel free to swap it out for whatever function
+#v::
+;LogIn("C:\accountData.txt")
+MasterCreateGame("romancandle", "thefinalfinal", "mangohichew", "cherryhichew")
+return
+
 #w::
-PlayMaxGames(true)
+WinGame(true)
 return
 
 #x::
-LoseMaxGames()
+SlaveJoinGame()
 return
 
 ;Creates and plays games until there are no custom minutes remaining.
@@ -20,7 +26,7 @@ return
 LoseMaxGames()
 {
     done := false
-    while (!done)
+    while (!done)cC
     {
         done := LoseGame()
     }
@@ -29,12 +35,12 @@ LoseMaxGames()
 ;Creates and plays games until there are no custom minutes remaining.
 ;Starts from client.
 ;Meant for 1024x768 resolution.
-PlayMaxGames(waitLong)
+WinMaxGames(waitLong)
 {
     done := false
     while (!done)
     {
-        done := PlayGame(waitLong)
+        done := WinGame(waitLong)
     }
 }
 
@@ -58,7 +64,7 @@ LoseGame()
 ;Starts from client.
 ;Meant for 1024x768 resolution.
 ;returns true if 0 minutes found, or false otherwise
-PlayGame(waitLong)
+WinGame(waitLong)
 {
     CreateCustomGame()
     SelectYi()
@@ -66,7 +72,7 @@ PlayGame(waitLong)
     if (waitLong)
         Sleep, 90000
     WaitGameStart()
-    GameLoop()
+    WinGameLoop()
     
     x := CleanupGame()
     return x
@@ -117,7 +123,7 @@ LoseGameLoop()
 }
 
 ;In-game loop of pushing/shopping.
-GameLoop()
+WinGameLoop()
 {
     while true
     {
@@ -325,3 +331,152 @@ SelectYi()
     Send {Click 702, 410} ;attempt to start game
     Sleep, 30000 ;wait for load screen to pop up if successful
 }
+
+CloseLoLClient()
+{
+    IfWinExist, PVP.net Client
+    {
+        WinKill
+    }
+    return
+}
+
+LogIn(accountData) ;accountData should have account name on first line and pw on second
+{
+    FileReadLine, username, %accountData%, 1
+    FileReadLine, password, %accountData%, 2
+
+    Run, C:\Riot Games\League of Legends\lol.launcher.exe
+    Sleep, 15000
+    While 1
+    {
+        IfWinExist, Error ;silly hack to dismiss the "another instance of LoL is running" box
+        {
+            WinActivate
+            Send {Enter}
+            Break
+        }
+        IfWinExist, PVP.net Patcher
+            Break
+    }
+
+    WinWait, PVP.net Patcher
+    WinActivate
+    Sleep, 5000
+    Send {click 701, 549} ;click on orange "play" button
+
+    WinWait, PVP.net Client
+    WinActivate
+    Sleep, 7000
+    Send {click 260,  240} ;username
+    Sleep, 1000
+    Send {ctrl down}a{ctrl up} ;select all previously existing text to overwrite
+    SendInput, %username%
+    Sleep, 2000
+    Send {click 230, 289} ;pw
+    SendInput, %password%
+    Sleep, 2000
+    Send {click 302,  319} ;log in
+    Sleep, 20000
+    return
+}
+
+MasterCreateGame(summoner1, summoner2, summoner3, summoner4)
+{
+    MouseClick, left,  511,  35 ;click orange "Play" button
+    Sleep, 2000
+    MouseClick, left,  278,  139 ;co-op vs ai
+    Sleep, 1000
+    MouseClick, left,  393,  119 ;classic
+    Sleep, 1000
+    MouseClick, left,  592,  137 ;summoner's rift
+    Sleep, 1000
+    ;MouseClick, left,  710,  122 ;beginner
+    MouseClick, left,  691,  145 ;intermediate
+    Sleep, 1000
+    MouseClick, left,  765,  570 ;invite my own teammates
+    Sleep, 2000
+    MouseClick, left,  781,  439 ;invite
+    Sleep, 2000
+    MouseClick, left,  722,  168 ;click on text box
+    Sleep, 500
+    Send {ctrl down}a{ctrl up} ;select all previously existing text to overwrite
+    Sleep, 500
+    Send, %summoner1%   ;type in summoner1's name
+    Sleep, 500
+    MouseClick, left,  902,  157 ;add to invite list
+    Sleep, 500
+    MouseClick, left,  722,  168 ;click on text box
+    Sleep, 500
+    Send {ctrl down}a{ctrl up} ;select all previously existing text to overwrite
+    Sleep, 500
+    Send, %summoner2%   ;type in summoner2's name
+    Sleep, 500
+    MouseClick, left,  902,  157 ;add to invite list
+    Sleep, 500
+    MouseClick, left,  722,  168 ;click on text box
+    Sleep, 500
+    Send {ctrl down}a{ctrl up} ;select all previously existing text to overwrite
+    Sleep, 500
+    Send, %summoner3%   ;type in summoner3's name
+    Sleep, 500
+    MouseClick, left,  902,  157 ;add to invite list
+    Sleep, 500
+    MouseClick, left,  722,  168 ;click on text box
+    Sleep, 500
+    Send {ctrl down}a{ctrl up} ;select all previously existing text to overwrite
+    Sleep, 500
+    Send, %summoner4%   ;type in summoner4's name
+    Sleep, 500
+    MouseClick, left,  902,  157 ;add to invite list
+    Sleep, 500
+    MouseClick, left,  735,  566 ;click "Invite players"
+    Sleep, 1000
+    while True      ;check that first player has joined
+    {
+        Sleep, 500
+        PixelSearch, FoundX, FoundY, 181, 364, 187, 374, 0xCCCCCC ;search for white of the "L" in "Level" where the fifth player shows up
+        if ErrorLevel ;could not find
+                Sleep, 10   
+        else
+            break   
+    }
+    Sleep, 1000
+    MouseClick, left, 529, 436 ;start game
+    while True ;wait for queue to fire
+    {
+        Sleep, 1000
+        PixelSearch, FoundX, FoundY, 507, 324, 509, 326, 0xFFFFFF ;look for white of timer pie
+        if ErrorLevel ;could not find
+                Sleep, 10   
+        else
+            break   
+    }
+    MouseClick, left, 421, 364 ;click "accept" when match is made to go to champ select
+}
+return
+
+SlaveJoinGame()
+{
+    while True ;wait for invite
+    {
+        Sleep, 1000
+        PixelSearch, FoundX, FoundY, 906, 559, 908, 561, 0xF4F4F4 ;look for white in "I" of "Intermediate"
+        if ErrorLevel ;could not find
+                Sleep, 10   
+        else
+            break   
+    }
+    MouseClick, left, 865, 590 ;accept invite
+    while True ;wait for queue to fire
+    { 
+        Sleep, 1000
+        PixelSearch, FoundX, FoundY, 507, 324, 509, 326, 0xFFFFFF ;look for white of timer pie
+        if ErrorLevel ;could not find
+                Sleep, 10   
+        else
+            break   
+    }
+    MouseClick, left, 421, 364 ;click "accept" when match is made to go to champ select
+}
+return

@@ -9,7 +9,8 @@ SetKeyDelay, 100, 30
 ;this is a utility testing method - feel free to swap it out for whatever function
 #v::
 ;LogIn("C:\accountData.txt")
-MasterCreateGame("romancandle", "thefinalfinal", "mangohichew", "cherryhichew")
+MasterCreateGame("mytroll17", "mytroll18", "mangohichew", "cherryhichew")
+WinGame(true)
 return
 
 #w::
@@ -18,6 +19,8 @@ return
 
 #x::
 SlaveJoinGame()
+WinGame(true) ; SelectYi() has been temporarily commented out for testing!
+;WinGameLoop()
 return
 
 ;Creates and plays games until there are no custom minutes remaining.
@@ -66,8 +69,8 @@ LoseGame()
 ;returns true if 0 minutes found, or false otherwise
 WinGame(waitLong)
 {
-    CreateCustomGame()
-    SelectYi()
+;    CreateCustomGame()
+    ;SelectYi() ; ***temporarily commented out for testing!***S
     Sleep, 20000 ;open-loop wait for countdown and loading of game
     if (waitLong)
         Sleep, 90000
@@ -217,23 +220,43 @@ Sleep, 100
 
 Shop()
 {
-MouseClick, left, 137,  754
-Sleep, 1000
-Send, {CTRLDOWN}l{CTRLUP}ydr
-Sleep, 500
-MouseClick, left,  203, 189
-Sleep, 300
-MouseClick, left,  730,  253
-MouseClick, left,  730,  253
-Sleep, 300
-MouseClick, left,  640,  311
-MouseClick, left,  640,  311
-Sleep, 300
-MouseClick, left,  570,  375
-MouseClick, left,  570,  375
-Sleep, 300
-MouseClick, left,  923, 64
+MouseClick, left, 137,  754 ;click to open shop
 Sleep, 100
+MouseClick, left, 137,  754 ;click to open shop
+Sleep, 100
+MouseClick, left, 137,  754 ;click to open shop
+Sleep, 1000
+Send, {CTRLDOWN}l{CTRLUP}loo
+Sleep, 500
+MouseClick, left,  203, 189 ;select BT
+Sleep, 300
+MouseClick, left,  737,  233 ;try to buy BT
+MouseClick, left,  737,  233
+Sleep, 300
+MouseClick, left,  625,  293 ;try to buy BF sword
+MouseClick, left,  625,  293
+Sleep, 300
+MouseClick, left,  815,  290 ;try to buy vamp scepter
+MouseClick, left,  815,  290
+Sleep, 300
+MouseClick, left,  923, 64 ;click to close shop
+Sleep, 100
+
+;Send, {CTRLDOWN}l{CTRLUP}ydr ;old hydra-buying logic
+;Sleep, 500
+;MouseClick, left,  203, 189
+;Sleep, 300
+;MouseClick, left,  730,  253
+;MouseClick, left,  730,  253
+;Sleep, 300
+;MouseClick, left,  640,  311
+;MouseClick, left,  640,  311
+;Sleep, 300
+;MouseClick, left,  570,  375
+;MouseClick, left,  570,  375
+;Sleep, 300
+;MouseClick, left,  923, 64
+;Sleep, 100
 return
 }
 
@@ -438,7 +461,7 @@ MasterCreateGame(summoner1, summoner2, summoner3, summoner4)
     while True      ;check that first player has joined
     {
         Sleep, 500
-        PixelSearch, FoundX, FoundY, 181, 364, 187, 374, 0xCCCCCC ;search for white of the "L" in "Level" where the fifth player shows up
+        PixelSearch, FoundX, FoundY, 191, 389, 193, 391, 0xA2E7F9 ;search for yellow of 'x' in kick button where fifth player shows up
         if ErrorLevel ;could not find
                 Sleep, 10   
         else

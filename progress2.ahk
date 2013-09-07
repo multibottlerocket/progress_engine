@@ -97,9 +97,9 @@ LoseGameLoop()
 {
     while true
     {
-        Send {Click right 600, 350}
+        Send {Click right 300, 350}
         Sleep, 5000
-        Send {Click right 600, 500}
+        Send {Click right 300, 500}
         Sleep, 5000
         if a_index > 150 ;after 25 min, surrender
         {
@@ -219,15 +219,18 @@ Shop()
 {
 MouseClick, left, 137,  754
 Sleep, 1000
-Send, {CTRLDOWN}l{CTRLUP}hydra
+Send, {CTRLDOWN}l{CTRLUP}ydr
 Sleep, 500
 MouseClick, left,  203, 189
 Sleep, 300
-MouseClick, right,  730,  253
+MouseClick, left,  730,  253
+MouseClick, left,  730,  253
 Sleep, 300
-MouseClick, right,  640,  311
+MouseClick, left,  640,  311
+MouseClick, left,  640,  311
 Sleep, 300
-MouseClick, right,  570,  375
+MouseClick, left,  570,  375
+MouseClick, left,  570,  375
 Sleep, 300
 MouseClick, left,  923, 64
 Sleep, 100
@@ -270,15 +273,15 @@ CreateCustomGame()
     Sleep, 2000
     Send {Click 576, 126} ;click dropdown menu
     Sleep, 2000
-    Send {Click 580, 150} ;scroll to top
+    Send {Click 582, 153} ;scroll to top
     Sleep, 400
-    Send {Click 580, 150} ;scroll to top
+    Send {Click 582, 153} ;scroll to top
     Sleep, 400
-    Send {Click 580, 150} ;scroll to top
+    Send {Click 582, 153} ;scroll to top
     Sleep, 400
-    Send {Click 580, 150} ;scroll to top
+    Send {Click 582, 153} ;scroll to top
     Sleep, 400
-    Send {Click 580, 150} ;scroll to top
+    Send {Click 582, 153} ;scroll to top
     Sleep, 400
     Send {Click 554, 155} ;pick annie
     Sleep, 4000

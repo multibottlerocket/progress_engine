@@ -1,6 +1,8 @@
 #NoEnv
 #InstallKeybdHook
 SetKeyDelay, 100, 30
+;position of "lvl 3 RP reward" popup x in client: 801, 93
+;position of "level up" popup x in client: 874, 93
 
 #s::Reload
 
@@ -18,9 +20,18 @@ WinGame(true)
 return
 
 #x::
-SlaveJoinGame()
-WinGame(true) ; SelectYi() has been temporarily commented out for testing!
+;SlaveJoinGame()
+;WinGame(true) ; SelectYi() has been temporarily commented out for testing!
 ;WinGameLoop()
+;SmurfSetup("C:\accountData.txt")
+;DoBattleTraining()
+while true
+{
+    Send {Click right 300, 350}
+    Sleep, 5000
+    Send {Click right 300, 500}
+    Sleep, 5000
+}
 return
 
 ;Creates and plays games until there are no custom minutes remaining.
@@ -404,7 +415,7 @@ LogIn(accountData) ;accountData should have account name on first line and pw on
     Sleep, 2000
     Send {click 302,  319} ;log in
     Sleep, 20000
-    return
+    return username
 }
 
 MasterCreateGame(summoner1, summoner2, summoner3, summoner4)
@@ -506,3 +517,140 @@ SlaveJoinGame()
     MouseClick, left, 421, 364 ;click "accept" when match is made to go to champ select
 }
 return
+
+SmurfSetup(accountData) ;fill out referral form on website - make sure captcha is typed in first!
+{
+    smurfName := LogIn(accountData)
+    MouseClick, left,  470,  392 ;click name entry box
+    Sleep, 500
+    Send, %smurfName%
+    MouseClick, left,  494,  451 ;confirm name entry
+    Sleep, 5000
+    MouseClick, left,  365,  327 ;select summoner icon
+    Sleep, 1000
+    MouseClick, left,  775,  430 ;confirm icon
+    Sleep, 2000
+    MouseClick, left,  311,  320 ;pick noob tier
+    Sleep, 2000
+    MouseClick, left,  724,  439 ;confirm tier
+    Sleep, 2000
+    MouseClick, left,  555,  405 ;decline tutorial
+    Sleep, 1000
+    MouseClick, left,  555,  405 ;decline battle trainig
+    Sleep, 3000
+    ;CloseLoLClient()
+    return
+}
+
+DoBattleTraining() ;run battle training automatically
+{
+    MouseClick, left,  510,  35 
+    Sleep, 2000
+    MouseClick, left,  278,  233
+    Sleep, 2000
+    MouseClick, left,  390,  165
+    Sleep, 2000
+    MouseClick, left,  679,  542
+    Sleep, 2000
+    MouseClick, left,  657,  384
+    Sleep, 2000
+    MouseClick, left,  651,  384
+    Sleep, 2000
+    MouseClick, left,  285,  243
+    Sleep, 2000
+    MouseClick, left,  348,  381
+    Sleep, 2000
+    MouseClick, left,  300,  371
+    Sleep, 2000
+    MouseClick, left,  358,  370
+    Sleep, 2000
+    MouseClick, left,  424,  382
+    Sleep, 2000
+    MouseClick, left,  256,  167
+    Sleep, 2000
+    MouseClick, left,  392,  331
+    Sleep, 2000
+    MouseClick, left,  742,  488
+    Sleep, 2000
+    MouseClick, left,  502,  429
+    Sleep, 2000
+    MouseClick, left,  466,  167
+    Sleep, 2000
+    MouseClick, left,  519,  179
+    Sleep, 2000
+    MouseClick, left,  366,  380
+    Sleep, 2000
+    MouseClick, left,  384,  421
+    Sleep, 2000
+    MouseClick, left,  386,  390
+    Sleep, 2000
+    MouseClick, left,  627,  535
+    Sleep, 2000
+    MouseClick, left,  862,  391
+    Sleep, 2000
+    MouseClick, left,  701,  400
+    Sleep, 120000 ;big pause here to count down and let game load
+    Loop, 5 ;this click drops sometimes, so spam it
+    {
+        MouseClick, left,  595,  396 ;click 'Continue' button
+        Sleep, 200
+    }
+    Sleep, 50000 ;long pause while lady talks
+    MouseClick, left,  987,  157 ;move mouse cursor over seconday quests
+    Sleep, 5000
+    MouseClick, left,  1016,  503 ;click hint above minimap
+    Sleep, 3000
+    MouseClick, left,  680,  481 ;close hint window
+    Sleep, 20000 ;wait for lady to talk
+    startTime := A_Now
+    while true ;spam right clicks for 19 minutes, then surrender and click continue button
+    {
+        Send {Click right 300, 350}
+        Sleep, 5000
+        Send {Click right 300, 500}
+        Sleep, 5000
+            nowTime := A_Now
+            EnvSub, nowTime, %startTime%, Minutes
+            if (nowTime > 19) ;after 19 minutes, surrender
+            {
+            Send {Enter}
+            Sleep, 100
+            Send {/}
+            Sleep, 100
+            Send {f}
+            Sleep, 100
+            Send {f}
+            Sleep, 100
+            Send {Enter}
+            Sleep, 20000 ;give lots of time for nexus to blow up and 'continue' button to appear
+            break
+        }
+    }
+
+        Send {Click 510, 416} ;click on "continue' button after defeat
+        Sleep, 120000 ;let game close and pvp.net client load
+    MouseClick, left,  645,  387 ;click continue on post battle screen
+    Sleep, 2000
+    statsNotLoaded := true
+    while statsNotLoaded
+    {
+        ImageSearch, FoundX, FoundY, 676, 570, 783, 607, home.png
+        if ErrorLevel ;could not find
+            statsNotLoaded := true  
+        else
+            statsNotLoaded := false
+        Sleep, 1000
+    }
+    MouseClick, left,  432,  313 ;click continue for ip
+    Sleep, 2000
+    MouseClick, left,  725,  592 ;click 'home'
+    Sleep, 2000
+    MouseClick, left,  561,  403 ;decline co op vs ai inv
+    Sleep, 2000
+    MouseClick, left,  561,  403 ;decline co op vs ai inv again
+    Sleep, 2000 
+    ;should be back at lobby again
+    ;BuyMasterYi()
+
+return
+}

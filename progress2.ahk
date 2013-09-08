@@ -11,8 +11,8 @@ SetKeyDelay, 100, 30
 ;this is a utility testing method - feel free to swap it out for whatever function
 #v::
 ;LogIn("C:\accountData.txt")
-MasterCreateGame("mytroll17", "mytroll18", "mangohichew", "cherryhichew")
-WinGame(true)
+MasterCreateGame("mytroll17", "mytroll18", "peachhichew", "greenapplehichew")
+;WinGame(true)
 return
 
 #w::
@@ -20,18 +20,13 @@ WinGame(true)
 return
 
 #x::
-;SlaveJoinGame()
-;WinGame(true) ; SelectYi() has been temporarily commented out for testing!
+SlaveJoinGame()
+WinGameVisual(true) ; SelectYi() has been temporarily commented out for testing!
 ;WinGameLoop()
 ;SmurfSetup("C:\accountData.txt")
 ;DoBattleTraining()
-while true
-{
-    Send {Click right 300, 350}
-    Sleep, 5000
-    Send {Click right 300, 500}
-    Sleep, 5000
-}
+;Sleep, 3000
+;WinGameLoopVisual()
 return
 
 ;Creates and plays games until there are no custom minutes remaining.
@@ -40,7 +35,7 @@ return
 LoseMaxGames()
 {
     done := false
-    while (!done)cC
+    while (!done)
     {
         done := LoseGame()
     }
@@ -81,12 +76,25 @@ LoseGame()
 WinGame(waitLong)
 {
 ;    CreateCustomGame()
-    ;SelectYi() ; ***temporarily commented out for testing!***S
+    ;SelectYi() ; ***temporarily commented out for testing!***
     Sleep, 20000 ;open-loop wait for countdown and loading of game
     if (waitLong)
         Sleep, 90000
     WaitGameStart()
     WinGameLoop()
+    
+    x := CleanupGame()
+    return x
+}
+
+WinGameVisual(waitLong)
+{
+    ;SelectYi() ; ***temporarily commented out for testing!***
+    Sleep, 20000 ;open-loop wait for countdown and loading of game
+    if (waitLong)
+        Sleep, 90000
+    WaitGameStart()
+    WinGameLoopVisual()
     
     x := CleanupGame()
     return x
@@ -142,8 +150,8 @@ WinGameLoop()
     while true
     {
         Suicide()
-        SkillUp()
-        Abilities()
+        ;SkillUp()   ;removed until we know what champs we're using
+        ;Abilities() ;
         Sleep, 1000
         Send {Click 510, 416} ;click on "continue' button after defeat/victory
         IfWinExist, PVP.net Client
@@ -153,6 +161,62 @@ WinGameLoop()
         }
         Sleep, 2000
         Shop()
+    }
+}
+
+;In-game loop of pushing/shopping with visual feedback
+WinGameLoopVisual()
+{
+    lastHealth := 100
+    dangerHealth := 20 ;run away and heal if below this % health
+    while true
+    {
+        Suicide()
+        ;SkillUp()   ;removed until we know what champs we're using
+        ;Abilities() ;
+        Sleep, 500
+        Send {Click 510, 416} ;click on "continue' button after defeat/victory
+        IfWinExist, PVP.net Client
+        {
+            WinActivate
+            return      
+        }
+        Sleep, 500
+        health := GetHealth()
+        if (health == 0) ;dead
+        {
+            Shop()
+        }
+        else if (health <= dangerHealth) ;if low, run away and b
+        {
+            Loop, 3 ;spam retreat (it sometimes drops on VM)
+            {
+                MouseClick, right, 838, 753 
+                Sleep, 100
+            }
+            Sleep, 10000
+            Send, b
+            Sleep, 9000
+            Shop()
+        }
+        else if (health < lastHealth) ;taking damage
+        {
+            Loop, 3 ;spam retreat (it sometimes drops on VM)
+            {
+                MouseClick, right, 838, 753 
+                Sleep, 100
+            }
+            healthDiff := lastHealth - health
+            if (healthDiff >= 30) ;took a lot of damage - retreat for next creep wave
+                Sleep, 15000
+            else
+                Sleep, 3000 ;didn't take too much - just jiggle back a bit
+            lastHealth := health
+        }
+        else ;all is well
+        {
+            lastHealth := health
+        }
     }
 }
 
@@ -190,9 +254,9 @@ Suicide()
 {
     Sleep, 100
     Send {a} ;issue attack move command
-    Sleep, 1000
+    Sleep, 500
     Send {Click 1011, 598}  ; click on enemy fountain via minimap
-    Sleep, 1000
+    Sleep, 500
 }
 
 SkillUp()
@@ -428,8 +492,8 @@ MasterCreateGame(summoner1, summoner2, summoner3, summoner4)
     Sleep, 1000
     MouseClick, left,  592,  137 ;summoner's rift
     Sleep, 1000
-    ;MouseClick, left,  710,  122 ;beginner
-    MouseClick, left,  691,  145 ;intermediate
+    MouseClick, left,  710,  122 ;beginner
+    ;MouseClick, left,  691,  145 ;intermediate
     Sleep, 1000
     MouseClick, left,  765,  570 ;invite my own teammates
     Sleep, 2000
@@ -498,7 +562,7 @@ SlaveJoinGame()
     while True ;wait for invite
     {
         Sleep, 1000
-        PixelSearch, FoundX, FoundY, 906, 559, 908, 561, 0xF4F4F4 ;look for white in "I" of "Intermediate"
+        PixelSearch, FoundX, FoundY, 912, 536, 912, 536, 0xFBFBFB ;look for white in "-" of "co-op"
         if ErrorLevel ;could not find
                 Sleep, 10   
         else
@@ -653,4 +717,30 @@ DoBattleTraining() ;run battle training automatically
     ;BuyMasterYi()
 
 return
+}
+
+GetHealth()
+{
+    healthXBase := 396
+    healthY := 740
+    Loop, 11
+    {
+        healthX := healthXBase + (A_index-1)*25 ;health bar is ~250 pixels wide
+        PixelSearch, FoundX, FoundY, healthX, healthY, healthX, healthY, 0x000000, 32 ;look for black-ish pixel
+        if (ErrorLevel and A_index < 11) ;pixel was not black and we're not at the end
+        {
+            continue
+        }
+        else if (ErrorLevel) ;pixel was not black and we're at the end of the health bar
+        {
+            health := 100
+            break
+        }
+        else ;pixel was black, so we found the end of the green
+        {
+            health := 10*(A_index-1)
+            break
+        }
+    }
+    return health
 }

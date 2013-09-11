@@ -11,80 +11,54 @@ SetKeyDelay, 100, 30
 ;this is a utility testing method - feel free to swap it out for whatever function
 #v::
 ;LogIn("C:\accountData.txt")
-MasterCreateGame("mytroll17", "mytroll18", "peachhichew", "greenapplehichew")
-;WinGame(true)
+;MasterCreateGame("mytroll17", "mytroll18", "peachhichew", "greenapplehichew")
+BotGameMaster()
 return
 
 #w::
-WinGame(true)
+WaitGameStart()
+WinGameLoop()
+CleanupGame()
+Sleep, 60000 ;give ample time for everyone to align
+BotGameSlave()
 return
 
 #x::
-SlaveJoinGame()
-WinGameVisual(true) ; SelectYi() has been temporarily commented out for testing!
-;WinGameLoop()
+;SlaveJoinGame()
+;WinGameVisual(true) ; SelectYi() has been temporarily commented out for testing!
 ;SmurfSetup("C:\accountData.txt")
 ;DoBattleTraining()
-;Sleep, 3000
-;WinGameLoopVisual()
+BotGameSlave()
 return
 
-;Creates and plays games until there are no custom minutes remaining.
-;Starts from client.
-;Meant for 1024x768 resolution.
-LoseMaxGames()
+;game creator for co-op vs ai spam
+BotGameMaster()
 {
-    done := false
-    while (!done)
+    while true
     {
-        done := LoseGame()
+        MasterCreateGame("peachhichew", "greenapplehichew", "mangohichew", "katherinewheel")
+        Sleep, 10000
+        SelectFirstChamp()
+        WaitGameStart()
+        WinGameLoop()
+        CleanupGame()
+        Sleep, 60000 ;give ample time for everyone to align
     }
 }
 
-;Creates and plays games until there are no custom minutes remaining.
-;Starts from client.
-;Meant for 1024x768 resolution.
-WinMaxGames(waitLong)
+;game slave for co-op vs ai spam
+BotGameSlave()
 {
-    done := false
-    while (!done)
+    while true
     {
-        done := WinGame(waitLong)
+        SlaveJoinGame()
+        Sleep, 10000
+        SelectFirstChamp()
+        WaitGameStart()
+        WinGameLoop()
+        CleanupGame()
+        Sleep, 60000 ;give ample time for everyone to align
     }
-}
-
-;Creates and loses a game by surrender.
-;Starts from client.
-;Meant for 1024x768 resolution.
-;returns true if 0 minutes found, or false otherwise
-LoseGame()
-{
-    CreateCustomGame()
-    SelectFirstChamp()
-    Sleep, 20000 ;open-loop wait for countdown and loading of game
-    WaitGameStart()
-    LoseGameLoop()
-    
-    x := CleanupGame()
-    return x
-}
-
-;Creates and plays a game.
-;Starts from client.
-;Meant for 1024x768 resolution.
-;returns true if 0 minutes found, or false otherwise
-WinGame(waitLong)
-{
-;    CreateCustomGame()
-    ;SelectYi() ; ***temporarily commented out for testing!***
-    Sleep, 20000 ;open-loop wait for countdown and loading of game
-    if (waitLong)
-        Sleep, 90000
-    WaitGameStart()
-    WinGameLoop()
-    
-    x := CleanupGame()
-    return x
 }
 
 WinGameVisual(waitLong)
@@ -96,8 +70,7 @@ WinGameVisual(waitLong)
     WaitGameStart()
     WinGameLoopVisual()
     
-    x := CleanupGame()
-    return x
+    CleanupGame()
 }
 
 ;waits for game to start
@@ -174,15 +147,24 @@ WinGameLoopVisual()
         Suicide()
         ;SkillUp()   ;removed until we know what champs we're using
         ;Abilities() ;
-        Sleep, 500
+        ;Sleep, 500
         Send {Click 510, 416} ;click on "continue' button after defeat/victory
         IfWinExist, PVP.net Client
         {
             WinActivate
             return      
         }
-        Sleep, 500
+        ;Sleep, 500
         health := GetHealth()
+        ;in-game debug output
+        ;healthXBase := 396
+        ;healthDbgY := 730
+        ;lastHealthDbgY := 720 
+        ;Send {Enter}
+        ;Send %health%
+        ;Send %lastHealth%
+        ;Send {Enter}
+        ;end in-game debugging output
         if (health == 0) ;dead
         {
             Shop()
@@ -211,6 +193,219 @@ WinGameLoopVisual()
                 Sleep, 15000
             else
                 Sleep, 3000 ;didn't take too much - just jiggle back a bit
+            health := GetHealth() ;get fresh health measurement before storing
+            lastHealth := health
+        }
+        else ;all is well
+        {
+            lastHealth := health
+        }
+    }
+}
+
+;In-game loop of pushing/shopping with visual feedback for kayle
+KayleLoop()
+{
+    lastHealth := 100
+    dangerHealth := 20 ;run away and heal if below this % health
+    while true
+    {
+        Suicide()
+        ;spam skills
+        Send e ;spam auto buff
+        Send d ;spam revive
+        Send f ;spam ghost
+        ;level up skills
+        Send ^r ;skill up r
+        Send ^e ;skill up w
+        Send ^w ;skill up e
+        Send {Click 510, 416} ;click on "continue' button after defeat/victory
+        IfWinExist, PVP.net Client
+        {
+            WinActivate
+            return      
+        }
+        health := GetHealth()
+        if (health == 0) ;dead
+        {
+            Shop()
+        }
+        else if (health <= dangerHealth) ;if low, run away and b
+        {
+            Loop, 3 ;spam retreat (it sometimes drops on VM)
+            {
+                MouseClick, right, 838, 753 
+                Sleep, 100
+            }
+            Send !r              ;self-ult
+            Send !w              ;self-heal for good measure
+            Sleep, 10000
+            Send, b
+            Sleep, 9000
+            Shop()
+        }
+        else if (health < lastHealth) ;taking damage
+        {
+            Loop, 3 ;spam retreat (it sometimes drops on VM)
+            {
+                MouseClick, right, 838, 753 
+                Sleep, 100
+            }
+            healthDiff := lastHealth - health
+            if (healthDiff >= 30) ;took a lot of damage - retreat for next creep wave
+            {
+                Send !r              ;self-ult
+                Send !w              ;self-heal for good measure
+                Sleep, 15000
+            }
+            else
+            {
+                Send !w              ;self-heal
+                Sleep, 3000 ;didn't take too much - just jiggle back a bit
+            }
+            health := GetHealth() ;get fresh health measurement before storing
+            lastHealth := health
+        }
+        else ;all is well
+        {
+            lastHealth := health
+        }
+    }
+}
+
+;In-game loop of pushing/shopping with visual feedback for ashe
+AsheLoop()
+{
+    lastHealth := 100
+    dangerHealth := 20 ;run away and heal if below this % health
+    while true
+    {
+        Suicide()
+        ;spam skills
+        Send d ;spam revive
+        Send f ;spam ghost
+        ;level up skills
+        Send ^r ;skill up r
+        Send ^w ;skill up w
+        Send ^e ;skill up e
+        Send {Click 510, 416} ;click on "continue' button after defeat/victory
+        IfWinExist, PVP.net Client
+        {
+            WinActivate
+            return      
+        }
+        health := GetHealth()
+        if (health == 0) ;dead
+        {
+            Shop()
+        }
+        else if (health <= dangerHealth) ;if low, run away and b
+        {
+            Loop, 3 ;spam retreat (it sometimes drops on VM)
+            {
+                MouseClick, right, 838, 753 
+                Sleep, 100
+            }
+            MouseMove, 610, 325 ;spam a volley as a parting gift
+            Send w              ;
+            MouseMove, 730, 145 ;toss an arrow out for good measure
+            Send r              ;
+            Sleep, 10000
+            Send, b
+            Sleep, 9000
+            Shop()
+        }
+        else if (health < lastHealth) ;taking damage
+        {
+            Loop, 3 ;spam retreat (it sometimes drops on VM)
+            {
+                MouseClick, right, 838, 753 
+                Sleep, 100
+            }
+            healthDiff := lastHealth - health
+            if (healthDiff >= 30) ;took a lot of damage - retreat for next creep wave
+            {
+                MouseMove, 610, 325 ;spam a volley as a parting gift
+                Send w              ;
+                MouseMove, 730, 145 ;toss an arrow out for good measure
+                Send r              ;
+                Sleep, 15000
+            }
+            else
+            {
+                MouseMove, 610, 325 ;spam a volley as a parting gift
+                Send w           
+                Sleep, 3000 ;didn't take too much - just jiggle back a bit
+            }
+            health := GetHealth() ;get fresh health measurement before storing
+            lastHealth := health
+        }
+        else ;all is well
+        {
+            lastHealth := health
+        }
+    }
+}
+
+;In-game loop of pushing/shopping with visual feedback for sivir
+SivirLoop()
+{
+    lastHealth := 100
+    dangerHealth := 20 ;run away and heal if below this % health
+    while true
+    {
+        Suicide()
+        ;spam skills
+        Send w ;spam auto-booster
+        Send r ;spam ult
+        Send d ;spam revive
+        Send f ;spam ghost
+        ;level up skills
+        Send ^r ;skill up r
+        Send ^w ;skill up w
+        Send ^e ;skill up e
+        Send {Click 510, 416} ;click on "continue' button after defeat/victory
+        IfWinExist, PVP.net Client
+        {
+            WinActivate
+            return      
+        }
+        health := GetHealth()
+        if (health == 0) ;dead
+        {
+            Shop()
+        }
+        else if (health <= dangerHealth) ;if low, run away and b
+        {
+            Loop, 3 ;spam retreat (it sometimes drops on VM)
+            {
+                MouseClick, right, 838, 753 
+                Sleep, 100
+            }
+            Send e ;randomly try to spell shield and get lucky
+            Sleep, 10000
+            Send, b
+            Sleep, 9000
+            Shop()
+        }
+        else if (health < lastHealth) ;taking damage
+        {
+            Loop, 3 ;spam retreat (it sometimes drops on VM)
+            {
+                MouseClick, right, 838, 753 
+                Sleep, 100
+            }
+            healthDiff := lastHealth - health
+            if (healthDiff >= 30) ;took a lot of damage - retreat for next creep wave
+            {
+                Send e ;randomly try to spell shield and get lucky
+                Sleep, 15000
+            }
+            else
+            {
+                Sleep, 3000 ;didn't take too much - just jiggle back a bit
+            }
+            health := GetHealth() ;get fresh health measurement before storing
             lastHealth := health
         }
         else ;all is well
@@ -223,10 +418,9 @@ WinGameLoopVisual()
 ;returns true if 0 minutes found, or false otherwise
 CleanupGame()
 {
-    x := StatsCheck()
+    StatsCheck()
     Send {Click 700, 590} ;click on 'return to lobby' button 
     Sleep, 5000
-    return x
 }
 
 StatsCheck()
@@ -242,21 +436,15 @@ StatsCheck()
             statsNotLoaded := false
         Sleep, 1000
     }
-    ImageSearch, FoundX, FoundY, 14, 192, 137, 281, 0minutes.png
-    if ErrorLevel ;could not find
-        return false
-    else
-        return true
 }
 
 
 Suicide()
 {
-    Sleep, 100
     Send {a} ;issue attack move command
-    Sleep, 500
+    Sleep, 200
     Send {Click 1011, 598}  ; click on enemy fountain via minimap
-    Sleep, 500
+    Sleep, 300
 }
 
 SkillUp()
@@ -492,8 +680,8 @@ MasterCreateGame(summoner1, summoner2, summoner3, summoner4)
     Sleep, 1000
     MouseClick, left,  592,  137 ;summoner's rift
     Sleep, 1000
-    MouseClick, left,  710,  122 ;beginner
-    ;MouseClick, left,  691,  145 ;intermediate
+    ;MouseClick, left,  710,  122 ;beginner
+    MouseClick, left,  691,  145 ;intermediate
     Sleep, 1000
     MouseClick, left,  765,  570 ;invite my own teammates
     Sleep, 2000

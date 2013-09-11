@@ -15,6 +15,14 @@ SetKeyDelay, 100, 30
 BotGameMaster()
 return
 
+#q::
+WaitGameStart()
+WinGameLoop()
+CleanupGame()
+Sleep, 60000 ;give ample time for everyone to align
+BotGameMaster()
+return
+
 #w::
 WaitGameStart()
 WinGameLoop()
@@ -36,11 +44,11 @@ BotGameMaster()
 {
     while true
     {
-        MasterCreateGame("peachhichew", "greenapplehichew", "mangohichew", "katherinewheel")
+        MasterCreateGame("TT", "peachhichew", "mytroll17", "mangohichew", "katherinewheel")
         Sleep, 10000
         SelectFirstChamp()
         WaitGameStart()
-        WinGameLoop()
+        WinGameLoop("TT")
         CleanupGame()
         Sleep, 60000 ;give ample time for everyone to align
     }
@@ -55,7 +63,7 @@ BotGameSlave()
         Sleep, 10000
         SelectFirstChamp()
         WaitGameStart()
-        WinGameLoop()
+        WinGameLoop("TT")
         CleanupGame()
         Sleep, 60000 ;give ample time for everyone to align
     }
@@ -118,11 +126,18 @@ LoseGameLoop()
 }
 
 ;In-game loop of pushing/shopping.
-WinGameLoop()
+WinGameLoop(map)
 {
     while true
     {
-        Suicide()
+        if (map == "TT")
+        {
+            SuicideTT()
+        }
+        else
+        {
+            Suicide()
+        }
         ;SkillUp()   ;removed until we know what champs we're using
         ;Abilities() ;
         Sleep, 1000
@@ -447,6 +462,15 @@ Suicide()
     Sleep, 300
 }
 
+;suicide through bot lane on TT
+SuicideTT()
+{
+    Send {a} ;issue attack move command
+    Sleep, 200
+    Send {Click 992, 669}  ; click on enemy fountain via minimap
+    Sleep, 300
+}
+
 SkillUp()
 {
 Send ^r ;skill up r
@@ -670,7 +694,7 @@ LogIn(accountData) ;accountData should have account name on first line and pw on
     return username
 }
 
-MasterCreateGame(summoner1, summoner2, summoner3, summoner4)
+MasterCreateGame(map, summoner1, summoner2, summoner3, summoner4)
 {
     MouseClick, left,  511,  35 ;click orange "Play" button
     Sleep, 2000
@@ -678,7 +702,18 @@ MasterCreateGame(summoner1, summoner2, summoner3, summoner4)
     Sleep, 1000
     MouseClick, left,  393,  119 ;classic
     Sleep, 1000
-    MouseClick, left,  592,  137 ;summoner's rift
+    if (map == "SR")
+    {
+        MouseClick, left,  592,  137 ;summoner's rift
+    }
+    else if (map == "TT")
+    {
+        MouseClick, left,  560,  160 ;twisted treeline
+    }
+    else ;default to SR
+    {
+        MouseClick, left,  592,  137 ;summoner's rift
+    }
     Sleep, 1000
     ;MouseClick, left,  710,  122 ;beginner
     MouseClick, left,  691,  145 ;intermediate

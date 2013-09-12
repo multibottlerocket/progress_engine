@@ -17,17 +17,17 @@ return
 
 #q::
 WaitGameStart()
-WinGameLoop()
+WinGameLoop("TT")
 CleanupGame()
-Sleep, 60000 ;give ample time for everyone to align
+Sleep, 20000 ;give ample time for everyone to align
 BotGameMaster()
 return
 
 #w::
 WaitGameStart()
-WinGameLoop()
+WinGameLoop("TT")
 CleanupGame()
-Sleep, 60000 ;give ample time for everyone to align
+Sleep, 20000 ;give ample time for everyone to align
 BotGameSlave()
 return
 
@@ -50,7 +50,7 @@ BotGameMaster()
         WaitGameStart()
         WinGameLoop("TT")
         CleanupGame()
-        Sleep, 60000 ;give ample time for everyone to align
+        Sleep, 20000 ;give ample time for everyone to align
     }
 }
 
@@ -65,7 +65,7 @@ BotGameSlave()
         WaitGameStart()
         WinGameLoop("TT")
         CleanupGame()
-        Sleep, 60000 ;give ample time for everyone to align
+        Sleep, 20000 ;give ample time for everyone to align
     }
 }
 
@@ -715,8 +715,8 @@ MasterCreateGame(map, summoner1, summoner2, summoner3, summoner4)
         MouseClick, left,  592,  137 ;summoner's rift
     }
     Sleep, 1000
-    ;MouseClick, left,  710,  122 ;beginner
-    MouseClick, left,  691,  145 ;intermediate
+    MouseClick, left,  710,  122 ;beginner
+    ;MouseClick, left,  691,  145 ;intermediate
     Sleep, 1000
     MouseClick, left,  765,  570 ;invite my own teammates
     Sleep, 2000
@@ -756,15 +756,43 @@ MasterCreateGame(map, summoner1, summoner2, summoner3, summoner4)
     Sleep, 500
     MouseClick, left,  735,  566 ;click "Invite players"
     Sleep, 1000
-    while True      ;check that first player has joined
+    if (map == "SR")
     {
-        Sleep, 500
-        PixelSearch, FoundX, FoundY, 191, 389, 193, 391, 0xA2E7F9 ;search for yellow of 'x' in kick button where fifth player shows up
-        if ErrorLevel ;could not find
-                Sleep, 10   
-        else
-            break   
+        while True      ;check that fifth player has joined
+        {
+            Sleep, 500
+            PixelSearch, FoundX, FoundY, 191, 389, 193, 391, 0xA2E7F9 ;search for yellow of 'x' in kick button where fifth player shows up
+            if ErrorLevel ;could not find
+                    Sleep, 10   
+            else
+                break   
+        }
     }
+    else if (map == "TT")
+    {
+        while True      ;check that fifth player has joined
+        {
+            Sleep, 500
+            PixelSearch, FoundX, FoundY, 191, 264, 193, 265, 0xA2E7F9 ;search for yellow of 'x' in kick button where third player shows up
+            if ErrorLevel ;could not find
+                    Sleep, 10   
+            else
+                break   
+        }
+    }
+    else ;default to SR
+    {
+        while True      ;check that fifth player has joined
+        {
+            Sleep, 500
+            PixelSearch, FoundX, FoundY, 191, 389, 193, 391, 0xA2E7F9 ;search for yellow of 'x' in kick button where fifth player shows up
+            if ErrorLevel ;could not find
+                    Sleep, 10   
+            else
+                break   
+        }
+    }
+
     Sleep, 1000
     MouseClick, left, 529, 436 ;start game
     while True ;wait for queue to fire

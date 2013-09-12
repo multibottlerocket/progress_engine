@@ -444,6 +444,10 @@ StatsCheck()
     statsNotLoaded := true
     while statsNotLoaded
     {
+        IfWinExist, PVP.net Client
+        {
+            WinActivate    
+        }
         ImageSearch, FoundX, FoundY, 676, 570, 783, 607, home.png
         if ErrorLevel ;could not find
             statsNotLoaded := true  

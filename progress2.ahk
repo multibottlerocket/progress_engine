@@ -11,8 +11,15 @@ SetKeyDelay, 100, 30
 ;this is a utility testing method - feel free to swap it out for whatever function
 #v::
 ;LogIn("C:\accountData.txt")
-;MasterCreateGame("mytroll17", "mytroll18", "peachhichew", "greenapplehichew")
 BotGameMaster()
+return
+
+#z::
+while true
+{
+    DoBattleTraining()
+    Sleep, 5000
+}
 return
 
 #q::
@@ -44,7 +51,7 @@ BotGameMaster()
 {
     while true
     {
-        MasterCreateGame("TT", "peachhichew", "mytroll17", "mangohichew", "katherinewheel")
+        MasterCreateGame("TT", "peachhichew", "donttouchmyduchy", "mangohichew", "katherinewheel")
         Sleep, 10000
         SelectFirstChamp()
         WaitGameStart()
@@ -719,8 +726,8 @@ MasterCreateGame(map, summoner1, summoner2, summoner3, summoner4)
         MouseClick, left,  592,  137 ;summoner's rift
     }
     Sleep, 1000
-    MouseClick, left,  710,  122 ;beginner
-    ;MouseClick, left,  691,  145 ;intermediate
+    ;MouseClick, left,  710,  122 ;beginner
+    MouseClick, left,  691,  145 ;intermediate
     Sleep, 1000
     MouseClick, left,  765,  570 ;invite my own teammates
     Sleep, 2000
@@ -818,6 +825,7 @@ SlaveJoinGame()
     {
         Sleep, 1000
         PixelSearch, FoundX, FoundY, 912, 536, 912, 536, 0xFBFBFB ;look for white in "-" of "co-op"
+                                                                  ;**KNOWN BUG** - make sure the inviting summoner's name is short enough that it's one line!
         if ErrorLevel ;could not find
                 Sleep, 10   
         else
@@ -870,7 +878,7 @@ DoBattleTraining() ;run battle training automatically
     MouseClick, left,  390,  165
     Sleep, 2000
     MouseClick, left,  679,  542
-    Sleep, 2000
+    Sleep, 5000
     MouseClick, left,  657,  384
     Sleep, 2000
     MouseClick, left,  651,  384
@@ -928,10 +936,10 @@ DoBattleTraining() ;run battle training automatically
         Sleep, 5000
         Send {Click right 300, 500}
         Sleep, 5000
-            nowTime := A_Now
-            EnvSub, nowTime, %startTime%, Minutes
-            if (nowTime > 19) ;after 19 minutes, surrender
-            {
+        nowTime := A_Now
+        EnvSub, nowTime, %startTime%, Minutes
+        if (nowTime > 17) ;surrender after 17 minutes (extra time is spent waiting for lady to talk)
+        {
             Send {Enter}
             Sleep, 100
             Send {/}
@@ -947,7 +955,7 @@ DoBattleTraining() ;run battle training automatically
     }
 
         Send {Click 510, 416} ;click on "continue' button after defeat
-        Sleep, 120000 ;let game close and pvp.net client load
+        Sleep, 20000 ;let game close and pvp.net client load
     MouseClick, left,  645,  387 ;click continue on post battle screen
     Sleep, 2000
     statsNotLoaded := true

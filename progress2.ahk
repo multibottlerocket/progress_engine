@@ -15,17 +15,18 @@ BotGameMaster()
 return
 
 #z::
-while true
-{
-    DoBattleTraining()
-    Sleep, 5000
-}
+SpamHonor()
+;while true
+;{
+;    DoBattleTraining()
+;    Sleep, 5000
+;}
 return
 
 #q::
 WaitGameStart()
 WinGameLoop("TT")
-CleanupGame()
+CleanupGame("master")
 Sleep, 20000 ;give ample time for everyone to align
 BotGameMaster()
 return
@@ -33,7 +34,7 @@ return
 #w::
 WaitGameStart()
 WinGameLoop("TT")
-CleanupGame()
+CleanupGame("slave")
 Sleep, 20000 ;give ample time for everyone to align
 BotGameSlave()
 return
@@ -51,12 +52,12 @@ BotGameMaster()
 {
     while true
     {
-        MasterCreateGame("TT", "peachhichew", "donttouchmyduchy", "mangohichew", "katherinewheel")
+        MasterCreateGame("TT", "peachhichew", "greenapplehichew", "mangohichew", "katherinewheel")
         Sleep, 10000
         SelectFirstChamp()
         WaitGameStart()
         WinGameLoop("TT")
-        CleanupGame()
+        CleanupGame("master")
         Sleep, 20000 ;give ample time for everyone to align
     }
 }
@@ -71,7 +72,7 @@ BotGameSlave()
         SelectFirstChamp()
         WaitGameStart()
         WinGameLoop("TT")
-        CleanupGame()
+        CleanupGame("slave")
         Sleep, 20000 ;give ample time for everyone to align
     }
 }
@@ -85,7 +86,7 @@ WinGameVisual(waitLong)
     WaitGameStart()
     WinGameLoopVisual()
     
-    CleanupGame()
+    CleanupGame("master")
 }
 
 ;waits for game to start
@@ -437,10 +438,13 @@ SivirLoop()
     }
 }
 
-;returns true if 0 minutes found, or false otherwise
-CleanupGame()
+CleanupGame(role)
 {
     StatsCheck()
+    if (role == "slave")
+    {
+        SpamHonor()
+    }
     Send {Click 700, 590} ;click on 'return to lobby' button 
     Sleep, 5000
 }
@@ -464,6 +468,26 @@ StatsCheck()
     }
 }
 
+SpamHonor()
+{
+    ;position variables
+    yOffset := 21 ;same UI for all 4 summoners, just shifted downards for each one
+    honorButtonX := 981     ;for the green thumbs up button
+    honorButtonYBase := 81  ;
+    honorSelectX := 828     ;for friendly, the honor on top
+    honorSelectYBase := 117 ;
+    honorSelectYOffset := 63 ;approx y distance between middle of honor type buttons
+
+    Loop, 4 ;spam for each allied summoner
+    {
+        yShift := (A_index-1)*yOffset ;everything shifts down as we move down through the summunoers
+        MouseClick, left, honorButtonX, honorButtonYBase+yShift
+        Sleep, 1000
+        Random, honorType, 0, 1 ;give friendly half the time, helpful the other
+        MouseClick, left, honorSelectX, honorSelectYBase+yShift+(honorType*honorSelectYOffset)
+        Sleep, 1000
+    }
+}
 
 Suicide()
 {

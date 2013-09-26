@@ -1,5 +1,6 @@
 #NoEnv
 #InstallKeybdHook
+#Include tf.ahk
 SetKeyDelay, 100, 30
 ;position of "lvl 3 RP reward" popup x in client: 801, 93
 ;position of "level up" popup x in client: 874, 93
@@ -10,70 +11,83 @@ SetKeyDelay, 100, 30
 
 ;this is a utility testing method - feel free to swap it out for whatever function
 #v::
-;LogIn("C:\accountData.txt")
-BotGameMaster()
+BotGameMaster("TT")
+;foo := 2+5
+;TF_ReplaceLine("!C:\offset.txt", "1", "1", foo)
 return
 
 #z::
-SpamHonor()
-;while true
-;{
-;    DoBattleTraining()
-;    Sleep, 5000
-;}
+;SivirLoop("SR")
+while true
+{
+    DoBattleTraining()
+    Sleep, 5000
+}
 return
 
 #q::
+Sleep, 80000
 WaitGameStart()
 WinGameLoop("TT")
 CleanupGame("master")
 Sleep, 20000 ;give ample time for everyone to align
-BotGameMaster()
+BotGameMaster("TT")
 return
 
 #w::
+Sleep, 80000
 WaitGameStart()
 WinGameLoop("TT")
 CleanupGame("slave")
 Sleep, 20000 ;give ample time for everyone to align
-BotGameSlave()
+BotGameSlave("TT")
 return
 
 #x::
 ;SlaveJoinGame()
 ;WinGameVisual(true) ; SelectYi() has been temporarily commented out for testing!
 ;SmurfSetup("C:\accountData.txt")
-;DoBattleTraining()
-BotGameSlave()
+;KayleLoop("SR")
+BotGameSlave("TT")
 return
 
 ;game creator for co-op vs ai spam
-BotGameMaster()
+BotGameMaster(map)
 {
     while true
     {
-        MasterCreateGame("TT", "peachhichew", "greenapplehichew", "mangohichew", "katherinewheel")
+        FileReadLine, masterOffset, masterOffset.txt, 1 ;get current position in smurf list
+        FileReadLine, smurf1, smurfs.txt, masterOffset+2 ;!!! currently hard-coded for TT!
+        FileReadLine, smurf2, smurfs.txt, masterOffset+5 ;
+        Sleep, 40000 ;wait for slaves to log in
+        MasterCreateGame(map, smurf1, smurf2, "", "")
         Sleep, 10000
         SelectFirstChamp()
+        Sleep, 80000
         WaitGameStart()
-        WinGameLoop("TT")
+        WinGameLoop(map)
         CleanupGame("master")
+        newOffset := masterOffset+6 ;!!! currently hard-coded for TT!
+        TF_ReplaceLine("!masterOffset.txt", "1", "1", newOffset)
         Sleep, 20000 ;give ample time for everyone to align
     }
 }
 
 ;game slave for co-op vs ai spam
-BotGameSlave()
+BotGameSlave(map)
 {
     while true
     {
+        FileReadLine, masterOffset, masterOffset.txt, 1 ;get current position in smurf list
+        FileReadLine, slaveNumber, C:\slaveNumber.txt, 1 ;get current position in smurf list
+        LogIn("smurfs.txt", masterOffset+(slaveNumber*3))
         SlaveJoinGame()
         Sleep, 10000
         SelectFirstChamp()
+        Sleep, 80000
         WaitGameStart()
-        WinGameLoop("TT")
+        WinGameLoop(map)
         CleanupGame("slave")
-        Sleep, 20000 ;give ample time for everyone to align
     }
 }
 
@@ -84,7 +98,7 @@ WinGameVisual(waitLong)
     if (waitLong)
         Sleep, 90000
     WaitGameStart()
-    WinGameLoopVisual()
+    WinGameLoopVisual("TT")
     
     CleanupGame("master")
 }
@@ -138,14 +152,7 @@ WinGameLoop(map)
 {
     while true
     {
-        if (map == "TT")
-        {
-            SuicideTT()
-        }
-        else
-        {
-            Suicide()
-        }
+        Suicide(map)
         ;SkillUp()   ;removed until we know what champs we're using
         ;Abilities() ;
         Sleep, 1000
@@ -156,18 +163,18 @@ WinGameLoop(map)
             return      
         }
         Sleep, 2000
-        Shop()
+        Shop(map)
     }
 }
 
 ;In-game loop of pushing/shopping with visual feedback
-WinGameLoopVisual()
+WinGameLoopVisual(map)
 {
     lastHealth := 100
     dangerHealth := 20 ;run away and heal if below this % health
     while true
     {
-        Suicide()
+        Suicide(map)
         ;SkillUp()   ;removed until we know what champs we're using
         ;Abilities() ;
         ;Sleep, 500
@@ -190,26 +197,24 @@ WinGameLoopVisual()
         ;end in-game debugging output
         if (health == 0) ;dead
         {
-            Shop()
+            Shop(map)
         }
         else if (health <= dangerHealth) ;if low, run away and b
         {
             Loop, 3 ;spam retreat (it sometimes drops on VM)
             {
-                MouseClick, right, 838, 753 
-                Sleep, 100
+                Retreat(map)
             }
             Sleep, 10000
             Send, b
             Sleep, 9000
-            Shop()
+            Shop(map)
         }
         else if (health < lastHealth) ;taking damage
         {
             Loop, 3 ;spam retreat (it sometimes drops on VM)
             {
-                MouseClick, right, 838, 753 
-                Sleep, 100
+                Retreat(map)
             }
             healthDiff := lastHealth - health
             if (healthDiff >= 30) ;took a lot of damage - retreat for next creep wave
@@ -227,13 +232,13 @@ WinGameLoopVisual()
 }
 
 ;In-game loop of pushing/shopping with visual feedback for kayle
-KayleLoop()
+KayleLoop(map)
 {
     lastHealth := 100
     dangerHealth := 20 ;run away and heal if below this % health
     while true
     {
-        Suicide()
+        Suicide(map)
         ;spam skills
         Send e ;spam auto buff
         Send d ;spam revive
@@ -251,40 +256,38 @@ KayleLoop()
         health := GetHealth()
         if (health == 0) ;dead
         {
-            Shop()
+            Shop(map)
         }
         else if (health <= dangerHealth) ;if low, run away and b
         {
             Loop, 3 ;spam retreat (it sometimes drops on VM)
             {
-                MouseClick, right, 838, 753 
-                Sleep, 100
+                Retreat(map)
             }
             Send !r              ;self-ult
             Send !w              ;self-heal for good measure
-            Sleep, 10000
+            Sleep, 7000
             Send, b
             Sleep, 9000
-            Shop()
+            Shop(map)
         }
         else if (health < lastHealth) ;taking damage
         {
             Loop, 3 ;spam retreat (it sometimes drops on VM)
             {
-                MouseClick, right, 838, 753 
-                Sleep, 100
+                Retreat(map)
             }
             healthDiff := lastHealth - health
             if (healthDiff >= 30) ;took a lot of damage - retreat for next creep wave
             {
                 Send !r              ;self-ult
                 Send !w              ;self-heal for good measure
-                Sleep, 15000
+                Sleep, 7000
             }
             else
             {
                 Send !w              ;self-heal
-                Sleep, 3000 ;didn't take too much - just jiggle back a bit
+                Sleep, 2000 ;didn't take too much - just jiggle back a bit
             }
             health := GetHealth() ;get fresh health measurement before storing
             lastHealth := health
@@ -297,13 +300,13 @@ KayleLoop()
 }
 
 ;In-game loop of pushing/shopping with visual feedback for ashe
-AsheLoop()
+AsheLoop(map)
 {
     lastHealth := 100
     dangerHealth := 20 ;run away and heal if below this % health
     while true
     {
-        Suicide()
+        Suicide(map)
         ;spam skills
         Send d ;spam revive
         Send f ;spam ghost
@@ -320,30 +323,28 @@ AsheLoop()
         health := GetHealth()
         if (health == 0) ;dead
         {
-            Shop()
+            Shop(map)
         }
         else if (health <= dangerHealth) ;if low, run away and b
         {
             Loop, 3 ;spam retreat (it sometimes drops on VM)
             {
-                MouseClick, right, 838, 753 
-                Sleep, 100
+                Retreat(map)
             }
             MouseMove, 610, 325 ;spam a volley as a parting gift
             Send w              ;
             MouseMove, 730, 145 ;toss an arrow out for good measure
             Send r              ;
-            Sleep, 10000
+            Sleep, 7000
             Send, b
             Sleep, 9000
-            Shop()
+            Shop(map)
         }
         else if (health < lastHealth) ;taking damage
         {
             Loop, 3 ;spam retreat (it sometimes drops on VM)
             {
-                MouseClick, right, 838, 753 
-                Sleep, 100
+                Retreat(map)
             }
             healthDiff := lastHealth - health
             if (healthDiff >= 30) ;took a lot of damage - retreat for next creep wave
@@ -352,13 +353,13 @@ AsheLoop()
                 Send w              ;
                 MouseMove, 730, 145 ;toss an arrow out for good measure
                 Send r              ;
-                Sleep, 15000
+                Sleep, 7000
             }
             else
             {
                 MouseMove, 610, 325 ;spam a volley as a parting gift
                 Send w           
-                Sleep, 3000 ;didn't take too much - just jiggle back a bit
+                Sleep, 2000 ;didn't take too much - just jiggle back a bit
             }
             health := GetHealth() ;get fresh health measurement before storing
             lastHealth := health
@@ -371,13 +372,13 @@ AsheLoop()
 }
 
 ;In-game loop of pushing/shopping with visual feedback for sivir
-SivirLoop()
+SivirLoop(map)
 {
     lastHealth := 100
     dangerHealth := 20 ;run away and heal if below this % health
     while true
     {
-        Suicide()
+        Suicide(map)
         ;spam skills
         Send w ;spam auto-booster
         Send r ;spam ult
@@ -386,7 +387,6 @@ SivirLoop()
         ;level up skills
         Send ^r ;skill up r
         Send ^w ;skill up w
-        Send ^e ;skill up e
         Send {Click 510, 416} ;click on "continue' button after defeat/victory
         IfWinExist, PVP.net Client
         {
@@ -396,37 +396,33 @@ SivirLoop()
         health := GetHealth()
         if (health == 0) ;dead
         {
-            Shop()
+            Shop(map)
         }
         else if (health <= dangerHealth) ;if low, run away and b
         {
             Loop, 3 ;spam retreat (it sometimes drops on VM)
             {
-                MouseClick, right, 838, 753 
-                Sleep, 100
+                Retreat(map)
             }
-            Send e ;randomly try to spell shield and get lucky
-            Sleep, 10000
+            Sleep, 7000
             Send, b
             Sleep, 9000
-            Shop()
+            Shop(map)
         }
         else if (health < lastHealth) ;taking damage
         {
             Loop, 3 ;spam retreat (it sometimes drops on VM)
             {
-                MouseClick, right, 838, 753 
-                Sleep, 100
+                Retreat(map)
             }
             healthDiff := lastHealth - health
             if (healthDiff >= 30) ;took a lot of damage - retreat for next creep wave
             {
-                Send e ;randomly try to spell shield and get lucky
-                Sleep, 15000
+                Sleep, 7000
             }
             else
             {
-                Sleep, 3000 ;didn't take too much - just jiggle back a bit
+                Sleep, 2000 ;didn't take too much - just jiggle back a bit
             }
             health := GetHealth() ;get fresh health measurement before storing
             lastHealth := health
@@ -484,25 +480,38 @@ SpamHonor()
         MouseClick, left, honorButtonX, honorButtonYBase+yShift
         Sleep, 1000
         Random, honorType, 0, 1 ;give friendly half the time, helpful the other
+        ;honorType := 1 ;temporarily give all helpful
         MouseClick, left, honorSelectX, honorSelectYBase+yShift+(honorType*honorSelectYOffset)
         Sleep, 1000
     }
 }
 
-Suicide()
+Retreat(map)
 {
-    Send {a} ;issue attack move command
-    Sleep, 200
-    Send {Click 1011, 598}  ; click on enemy fountain via minimap
-    Sleep, 300
+    if (map == "SR")
+    {
+        MouseClick, right, 838, 753
+        Sleep, 100
+    }
+    else if (map == "TT")
+    {
+        MouseClick, right, 847, 676
+        Sleep, 100
+    }
 }
 
-;suicide through bot lane on TT
-SuicideTT()
+Suicide(map)
 {
     Send {a} ;issue attack move command
     Sleep, 200
-    Send {Click 992, 669}  ; click on enemy fountain via minimap
+    if (map == "SR")
+    {
+        MouseClick, left, 1011, 598
+    }
+    else if (map == "TT")
+    {
+        MouseClick, left, 992, 685
+    }
     Sleep, 300
 }
 
@@ -540,46 +549,60 @@ Sleep, 100
 */
 }
 
-Shop()
+Shop(map)
 {
-MouseClick, left, 137,  754 ;click to open shop
-Sleep, 100
-MouseClick, left, 137,  754 ;click to open shop
-Sleep, 100
-MouseClick, left, 137,  754 ;click to open shop
-Sleep, 1000
-Send, {CTRLDOWN}l{CTRLUP}loo
-Sleep, 500
-MouseClick, left,  203, 189 ;select BT
-Sleep, 300
-MouseClick, left,  737,  233 ;try to buy BT
-MouseClick, left,  737,  233
-Sleep, 300
-MouseClick, left,  625,  293 ;try to buy BF sword
-MouseClick, left,  625,  293
-Sleep, 300
-MouseClick, left,  815,  290 ;try to buy vamp scepter
-MouseClick, left,  815,  290
-Sleep, 300
-MouseClick, left,  923, 64 ;click to close shop
-Sleep, 100
+    MouseClick, left, 137,  754 ;click to open shop
+    Sleep, 100
+    MouseClick, left, 137,  754 ;click to open shop
+    Sleep, 100
+    MouseClick, left, 137,  754 ;click to open shop
+    Sleep, 1000
+    if (map == "SR")
+    {
+        Send, {CTRLDOWN}l{CTRLUP}kk ;loo
+        Sleep, 500
+        MouseClick, left,  203, 189 ;select BT
+        Sleep, 300
+        MouseClick, left,  737,  233 ;try to buy BT
+        MouseClick, left,  737,  233
+        Sleep, 300
+        MouseClick, left,  625,  293 ;try to buy BF sword
+        MouseClick, left,  625,  293
+        Sleep, 300
+        MouseClick, left,  815,  290 ;try to buy vamp scepter
+        MouseClick, left,  815,  290
+    }
+    else if (map == "TT")
+    {
+        Send, {CTRLDOWN}l{CTRLUP}do
+        Sleep, 500
+        MouseClick, left,  207, 240 ;select doran's blade
+        Sleep, 300
+        MouseClick, left, 813, 464 ;try to buy doran's blade
+        MouseClick, left, 813, 464 ;
+        MouseClick, left, 813, 464 ;
+        MouseClick, left, 813, 464 ;
+    }
+    Sleep, 300
+    MouseClick, left,  923, 64 ;click to close shop
+    Sleep, 100
 
-;Send, {CTRLDOWN}l{CTRLUP}ydr ;old hydra-buying logic
-;Sleep, 500
-;MouseClick, left,  203, 189
-;Sleep, 300
-;MouseClick, left,  730,  253
-;MouseClick, left,  730,  253
-;Sleep, 300
-;MouseClick, left,  640,  311
-;MouseClick, left,  640,  311
-;Sleep, 300
-;MouseClick, left,  570,  375
-;MouseClick, left,  570,  375
-;Sleep, 300
-;MouseClick, left,  923, 64
-;Sleep, 100
-return
+    ;Send, {CTRLDOWN}l{CTRLUP}ydr ;old hydra-buying logic
+    ;Sleep, 500
+    ;MouseClick, left,  203, 189
+    ;Sleep, 300
+    ;MouseClick, left,  730,  253
+    ;MouseClick, left,  730,  253
+    ;Sleep, 300
+    ;MouseClick, left,  640,  311
+    ;MouseClick, left,  640,  311
+    ;Sleep, 300
+    ;MouseClick, left,  570,  375
+    ;MouseClick, left,  570,  375
+    ;Sleep, 300
+    ;MouseClick, left,  923, 64
+    ;Sleep, 100
+    return
 }
 
 ;Starting from client, create a custom game.
@@ -689,10 +712,12 @@ CloseLoLClient()
     return
 }
 
-LogIn(accountData) ;accountData should have account name on first line and pw on second
+LogIn(accountData, offset) ;accountData should have account name on first line and pw on second
 {
-    FileReadLine, username, %accountData%, 1
-    FileReadLine, password, %accountData%, 2
+    FileReadLine, username, %accountData%, 1+offset
+    FileReadLine, password, %accountData%, 3+offset
+
+    ;MsgBox, %username% %password%
 
     Run, C:\Riot Games\League of Legends\lol.launcher.exe
     Sleep, 15000
@@ -716,21 +741,22 @@ LogIn(accountData) ;accountData should have account name on first line and pw on
     WinWait, PVP.net Client
     WinActivate
     Sleep, 7000
-    Send {click 260,  240} ;username
+    Send {click 233,  255} ;username
     Sleep, 1000
     Send {ctrl down}a{ctrl up} ;select all previously existing text to overwrite
     SendInput, %username%
     Sleep, 2000
-    Send {click 230, 289} ;pw
+    Send {click 239, 315} ;pw
     SendInput, %password%
     Sleep, 2000
-    Send {click 302,  319} ;log in
+    Send {click 276,  338} ;log in
     Sleep, 20000
     return username
 }
 
 MasterCreateGame(map, summoner1, summoner2, summoner3, summoner4)
 {
+    ;MsgBox %summoner1% %summoner2%
     MouseClick, left,  511,  35 ;click orange "Play" button
     Sleep, 2000
     MouseClick, left,  278,  139 ;co-op vs ai
@@ -871,7 +897,7 @@ return
 
 SmurfSetup(accountData) ;fill out referral form on website - make sure captcha is typed in first!
 {
-    smurfName := LogIn(accountData)
+    smurfName := LogIn(accountData, 0)
     MouseClick, left,  470,  392 ;click name entry box
     Sleep, 500
     Send, %smurfName%

@@ -11,13 +11,16 @@ SetKeyDelay, 100, 30
 
 ;this is a utility testing method - feel free to swap it out for whatever function
 #v::
+WaitGameStart()
+WinGameLoop("TT")
+CleanupGame("master")
+Sleep, 20000 ;give ample time for everyone to align
 BotGameMaster("TT")
-;foo := 2+5
-;TF_ReplaceLine("!C:\offset.txt", "1", "1", foo)
+;UpdateNames()
 return
 
 #z::
-;SivirLoop("SR")
+;UpdateNames()
 while true
 {
     DoBattleTraining()
@@ -26,33 +29,20 @@ while true
 return
 
 #q::
-Sleep, 80000
-WaitGameStart()
-WinGameLoop("TT")
-CleanupGame("master")
-Sleep, 20000 ;give ample time for everyone to align
 BotGameMaster("TT")
 return
 
 #w::
-Sleep, 80000
-WaitGameStart()
-WinGameLoop("TT")
-CleanupGame("slave")
-Sleep, 20000 ;give ample time for everyone to align
 BotGameSlave("TT")
 return
 
 #x::
-;SlaveJoinGame()
-;WinGameVisual(true) ; SelectYi() has been temporarily commented out for testing!
-;SmurfSetup("C:\accountData.txt")
-;KayleLoop("SR")
-BotGameSlave("TT")
+MakeNewSmurf("ThatPlatFatMatt", "random17", "http://signup.leagueoflegends.com/?ref=4cc4c1a9f163d487340900")
+;BuyXPBoost()
 return
 
-;game creator for co-op vs ai spam
-BotGameMaster(map)
+;game creator for grinding honor
+HonorFarmMaster(map)
 {
     while true
     {
@@ -73,8 +63,8 @@ BotGameMaster(map)
     }
 }
 
-;game slave for co-op vs ai spam
-BotGameSlave(map)
+;game slave for grinding honor
+HonorFarmSlave(map)
 {
     while true
     {
@@ -88,6 +78,37 @@ BotGameSlave(map)
         WaitGameStart()
         WinGameLoop(map)
         CleanupGame("slave")
+    }
+}
+
+;game creator for co-op vs ai spam
+BotGameMaster(map)
+{
+    while true
+    {
+        MasterCreateGame(map, "fatmattplatcat", "platplatmattmatt", "", "")
+        Sleep, 10000
+        SelectFirstChamp()
+        Sleep, 80000
+        WaitGameStart()
+        WinGameLoop(map)
+        CleanupGame("master")
+        Sleep, 20000 ;give ample time for everyone to align
+    }
+}
+
+;game slave for co-op vs ai spam
+BotGameSlave(map)
+{
+    while true
+    {
+        SlaveJoinGame()
+        Sleep, 10000
+        SelectFirstChamp()
+        Sleep, 80000
+        WaitGameStart()
+        WinGameLoop(map)
+        CleanupGame("master") ;set to master to not spam honor
     }
 }
 
@@ -479,7 +500,7 @@ SpamHonor()
         yShift := (A_index-1)*yOffset ;everything shifts down as we move down through the summunoers
         MouseClick, left, honorButtonX, honorButtonYBase+yShift
         Sleep, 1000
-        Random, honorType, 0, 1 ;give friendly half the time, helpful the other
+        Random, honorType, 0, 2 ;give different kinds of honor uniformly
         ;honorType := 1 ;temporarily give all helpful
         MouseClick, left, honorSelectX, honorSelectYBase+yShift+(honorType*honorSelectYOffset)
         Sleep, 1000
@@ -750,7 +771,7 @@ LogIn(accountData, offset) ;accountData should have account name on first line a
     SendInput, %password%
     Sleep, 2000
     Send {click 276,  338} ;log in
-    Sleep, 20000
+    Sleep, 15000
     return username
 }
 
@@ -1032,6 +1053,22 @@ DoBattleTraining() ;run battle training automatically
 return
 }
 
+BuyXPBoost()
+{
+    MouseClick, left,  704,  40 ;open shop
+    Sleep, 7000
+    MouseClick, left,  67,  507 ;boosts
+    Sleep, 5000
+    MouseClick, left,  257,  155 ;search box
+    Sleep, 100
+    Send, xp
+    Sleep, 1000
+    MouseClick, left,  576,  286 ;3 day boost
+    Sleep, 3000
+    MouseClick, left,  593,  574 ;purchase
+    Sleep, 2000
+}
+
 GetHealth()
 {
     healthXBase := 396
@@ -1056,4 +1093,109 @@ GetHealth()
         }
     }
     return health
+}
+
+NameChange(name)
+{
+    MouseClick, left,  455,  387
+    Sleep, 100
+    Send, %name%
+    MouseClick, left,  508,  457
+    Sleep, 600
+    MouseClick, left,  494,  356
+    Sleep, 600
+    FileAppend, `n%name%, smurfs.txt
+    FileAppend, `n%name%, smurfs.txt
+    FileAppend, `ntrivial11p, smurfs.txt
+    MouseClick, left,  1013,  12
+    Sleep, 600
+    MouseClick, left,  440,  348
+    Sleep, 600   
+}
+
+LogInManual(username, password) ;accountData should have account name on first line and pw on second
+{
+    Run, C:\Riot Games\League of Legends\lol.launcher.exe
+    Sleep, 3000
+    While 1
+    {
+        IfWinExist, Error ;silly hack to dismiss the "another instance of LoL is running" box
+        {
+            WinActivate
+            Send {Enter}
+            Break
+        }
+        IfWinExist, PVP.net Patcher
+            Break
+    }
+
+    WinWait, PVP.net Patcher
+    WinActivate
+    Sleep, 3000
+    Send {click 701, 549} ;click on orange "play" button
+
+    WinWait, PVP.net Client
+    WinActivate
+    Sleep, 4000
+    Send {click 233,  255} ;username
+    Sleep, 1000
+    Send {ctrl down}a{ctrl up} ;select all previously existing text to overwrite
+    SendInput, %username%
+    Sleep, 1000
+    Send {click 239, 315} ;pw
+    SendInput, %password%
+    Sleep, 1000
+    Send {click 276,  338} ;log in
+    Sleep, 17000
+    return
+}
+
+UpdateNames()
+{
+    trollNum := 1
+    while true
+    {
+        trollName := "mybotmybot" . trollNum
+        LogInManual(trollName, "randomer17")
+        NameChange(trollName)
+        trollNum := trollNum + 1
+    }
+}
+
+MakeNewSmurf(username, password, reflink)
+{
+    run C:\Program Files (x86)\Google\Chrome\Application\chrome.exe
+    SetTitleMatchMode, 2 ;look for windows that merely contain "google chrome"
+    WinWait, Google Chrome, 
+    IfWinNotActive, Google Chrome, , WinActivate, Google Chrome, 
+    WinWaitActive, Google Chrome, 
+    Send, {CTRLDOWN}l{CTRLUP}wg741.webgate.pl{ENTER}
+    Sleep, 15000
+    ;WinWait, wg741.webgate.pl - Google Chrome, 
+    ;IfWinNotActive, wg741.webgate.pl - Google Chrome, , WinActivate, wg741.webgate.pl - Google Chrome, 
+    ;WinWaitActive, wg741.webgate.pl - Google Chrome, 
+    MouseClick, left,  340,  293 ;reflink box
+    Sleep, 100
+    Send, %reflink%
+    MouseClick, left,  334,  339 
+    Sleep, 100
+    Send, {CTRLDOWN}a{CTRLUP}%username%
+    MouseClick, left,  325,  368
+    Sleep, 100
+    Send, {CTRLDOWN}a{CTRLUP}%password%
+    MouseClick, left,  233,  426
+    Sleep, 100
+    Random, day, 1, 28
+    Send, {CTRLDOWN}a{CTRLUP}%day%
+    MouseClick, left,  300,  430
+    Sleep, 100
+    Random, month, 1, 12
+    Send, {CTRLDOWN}a{CTRLUP}%month%
+    MouseClick, left,  384,  419
+    Sleep, 100
+    Random, year, 1981, 1992
+    Send, {CTRLDOWN}a{CTRLUP}%year%
+    MouseClick, left,  261,  472 ;create!
+    Sleep, 10000 ;wait for account to create
+    ;add new account to smurf list
 }

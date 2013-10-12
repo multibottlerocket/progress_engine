@@ -4,6 +4,13 @@
 SetKeyDelay, 100, 30
 ;position of "lvl 3 RP reward" popup x in client: 801, 93
 ;position of "level up" popup x in client: 874, 93
+;matt's referral link: "http://signup.leagueoflegends.com/?ref=4cc4c1a9f163d487340900"
+;jlosh referral link:  "http://signup.leagueoflegends.com/?ref=4df3022975a2d908834853"
+;george ref link:      "http://signup.leagueoflegends.com/?ref=4dc070d8d86a0397596492"
+
+;"OK" for in-game afk notification that exits game 617, 472
+;I think bug splats for battle trainning don't give you the orange "reconnect" button - 
+;   they just put you on the normal client screen
 
 #s::Reload
 
@@ -11,21 +18,11 @@ SetKeyDelay, 100, 30
 
 ;this is a utility testing method - feel free to swap it out for whatever function
 #v::
-WaitGameStart()
-WinGameLoop("TT")
-CleanupGame("master")
-Sleep, 20000 ;give ample time for everyone to align
-BotGameMaster("TT")
-;UpdateNames()
+CheckIfFive()
 return
 
 #z::
-;UpdateNames()
-while true
-{
-    DoBattleTraining()
-    Sleep, 5000
-}
+
 return
 
 #q::
@@ -37,9 +34,93 @@ BotGameSlave("TT")
 return
 
 #x::
-MakeNewSmurf("ThatPlatFatMatt", "random17", "http://signup.leagueoflegends.com/?ref=4cc4c1a9f163d487340900")
-;BuyXPBoost()
+;MakeNewSmurf("myclam7", "random17", "http://signup.leagueoflegends.com/?ref=4dc070d8d86a0397596492")
+;SmurfSetup("myclam7", "random17")
+;Loop, 5
+;{
+;    DoBattleTraining()
+;    Sleep, 5000
+;}
+;BuyXPBoost("small")
+Loop, 4
+{
+    DoBattleTraining()
+    Sleep, 5000
+}
+CloseLoLClient()
+;Sleep, 120000
+MakeNewSmurf("myclam4", "random17", "http://signup.leagueoflegends.com/?ref=4dc070d8d86a0397596492")
+SmurfSetup("myclam4", "random17")
+Loop, 5
+{
+    DoBattleTraining()
+    Sleep, 5000
+}
+BuyXPBoost("small")
+Loop, 4
+{
+    DoBattleTraining()
+    Sleep, 5000
+}
+CloseLoLClient()
+MakeNewSmurf("myclam10", "random17", "http://signup.leagueoflegends.com/?ref=4dc070d8d86a0397596492")
+SmurfSetup("myclam10", "random17")
+Loop, 5
+{
+    DoBattleTraining()
+    Sleep, 5000
+}
+BuyXPBoost("small")
+Loop, 4
+{
+    DoBattleTraining()
+    Sleep, 5000
+}
+CloseLoLClient()
 return
+
+AutoSmurf(username, password, reflink)
+{
+    ;check if we're in the middle of getting a smurf to 5 (numTrainings != -1)
+    ;if not, 
+        ;get smurf index from global smurf index file
+        ;append smurf index to username base
+        ;make new account, etc
+    ;else,
+        ;if numTrainings < 5, GrindLvl3
+        ;else, GrindLvl5
+
+    MakeNewSmurf(username, password, reflink)
+
+    ;increment smurf index in global smurf index file
+
+    SmurfSetup(username, password)
+
+    ;set # of trainings in local training file to 0
+
+    numTrainings := 0
+    while numTrainings < 5
+    {
+        DoBattleTraining()
+        Sleep, 5000
+        ;numTrainings := GetNumTrainings(reflink)
+    }
+    BuyXPBoost("small") ;now we're level 3, so use some of the free RP for an XP boost
+
+    ;set # trainings to 100 (outside of [-1, 5]) to indicate boost has been bought
+
+    while not CheckIfFive() 
+    {
+        DoBattleTraining()
+        Sleep, 5000
+    }
+
+    ;push smurf onto "lvl 5-9 smurfs list"
+    ;set # of trainings in local training file to -1, indicating we're currently not grinding a smurf
+
+    CloseLoLClient()
+    return
+}
 
 ;game creator for grinding honor
 HonorFarmMaster(map)
@@ -112,18 +193,6 @@ BotGameSlave(map)
     }
 }
 
-WinGameVisual(waitLong)
-{
-    ;SelectYi() ; ***temporarily commented out for testing!***
-    Sleep, 20000 ;open-loop wait for countdown and loading of game
-    if (waitLong)
-        Sleep, 90000
-    WaitGameStart()
-    WinGameLoopVisual("TT")
-    
-    CleanupGame("master")
-}
-
 ;waits for game to start
 WaitGameStart()
 {
@@ -185,273 +254,6 @@ WinGameLoop(map)
         }
         Sleep, 2000
         Shop(map)
-    }
-}
-
-;In-game loop of pushing/shopping with visual feedback
-WinGameLoopVisual(map)
-{
-    lastHealth := 100
-    dangerHealth := 20 ;run away and heal if below this % health
-    while true
-    {
-        Suicide(map)
-        ;SkillUp()   ;removed until we know what champs we're using
-        ;Abilities() ;
-        ;Sleep, 500
-        Send {Click 510, 416} ;click on "continue' button after defeat/victory
-        IfWinExist, PVP.net Client
-        {
-            WinActivate
-            return      
-        }
-        ;Sleep, 500
-        health := GetHealth()
-        ;in-game debug output
-        ;healthXBase := 396
-        ;healthDbgY := 730
-        ;lastHealthDbgY := 720 
-        ;Send {Enter}
-        ;Send %health%
-        ;Send %lastHealth%
-        ;Send {Enter}
-        ;end in-game debugging output
-        if (health == 0) ;dead
-        {
-            Shop(map)
-        }
-        else if (health <= dangerHealth) ;if low, run away and b
-        {
-            Loop, 3 ;spam retreat (it sometimes drops on VM)
-            {
-                Retreat(map)
-            }
-            Sleep, 10000
-            Send, b
-            Sleep, 9000
-            Shop(map)
-        }
-        else if (health < lastHealth) ;taking damage
-        {
-            Loop, 3 ;spam retreat (it sometimes drops on VM)
-            {
-                Retreat(map)
-            }
-            healthDiff := lastHealth - health
-            if (healthDiff >= 30) ;took a lot of damage - retreat for next creep wave
-                Sleep, 15000
-            else
-                Sleep, 3000 ;didn't take too much - just jiggle back a bit
-            health := GetHealth() ;get fresh health measurement before storing
-            lastHealth := health
-        }
-        else ;all is well
-        {
-            lastHealth := health
-        }
-    }
-}
-
-;In-game loop of pushing/shopping with visual feedback for kayle
-KayleLoop(map)
-{
-    lastHealth := 100
-    dangerHealth := 20 ;run away and heal if below this % health
-    while true
-    {
-        Suicide(map)
-        ;spam skills
-        Send e ;spam auto buff
-        Send d ;spam revive
-        Send f ;spam ghost
-        ;level up skills
-        Send ^r ;skill up r
-        Send ^e ;skill up w
-        Send ^w ;skill up e
-        Send {Click 510, 416} ;click on "continue' button after defeat/victory
-        IfWinExist, PVP.net Client
-        {
-            WinActivate
-            return      
-        }
-        health := GetHealth()
-        if (health == 0) ;dead
-        {
-            Shop(map)
-        }
-        else if (health <= dangerHealth) ;if low, run away and b
-        {
-            Loop, 3 ;spam retreat (it sometimes drops on VM)
-            {
-                Retreat(map)
-            }
-            Send !r              ;self-ult
-            Send !w              ;self-heal for good measure
-            Sleep, 7000
-            Send, b
-            Sleep, 9000
-            Shop(map)
-        }
-        else if (health < lastHealth) ;taking damage
-        {
-            Loop, 3 ;spam retreat (it sometimes drops on VM)
-            {
-                Retreat(map)
-            }
-            healthDiff := lastHealth - health
-            if (healthDiff >= 30) ;took a lot of damage - retreat for next creep wave
-            {
-                Send !r              ;self-ult
-                Send !w              ;self-heal for good measure
-                Sleep, 7000
-            }
-            else
-            {
-                Send !w              ;self-heal
-                Sleep, 2000 ;didn't take too much - just jiggle back a bit
-            }
-            health := GetHealth() ;get fresh health measurement before storing
-            lastHealth := health
-        }
-        else ;all is well
-        {
-            lastHealth := health
-        }
-    }
-}
-
-;In-game loop of pushing/shopping with visual feedback for ashe
-AsheLoop(map)
-{
-    lastHealth := 100
-    dangerHealth := 20 ;run away and heal if below this % health
-    while true
-    {
-        Suicide(map)
-        ;spam skills
-        Send d ;spam revive
-        Send f ;spam ghost
-        ;level up skills
-        Send ^r ;skill up r
-        Send ^w ;skill up w
-        Send ^e ;skill up e
-        Send {Click 510, 416} ;click on "continue' button after defeat/victory
-        IfWinExist, PVP.net Client
-        {
-            WinActivate
-            return      
-        }
-        health := GetHealth()
-        if (health == 0) ;dead
-        {
-            Shop(map)
-        }
-        else if (health <= dangerHealth) ;if low, run away and b
-        {
-            Loop, 3 ;spam retreat (it sometimes drops on VM)
-            {
-                Retreat(map)
-            }
-            MouseMove, 610, 325 ;spam a volley as a parting gift
-            Send w              ;
-            MouseMove, 730, 145 ;toss an arrow out for good measure
-            Send r              ;
-            Sleep, 7000
-            Send, b
-            Sleep, 9000
-            Shop(map)
-        }
-        else if (health < lastHealth) ;taking damage
-        {
-            Loop, 3 ;spam retreat (it sometimes drops on VM)
-            {
-                Retreat(map)
-            }
-            healthDiff := lastHealth - health
-            if (healthDiff >= 30) ;took a lot of damage - retreat for next creep wave
-            {
-                MouseMove, 610, 325 ;spam a volley as a parting gift
-                Send w              ;
-                MouseMove, 730, 145 ;toss an arrow out for good measure
-                Send r              ;
-                Sleep, 7000
-            }
-            else
-            {
-                MouseMove, 610, 325 ;spam a volley as a parting gift
-                Send w           
-                Sleep, 2000 ;didn't take too much - just jiggle back a bit
-            }
-            health := GetHealth() ;get fresh health measurement before storing
-            lastHealth := health
-        }
-        else ;all is well
-        {
-            lastHealth := health
-        }
-    }
-}
-
-;In-game loop of pushing/shopping with visual feedback for sivir
-SivirLoop(map)
-{
-    lastHealth := 100
-    dangerHealth := 20 ;run away and heal if below this % health
-    while true
-    {
-        Suicide(map)
-        ;spam skills
-        Send w ;spam auto-booster
-        Send r ;spam ult
-        Send d ;spam revive
-        Send f ;spam ghost
-        ;level up skills
-        Send ^r ;skill up r
-        Send ^w ;skill up w
-        Send {Click 510, 416} ;click on "continue' button after defeat/victory
-        IfWinExist, PVP.net Client
-        {
-            WinActivate
-            return      
-        }
-        health := GetHealth()
-        if (health == 0) ;dead
-        {
-            Shop(map)
-        }
-        else if (health <= dangerHealth) ;if low, run away and b
-        {
-            Loop, 3 ;spam retreat (it sometimes drops on VM)
-            {
-                Retreat(map)
-            }
-            Sleep, 7000
-            Send, b
-            Sleep, 9000
-            Shop(map)
-        }
-        else if (health < lastHealth) ;taking damage
-        {
-            Loop, 3 ;spam retreat (it sometimes drops on VM)
-            {
-                Retreat(map)
-            }
-            healthDiff := lastHealth - health
-            if (healthDiff >= 30) ;took a lot of damage - retreat for next creep wave
-            {
-                Sleep, 7000
-            }
-            else
-            {
-                Sleep, 2000 ;didn't take too much - just jiggle back a bit
-            }
-            health := GetHealth() ;get fresh health measurement before storing
-            lastHealth := health
-        }
-        else ;all is well
-        {
-            lastHealth := health
-        }
     }
 }
 
@@ -916,30 +718,6 @@ SlaveJoinGame()
 }
 return
 
-SmurfSetup(accountData) ;fill out referral form on website - make sure captcha is typed in first!
-{
-    smurfName := LogIn(accountData, 0)
-    MouseClick, left,  470,  392 ;click name entry box
-    Sleep, 500
-    Send, %smurfName%
-    MouseClick, left,  494,  451 ;confirm name entry
-    Sleep, 5000
-    MouseClick, left,  365,  327 ;select summoner icon
-    Sleep, 1000
-    MouseClick, left,  775,  430 ;confirm icon
-    Sleep, 2000
-    MouseClick, left,  311,  320 ;pick noob tier
-    Sleep, 2000
-    MouseClick, left,  724,  439 ;confirm tier
-    Sleep, 2000
-    MouseClick, left,  555,  405 ;decline tutorial
-    Sleep, 1000
-    MouseClick, left,  555,  405 ;decline battle trainig
-    Sleep, 3000
-    ;CloseLoLClient()
-    return
-}
-
 DoBattleTraining() ;run battle training automatically
 {
     MouseClick, left,  510,  35 
@@ -1020,8 +798,12 @@ DoBattleTraining() ;run battle training automatically
             Send {f}
             Sleep, 100
             Send {Enter}
-            Sleep, 20000 ;give lots of time for nexus to blow up and 'continue' button to appear
-            break
+        }
+        Send {Click 510, 416} ;click on "continue' button after defeat
+        IfWinExist, PVP.net Client
+        {
+            WinActivate
+            break       
         }
     }
 
@@ -1053,7 +835,7 @@ DoBattleTraining() ;run battle training automatically
 return
 }
 
-BuyXPBoost()
+BuyXPBoost(size)
 {
     MouseClick, left,  704,  40 ;open shop
     Sleep, 7000
@@ -1063,36 +845,15 @@ BuyXPBoost()
     Sleep, 100
     Send, xp
     Sleep, 1000
-    MouseClick, left,  576,  286 ;3 day boost
+    if (size == "big")
+        MouseClick, left,  576,  286 ;3 day boost
+    else if (size == "small")
+        MouseClick, left,  763,  287 ;1 day boost
+    else
+        MouseClick, left,  763,  287 ;1 day boost    
     Sleep, 3000
     MouseClick, left,  593,  574 ;purchase
     Sleep, 2000
-}
-
-GetHealth()
-{
-    healthXBase := 396
-    healthY := 740
-    Loop, 11
-    {
-        healthX := healthXBase + (A_index-1)*25 ;health bar is ~250 pixels wide
-        PixelSearch, FoundX, FoundY, healthX, healthY, healthX, healthY, 0x000000, 32 ;look for black-ish pixel
-        if (ErrorLevel and A_index < 11) ;pixel was not black and we're not at the end
-        {
-            continue
-        }
-        else if (ErrorLevel) ;pixel was not black and we're at the end of the health bar
-        {
-            health := 100
-            break
-        }
-        else ;pixel was black, so we found the end of the green
-        {
-            health := 10*(A_index-1)
-            break
-        }
-    }
-    return health
 }
 
 NameChange(name)
@@ -1146,7 +907,7 @@ LogInManual(username, password) ;accountData should have account name on first l
     SendInput, %password%
     Sleep, 1000
     Send {click 276,  338} ;log in
-    Sleep, 17000
+    Sleep, 25000
     return
 }
 
@@ -1182,6 +943,8 @@ MakeNewSmurf(username, password, reflink)
     Send, {CTRLDOWN}a{CTRLUP}%username%
     MouseClick, left,  325,  368
     Sleep, 100
+    MouseClick, left,  325,  368
+    Sleep, 100
     Send, {CTRLDOWN}a{CTRLUP}%password%
     MouseClick, left,  233,  426
     Sleep, 100
@@ -1196,6 +959,52 @@ MakeNewSmurf(username, password, reflink)
     Random, year, 1981, 1992
     Send, {CTRLDOWN}a{CTRLUP}%year%
     MouseClick, left,  261,  472 ;create!
-    Sleep, 10000 ;wait for account to create
+    Sleep, 30000 ;wait for account to create
     ;add new account to smurf list
+    IfWinExist, Google Chrome
+    {
+        WinKill
+    }
+}
+
+SmurfSetup(username, password) ;fill out referral form on website - make sure captcha is typed in first!
+{
+    smurfName := LogInManual(username, password)
+    MouseClick, left,  470,  392 ;click name entry box
+    Sleep, 500
+    Send, %username%
+    MouseClick, left,  494,  451 ;confirm name entry
+    Sleep, 5000
+    MouseClick, left,  365,  327 ;select summoner icon
+    Sleep, 1000
+    MouseClick, left,  775,  430 ;confirm icon
+    Sleep, 2000
+    MouseClick, left,  311,  320 ;pick noob tier
+    Sleep, 2000
+    MouseClick, left,  724,  439 ;confirm tier
+    Sleep, 2000
+    MouseClick, left,  555,  405 ;decline tutorial
+    Sleep, 1000
+    MouseClick, left,  555,  405 ;decline battle trainig
+    Sleep, 3000
+    ;CloseLoLClient()
+    return
+}
+
+CheckIfFive() ;check if acct is level 5 ;make sure you have level5.bmp from the git repository in your working directory
+{
+    MouseClick, left, 769, 43 ;view profile
+    Sleep, 5000
+    ImageSearch, FoundX, FoundY, 357, 252, 426, 276, level5.png ;scan for "level 5" with image
+    if ErrorLevel ;could not find
+    {
+        ;MsgBox, not found
+        return false    
+    }
+    else
+    {
+        ;MsgBox, found
+        return true
+    }
+    return
 }

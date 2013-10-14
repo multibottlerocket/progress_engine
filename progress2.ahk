@@ -18,11 +18,17 @@ SetKeyDelay, 100, 30
 
 ;this is a utility testing method - feel free to swap it out for whatever function
 #v::
-CheckIfFive()
+Sleep, 1000
+BuyXPBoost("small")
+Loop, 4
+{
+    DoBattleTraining()
+    Sleep, 5000
+}
 return
 
 #z::
-
+AutoSmurf("eggie5Parada", "random17", "http://signup.leagueoflegends.com/?ref=4dc070d8d86a0397596492")
 return
 
 #q::
@@ -838,9 +844,9 @@ return
 BuyXPBoost(size)
 {
     MouseClick, left,  704,  40 ;open shop
-    Sleep, 7000
+    Sleep, 15000
     MouseClick, left,  67,  507 ;boosts
-    Sleep, 5000
+    Sleep, 10000
     MouseClick, left,  257,  155 ;search box
     Sleep, 100
     Send, xp
@@ -925,7 +931,7 @@ UpdateNames()
 
 MakeNewSmurf(username, password, reflink)
 {
-    run C:\Program Files (x86)\Google\Chrome\Application\chrome.exe
+    run C:\Program Files\Google\Chrome\Application\chrome.exe
     SetTitleMatchMode, 2 ;look for windows that merely contain "google chrome"
     WinWait, Google Chrome, 
     IfWinNotActive, Google Chrome, , WinActivate, Google Chrome, 

@@ -7,6 +7,8 @@ SetKeyDelay, 100, 30
 ;matt's referral link: "http://signup.leagueoflegends.com/?ref=4cc4c1a9f163d487340900"
 ;jlosh referral link:  "http://signup.leagueoflegends.com/?ref=4df3022975a2d908834853"
 ;george ref link:      "http://signup.leagueoflegends.com/?ref=4dc070d8d86a0397596492"
+;tiffany ref link:      http://signup.leagueoflegends.com/?ref=525b5a8594184160217873
+;josh ref link:         http://signup.leagueoflegends.com/?ref=525b4f68a0b5a519065718
 
 ;"OK" for in-game afk notification that exits game 617, 472
 ;I think bug splats for battle trainning don't give you the orange "reconnect" button - 
@@ -22,7 +24,11 @@ CheckIfFive()
 return
 
 #z::
-
+Loop, 1
+{
+    DoBattleTraining()
+    Sleep, 5000
+}
 return
 
 #q::
@@ -34,23 +40,11 @@ BotGameSlave("TT")
 return
 
 #x::
-;MakeNewSmurf("myclam7", "random17", "http://signup.leagueoflegends.com/?ref=4dc070d8d86a0397596492")
-;SmurfSetup("myclam7", "random17")
-;Loop, 5
-;{
-;    DoBattleTraining()
-;    Sleep, 5000
-;}
-;BuyXPBoost("small")
-Loop, 4
-{
-    DoBattleTraining()
-    Sleep, 5000
-}
-CloseLoLClient()
-;Sleep, 120000
-MakeNewSmurf("myclam4", "random17", "http://signup.leagueoflegends.com/?ref=4dc070d8d86a0397596492")
-SmurfSetup("myclam4", "random17")
+;Sleep, 60000
+;MakeNewSmurf("mikklepunez1", "random17", "http://signup.leagueoflegends.com/?ref=525b4f68a0b5a519065718") ;tiffany
+MakeNewSmurf("GPDay2RareDraft", "random17", "http://signup.leagueoflegends.com/?ref=525b4f68a0b5a519065718") ;josh
+;MakeNewSmurf("myclam20", "random17", "http://signup.leagueoflegends.com/?ref=4dc070d8d86a0397596492") ;george
+SmurfSetup("GPDay2RareDraft", "random17")
 Loop, 5
 {
     DoBattleTraining()
@@ -63,8 +57,11 @@ Loop, 4
     Sleep, 5000
 }
 CloseLoLClient()
-MakeNewSmurf("myclam10", "random17", "http://signup.leagueoflegends.com/?ref=4dc070d8d86a0397596492")
-SmurfSetup("myclam10", "random17")
+;Sleep, 120000
+;MakeNewSmurf("mikklepunez2", "random17", "http://signup.leagueoflegends.com/?ref=525b4f68a0b5a519065718") ;tiffany
+MakeNewSmurf("tabakattack1", "random17", "http://signup.leagueoflegends.com/?ref=525b4f68a0b5a519065718") ;josh
+;MakeNewSmurf("myclam23", "random17", "http://signup.leagueoflegends.com/?ref=4dc070d8d86a0397596492") ;george
+SmurfSetup("tabakattack1", "random17")
 Loop, 5
 {
     DoBattleTraining()
@@ -925,7 +922,7 @@ UpdateNames()
 
 MakeNewSmurf(username, password, reflink)
 {
-    run C:\Program Files (x86)\Google\Chrome\Application\chrome.exe
+    run C:\Program Files\Google\Chrome\Application\chrome.exe
     SetTitleMatchMode, 2 ;look for windows that merely contain "google chrome"
     WinWait, Google Chrome, 
     IfWinNotActive, Google Chrome, , WinActivate, Google Chrome, 

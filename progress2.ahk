@@ -12,78 +12,6 @@ SetKeyDelay, 100, 30
 ;I think bug splats for battle trainning don't give you the orange "reconnect" button - 
 ;   they just put you on the normal client screen
 
-#s::Reload
-
-#t::Pause
-
-;this is a utility testing method - feel free to swap it out for whatever function
-#v::
-Sleep, 1000
-BuyXPBoost("small")
-Loop, 4
-{
-    DoBattleTraining()
-    Sleep, 5000
-}
-return
-
-#z::
-AutoSmurf("eggie5Parada", "random17", "http://signup.leagueoflegends.com/?ref=4dc070d8d86a0397596492")
-return
-
-#q::
-BotGameMaster("TT")
-return
-
-#w::
-BotGameSlave("TT")
-return
-
-#x::
-;MakeNewSmurf("myclam7", "random17", "http://signup.leagueoflegends.com/?ref=4dc070d8d86a0397596492")
-;SmurfSetup("myclam7", "random17")
-;Loop, 5
-;{
-;    DoBattleTraining()
-;    Sleep, 5000
-;}
-;BuyXPBoost("small")
-Loop, 4
-{
-    DoBattleTraining()
-    Sleep, 5000
-}
-CloseLoLClient()
-;Sleep, 120000
-MakeNewSmurf("myclam4", "random17", "http://signup.leagueoflegends.com/?ref=4dc070d8d86a0397596492")
-SmurfSetup("myclam4", "random17")
-Loop, 5
-{
-    DoBattleTraining()
-    Sleep, 5000
-}
-BuyXPBoost("small")
-Loop, 4
-{
-    DoBattleTraining()
-    Sleep, 5000
-}
-CloseLoLClient()
-MakeNewSmurf("myclam10", "random17", "http://signup.leagueoflegends.com/?ref=4dc070d8d86a0397596492")
-SmurfSetup("myclam10", "random17")
-Loop, 5
-{
-    DoBattleTraining()
-    Sleep, 5000
-}
-BuyXPBoost("small")
-Loop, 4
-{
-    DoBattleTraining()
-    Sleep, 5000
-}
-CloseLoLClient()
-return
 
 AutoSmurf(username, password, reflink)
 {
@@ -109,6 +37,7 @@ AutoSmurf(username, password, reflink)
     {
         DoBattleTraining()
         Sleep, 5000
+        numTrainings += 1
         ;numTrainings := GetNumTrainings(reflink)
     }
     BuyXPBoost("small") ;now we're level 3, so use some of the free RP for an XP boost
@@ -935,7 +864,8 @@ MakeNewSmurf(username, password, reflink)
     SetTitleMatchMode, 2 ;look for windows that merely contain "google chrome"
     WinWait, Google Chrome, 
     IfWinNotActive, Google Chrome, , WinActivate, Google Chrome, 
-    WinWaitActive, Google Chrome, 
+    WinWaitActive, Google Chrome,
+    Sleep, 10000
     Send, {CTRLDOWN}l{CTRLUP}wg741.webgate.pl{ENTER}
     Sleep, 15000
     ;WinWait, wg741.webgate.pl - Google Chrome, 

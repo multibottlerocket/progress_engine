@@ -7,6 +7,8 @@ SetKeyDelay, 100, 30
 ;matt's referral link: "http://signup.leagueoflegends.com/?ref=4cc4c1a9f163d487340900"
 ;jlosh referral link:  "http://signup.leagueoflegends.com/?ref=4df3022975a2d908834853"
 ;george ref link:      "http://signup.leagueoflegends.com/?ref=4dc070d8d86a0397596492"
+;josh ref link:        "http://signup.leagueoflegends.com/?ref=525b4f68a0b5a519065718"
+;tiffany ref link:     "http://signup.leagueoflegends.com/?ref=525b5a8594184160217873"
 
 ;"OK" for in-game afk notification that exits game 617, 472
 ;I think bug splats for battle trainning don't give you the orange "reconnect" button - 
@@ -28,7 +30,11 @@ Loop, 4
 return
 
 #z::
-AutoSmurf("eggie5Parada", "random17", "http://signup.leagueoflegends.com/?ref=4dc070d8d86a0397596492")
+;AutoSmurf("tabakattack1", "random17", "http://signup.leagueoflegends.com/?ref=4dc070d8d86a0397596492") ;george
+AutoSmurf("tabakattack4", "random17", "http://signup.leagueoflegends.com/?ref=525b4f68a0b5a519065718") ;josh
+AutoSmurf("tabakattack5", "random17", "http://signup.leagueoflegends.com/?ref=525b4f68a0b5a519065718") ;josh
+;AutoSmurf("mikklepunez3", "random17", "http://signup.leagueoflegends.com/?ref=525b5a8594184160217873") ;tiffany
+;AutoSmurf("mikklepunez5", "random17", "http://signup.leagueoflegends.com/?ref=525b5a8594184160217873") ;tiffany
 return
 
 #q::
@@ -40,49 +46,25 @@ BotGameSlave("TT")
 return
 
 #x::
-;MakeNewSmurf("myclam7", "random17", "http://signup.leagueoflegends.com/?ref=4dc070d8d86a0397596492")
-;SmurfSetup("myclam7", "random17")
+;Sleep, 120000
+;LogInManual("toomanygrapeshots", "random17")
+;SmurfSetup("myclam4", "random17")
 ;Loop, 5
 ;{
 ;    DoBattleTraining()
 ;    Sleep, 5000
 ;}
 ;BuyXPBoost("small")
-Loop, 4
+Loop, 2
 {
     DoBattleTraining()
     Sleep, 5000
 }
 CloseLoLClient()
-;Sleep, 120000
-MakeNewSmurf("myclam4", "random17", "http://signup.leagueoflegends.com/?ref=4dc070d8d86a0397596492")
-SmurfSetup("myclam4", "random17")
-Loop, 5
-{
-    DoBattleTraining()
-    Sleep, 5000
-}
-BuyXPBoost("small")
-Loop, 4
-{
-    DoBattleTraining()
-    Sleep, 5000
-}
-CloseLoLClient()
-MakeNewSmurf("myclam10", "random17", "http://signup.leagueoflegends.com/?ref=4dc070d8d86a0397596492")
-SmurfSetup("myclam10", "random17")
-Loop, 5
-{
-    DoBattleTraining()
-    Sleep, 5000
-}
-BuyXPBoost("small")
-Loop, 4
-{
-    DoBattleTraining()
-    Sleep, 5000
-}
-CloseLoLClient()
+;AutoSmurf("tabakattack3", "random17", "http://signup.leagueoflegends.com/?ref=525b4f68a0b5a519065718") ;josh
+;AutoSmurf("tabakattack4", "random17", "http://signup.leagueoflegends.com/?ref=525b4f68a0b5a519065718") ;josh
+AutoSmurf("mikklepunez5", "random17", "http://signup.leagueoflegends.com/?ref=525b5a8594184160217873") ;tiffany
+AutoSmurf("mikklepunez6", "random17", "http://signup.leagueoflegends.com/?ref=525b5a8594184160217873") ;tiffany
 return
 
 AutoSmurf(username, password, reflink)
@@ -110,6 +92,7 @@ AutoSmurf(username, password, reflink)
         DoBattleTraining()
         Sleep, 5000
         ;numTrainings := GetNumTrainings(reflink)
+        numTrainings += 1
     }
     BuyXPBoost("small") ;now we're level 3, so use some of the free RP for an XP boost
 
@@ -733,7 +716,7 @@ DoBattleTraining() ;run battle training automatically
     MouseClick, left,  390,  165
     Sleep, 2000
     MouseClick, left,  679,  542
-    Sleep, 5000
+    Sleep, 10000
     MouseClick, left,  657,  384
     Sleep, 2000
     MouseClick, left,  651,  384
@@ -771,7 +754,7 @@ DoBattleTraining() ;run battle training automatically
     MouseClick, left,  862,  391
     Sleep, 2000
     MouseClick, left,  701,  400
-    Sleep, 120000 ;big pause here to count down and let game load
+    Sleep, 180000 ;big pause here to count down and let game load
     Loop, 5 ;this click drops sometimes, so spam it
     {
         MouseClick, left,  595,  396 ;click 'Continue' button
@@ -784,8 +767,10 @@ DoBattleTraining() ;run battle training automatically
     Sleep, 3000
     MouseClick, left,  680,  481 ;close hint window
     Sleep, 20000 ;wait for lady to talk
+    MouseClick, left, 617, 472 ;dismiss afk window
+    MouseClick, left, 617, 472 ;dismiss afk window
     startTime := A_Now
-    while true ;spam right clicks for 19 minutes, then surrender and click continue button
+    while true ;spam right clicks for 17 minutes, then surrender and click continue button
     {
         Send {Click right 300, 350}
         Sleep, 5000
@@ -936,6 +921,7 @@ MakeNewSmurf(username, password, reflink)
     WinWait, Google Chrome, 
     IfWinNotActive, Google Chrome, , WinActivate, Google Chrome, 
     WinWaitActive, Google Chrome, 
+    Sleep, 10000
     Send, {CTRLDOWN}l{CTRLUP}wg741.webgate.pl{ENTER}
     Sleep, 15000
     ;WinWait, wg741.webgate.pl - Google Chrome, 

@@ -14,6 +14,7 @@ SetKeyDelay, 100, 30
 ;I think bug splats for battle trainning don't give you the orange "reconnect" button - 
 ;   they just put you on the normal client screen
 
+<<<<<<< HEAD
 #s::Reload
 
 #t::Pause
@@ -66,6 +67,8 @@ CloseLoLClient()
 AutoSmurf("mikklepunez5", "random17", "http://signup.leagueoflegends.com/?ref=525b5a8594184160217873") ;tiffany
 AutoSmurf("mikklepunez6", "random17", "http://signup.leagueoflegends.com/?ref=525b5a8594184160217873") ;tiffany
 return
+=======
+>>>>>>> 26faa40ac8b191bdd846ed0fddea30345eee5595
 
 AutoSmurf(username, password, reflink)
 {
@@ -91,6 +94,7 @@ AutoSmurf(username, password, reflink)
     {
         DoBattleTraining()
         Sleep, 5000
+        numTrainings += 1
         ;numTrainings := GetNumTrainings(reflink)
         numTrainings += 1
     }
@@ -920,7 +924,11 @@ MakeNewSmurf(username, password, reflink)
     SetTitleMatchMode, 2 ;look for windows that merely contain "google chrome"
     WinWait, Google Chrome, 
     IfWinNotActive, Google Chrome, , WinActivate, Google Chrome, 
+<<<<<<< HEAD
     WinWaitActive, Google Chrome, 
+=======
+    WinWaitActive, Google Chrome,
+>>>>>>> 26faa40ac8b191bdd846ed0fddea30345eee5595
     Sleep, 10000
     Send, {CTRLDOWN}l{CTRLUP}wg741.webgate.pl{ENTER}
     Sleep, 15000

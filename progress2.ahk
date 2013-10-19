@@ -6,113 +6,157 @@ SetKeyDelay, 100, 30
 ;position of "level up" popup x in client: 874, 93
 ;matt's referral link: "http://signup.leagueoflegends.com/?ref=4cc4c1a9f163d487340900"
 ;jlosh referral link:  "http://signup.leagueoflegends.com/?ref=4df3022975a2d908834853"
+;aerial referral link: "http://signup.leagueoflegends.com/?ref=4e0d1472cd21a929683971"
 ;george ref link:      "http://signup.leagueoflegends.com/?ref=4dc070d8d86a0397596492"
 ;josh ref link:        "http://signup.leagueoflegends.com/?ref=525b4f68a0b5a519065718"
 ;tiffany ref link:     "http://signup.leagueoflegends.com/?ref=525b5a8594184160217873"
+;golf ref link:        "http://signup.leagueoflegends.com/?ref=525f7133f4190108692822"
 
 ;"OK" for in-game afk notification that exits game 617, 472
 ;I think bug splats for battle trainning don't give you the orange "reconnect" button - 
 ;   they just put you on the normal client screen
 
-<<<<<<< HEAD
 #s::Reload
 
 #t::Pause
 
 ;this is a utility testing method - feel free to swap it out for whatever function
 #v::
-Sleep, 1000
-BuyXPBoost("small")
-Loop, 4
-{
-    DoBattleTraining()
-    Sleep, 5000
-}
+MsgBox, %A_IPAddress1%
 return
 
 #z::
-;AutoSmurf("tabakattack1", "random17", "http://signup.leagueoflegends.com/?ref=4dc070d8d86a0397596492") ;george
-AutoSmurf("tabakattack4", "random17", "http://signup.leagueoflegends.com/?ref=525b4f68a0b5a519065718") ;josh
-AutoSmurf("tabakattack5", "random17", "http://signup.leagueoflegends.com/?ref=525b4f68a0b5a519065718") ;josh
-;AutoSmurf("mikklepunez3", "random17", "http://signup.leagueoflegends.com/?ref=525b5a8594184160217873") ;tiffany
-;AutoSmurf("mikklepunez5", "random17", "http://signup.leagueoflegends.com/?ref=525b5a8594184160217873") ;tiffany
+;AutoSmurf("random17", "http://signup.leagueoflegends.com/?ref=4dc070d8d86a0397596492") ;george
+;AutoSmurf("random17", "http://signup.leagueoflegends.com/?ref=525b4f68a0b5a519065718") ;josh
+;AutoSmurf("random17", "http://signup.leagueoflegends.com/?ref=525b4f68a0b5a519065718") ;josh
+;AutoSmurf("random17", "http://signup.leagueoflegends.com/?ref=525b5a8594184160217873") ;tiffany
+;AutoSmurf("random17", "http://signup.leagueoflegends.com/?ref=525b5a8594184160217873") ;tiffany
+;AutoSmurf("random17", "http://signup.leagueoflegends.com/?ref=525f7133f4190108692822") ;golf
+;AutoSmurf("random17", "http://signup.leagueoflegends.com/?ref=525f7133f4190108692822") ;golf
+AutoSmurf("random17", "http://signup.leagueoflegends.com/?ref=4e0d1472cd21a929683971") ;golf
 return
 
 #q::
-BotGameMaster("TT")
-return
-
-#w::
-BotGameSlave("TT")
-return
-
-#x::
-;Sleep, 120000
-;LogInManual("toomanygrapeshots", "random17")
-;SmurfSetup("myclam4", "random17")
-;Loop, 5
-;{
-;    DoBattleTraining()
-;    Sleep, 5000
-;}
-;BuyXPBoost("small")
-Loop, 2
+Loop, 3
 {
     DoBattleTraining()
     Sleep, 5000
 }
 CloseLoLClient()
-;AutoSmurf("tabakattack3", "random17", "http://signup.leagueoflegends.com/?ref=525b4f68a0b5a519065718") ;josh
-;AutoSmurf("tabakattack4", "random17", "http://signup.leagueoflegends.com/?ref=525b4f68a0b5a519065718") ;josh
-AutoSmurf("mikklepunez5", "random17", "http://signup.leagueoflegends.com/?ref=525b5a8594184160217873") ;tiffany
-AutoSmurf("mikklepunez6", "random17", "http://signup.leagueoflegends.com/?ref=525b5a8594184160217873") ;tiffany
+LogInManual("picogolf4", "random17")
+DoBattleTraining()
+Sleep, 5000
+CloseLoLClient()
 return
-=======
->>>>>>> 26faa40ac8b191bdd846ed0fddea30345eee5595
 
-AutoSmurf(username, password, reflink)
+#w::
+;LogInManual("myengine5", "random17")
+;DoBattleTraining()
+;Sleep, 5000
+;CloseLoLClient()
+LogInManual("myclam8", "random17")
+DoBattleTraining()
+Sleep, 5000
+CloseLoLClient()
+LogInManual("myclam9", "random17")
+DoBattleTraining()
+Sleep, 5000
+CloseLoLClient()
+;AutoSmurf("random17", "http://signup.leagueoflegends.com/?ref=4dc070d8d86a0397596492") ;george
+return
+
+#x::
+;Sleep, 120000
+;LogInManual("picogolf5", "random17")
+;SmurfSetup("picogolf8", "random17")
+;Loop, 5
+;{
+;    DoBattleTraining()
+;    Sleep, 5000
+;}
+BuyXPBoost("small")
+while not CheckIfFive() 
 {
-    ;check if we're in the middle of getting a smurf to 5 (numTrainings != -1)
-    ;if not, 
+    DoBattleTraining()
+    Sleep, 5000
+}
+CloseLoLClient()
+LogInManual("picogolf5", "random17")
+Loop, 1
+{
+    DoBattleTraining()
+    Sleep, 5000
+}
+CloseLoLClient()
+;AutoSmurf("random17", "http://signup.leagueoflegends.com/?ref=4dc070d8d86a0397596492") ;george
+;AutoSmurf("random17", "http://signup.leagueoflegends.com/?ref=525b4f68a0b5a519065718") ;josh
+;AutoSmurf("random17", "http://signup.leagueoflegends.com/?ref=525b5a8594184160217873") ;tiffany
+;AutoSmurf("random17", "http://signup.leagueoflegends.com/?ref=525f7133f4190108692822") ;golf
+return
+
+;TODO: change currentSmurf.txt to also include reflink
+;TODO: add timeouts that restart lol client and game if we've been locked in one state for too long
+AutoSmurf(password, reflink) 
+{
+    refCode := SubStr(reflink, -3)
+    currentSmurf := "C:\currentSmurf" . refCode . ".txt"
+    FileReadLine, smurfName, %currentSmurf%, 1 ;get current smurf name, stored locally
+    if ErrorLevel ;currentSmurf.txt does not exist, so create it
+    {
+        FileAppend, None, %currentSmurf% ;first line stores name of smurf
+        FileAppend, `nNone, %currentSmurf% ;second line stores password of smurf
+        smurfName = None
+    }
+    if (smurfName == "None") ;make fresh smurf
+    {
         ;get smurf index from global smurf index file
+        refCode := SubStr(reflink, -3)
+        smurfFile := "reflink" . refCode . ".txt" ;smurf file name is last 4 digits of reflnik
+        FileReadLine, smurfIndex, %smurfFile%, 1 ;get current index of smurf, stored on SHARED space between VMs - this means run the ahk out of the shared github drive from the host!!
+        if ErrorLevel ;smurf file for this reflink does not exist, so create it
+        {
+            FileAppend, 0, %smurfFile%
+            smurfIndex = 0
+        }
+        else
+        {
+            smurfIndex += 1
+            TF_ReplaceLine("!" . smurfFile, "1", "1", smurfIndex)
+        }
         ;append smurf index to username base
-        ;make new account, etc
-    ;else,
-        ;if numTrainings < 5, GrindLvl3
-        ;else, GrindLvl5
-
-    MakeNewSmurf(username, password, reflink)
-
-    ;increment smurf index in global smurf index file
-
-    SmurfSetup(username, password)
-
-    ;set # of trainings in local training file to 0
-
-    numTrainings := 0
-    while numTrainings < 5
-    {
-        DoBattleTraining()
-        Sleep, 5000
-        numTrainings += 1
-        ;numTrainings := GetNumTrainings(reflink)
-        numTrainings += 1
+        smurfName := "engine" . refCode . smurfIndex 
+        MakeNewSmurf(smurfName, password, reflink)
+        ;ugh i really want feedback on whether an account got created successfully
+        SmurfSetup(smurfName, password)
+        TF_ReplaceLine("!" . currentSmurf, "1", "1", smurfName) ;store current smurfs login info
+        TF_ReplaceLine("!" . currentSmurf, "2", "2", password)
     }
-    BuyXPBoost("small") ;now we're level 3, so use some of the free RP for an XP boost
-
-    ;set # trainings to 100 (outside of [-1, 5]) to indicate boost has been bought
-
-    while not CheckIfFive() 
+    else ;resume where we left off
     {
+        FileReadLine, smurfName, %currentSmurf%, 1
+        FileReadLine, password, %currentSmurf%, 2
+        LogInManual(smurfName, password)
+    }
+    while not CheckIfFive()
+    {
+        if CheckIfRich()
+        {
+            BuyXPBoost("small")
+        }
         DoBattleTraining()
         Sleep, 5000
     }
-
-    ;push smurf onto "lvl 5-9 smurfs list"
-    ;set # of trainings in local training file to -1, indicating we're currently not grinding a smurf
-
+    ;we're done, so do some cleanup
+    TF_ReplaceLine("!%currentSmurf%", "1", "1", None) ;store current smurfs login info
+    TF_ReplaceLine("!%currentSmurf%", "2", "2", None)
     CloseLoLClient()
     return
+}
+
+GetNumTrainings()
+{
+    FileReadLine, numTrainings, %currentSmurf%, 1 ;get current # of trainings, stored locally
+    return numTrainings
 }
 
 ;game creator for grinding honor
@@ -889,6 +933,8 @@ LogInManual(username, password) ;accountData should have account name on first l
     WinActivate
     Sleep, 3000
     Send {click 701, 549} ;click on orange "play" button
+    Sleep, 2000
+    Send {click 701, 549} ;tiny XP VM sometimes misses first click
 
     WinWait, PVP.net Client
     WinActivate
@@ -924,12 +970,8 @@ MakeNewSmurf(username, password, reflink)
     SetTitleMatchMode, 2 ;look for windows that merely contain "google chrome"
     WinWait, Google Chrome, 
     IfWinNotActive, Google Chrome, , WinActivate, Google Chrome, 
-<<<<<<< HEAD
     WinWaitActive, Google Chrome, 
-=======
-    WinWaitActive, Google Chrome,
->>>>>>> 26faa40ac8b191bdd846ed0fddea30345eee5595
-    Sleep, 10000
+    Sleep, 20000
     Send, {CTRLDOWN}l{CTRLUP}wg741.webgate.pl{ENTER}
     Sleep, 15000
     ;WinWait, wg741.webgate.pl - Google Chrome, 
@@ -991,11 +1033,27 @@ SmurfSetup(username, password) ;fill out referral form on website - make sure ca
     return
 }
 
-CheckIfFive() ;check if acct is level 5 ;make sure you have level5.bmp from the git repository in your working directory
+CheckIfFive() ;check if acct is level 5 ;make sure you have level5.png from the git repository in your working directory
 {
     MouseClick, left, 769, 43 ;view profile
     Sleep, 5000
     ImageSearch, FoundX, FoundY, 357, 252, 426, 276, level5.png ;scan for "level 5" with image
+    if ErrorLevel ;could not find
+    {
+        ;MsgBox, not found
+        return false    
+    }
+    else
+    {
+        ;MsgBox, found
+        return true
+    }
+    return
+}
+
+CheckIfRich() ;check if acct has 400 RP for XP boost ;make sure you have 400RP.png from the git repository in your working directory
+{
+    ImageSearch, FoundX, FoundY, 818, 16, 845, 33, 400RP.png ;scan RP with image
     if ErrorLevel ;could not find
     {
         ;MsgBox, not found

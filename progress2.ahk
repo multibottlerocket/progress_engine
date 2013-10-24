@@ -26,27 +26,21 @@ MsgBox, %A_IPAddress1%
 return
 
 #z::
-;AutoSmurf("random17", "http://signup.leagueoflegends.com/?ref=4dc070d8d86a0397596492") ;george
+;Sleep, 120000
+AutoSmurf("random17", "http://signup.leagueoflegends.com/?ref=4dc070d8d86a0397596492") ;george
+AutoSmurf("random17", "http://signup.leagueoflegends.com/?ref=4dc070d8d86a0397596492") ;george
+AutoSmurf("random17", "http://signup.leagueoflegends.com/?ref=4dc070d8d86a0397596492") ;george
 ;AutoSmurf("random17", "http://signup.leagueoflegends.com/?ref=525b4f68a0b5a519065718") ;josh
 ;AutoSmurf("random17", "http://signup.leagueoflegends.com/?ref=525b4f68a0b5a519065718") ;josh
 ;AutoSmurf("random17", "http://signup.leagueoflegends.com/?ref=525b5a8594184160217873") ;tiffany
 ;AutoSmurf("random17", "http://signup.leagueoflegends.com/?ref=525b5a8594184160217873") ;tiffany
 ;AutoSmurf("random17", "http://signup.leagueoflegends.com/?ref=525f7133f4190108692822") ;golf
 ;AutoSmurf("random17", "http://signup.leagueoflegends.com/?ref=525f7133f4190108692822") ;golf
-AutoSmurf("random17", "http://signup.leagueoflegends.com/?ref=4e0d1472cd21a929683971") ;golf
+;AutoSmurf("random17", "http://signup.leagueoflegends.com/?ref=4e0d1472cd21a929683971") ;aerial
 return
 
 #q::
-Loop, 3
-{
-    DoBattleTraining()
-    Sleep, 5000
-}
-CloseLoLClient()
-LogInManual("picogolf4", "random17")
-DoBattleTraining()
-Sleep, 5000
-CloseLoLClient()
+AutoSmurf("random17", "http://signup.leagueoflegends.com/?ref=4dc070d8d86a0397596492") ;george
 return
 
 #w::
@@ -94,7 +88,6 @@ CloseLoLClient()
 ;AutoSmurf("random17", "http://signup.leagueoflegends.com/?ref=525f7133f4190108692822") ;golf
 return
 
-;TODO: change currentSmurf.txt to also include reflink
 ;TODO: add timeouts that restart lol client and game if we've been locked in one state for too long
 AutoSmurf(password, reflink) 
 {
@@ -121,15 +114,16 @@ AutoSmurf(password, reflink)
         else
         {
             smurfIndex += 1
-            TF_ReplaceLine("!" . smurfFile, "1", "1", smurfIndex)
         }
         ;append smurf index to username base
-        smurfName := "engine" . refCode . smurfIndex 
+        Random, smurfRand, 10000000, 99999999
+        smurfName := "eng" . smurfRand . "x" . smurfIndex 
         MakeNewSmurf(smurfName, password, reflink)
         ;ugh i really want feedback on whether an account got created successfully
         SmurfSetup(smurfName, password)
         TF_ReplaceLine("!" . currentSmurf, "1", "1", smurfName) ;store current smurfs login info
         TF_ReplaceLine("!" . currentSmurf, "2", "2", password)
+        TF_ReplaceLine("!" . smurfFile, "1", "1", smurfIndex)
     }
     else ;resume where we left off
     {
@@ -147,8 +141,8 @@ AutoSmurf(password, reflink)
         Sleep, 5000
     }
     ;we're done, so do some cleanup
-    TF_ReplaceLine("!%currentSmurf%", "1", "1", None) ;store current smurfs login info
-    TF_ReplaceLine("!%currentSmurf%", "2", "2", None)
+    TF_ReplaceLine("!" . currentSmurf, "1", "1", "None") ;indicate we're not currently doing a smurf
+    TF_ReplaceLine("!" . currentSmurf, "2", "2", "None")
     CloseLoLClient()
     return
 }
@@ -315,6 +309,7 @@ StatsCheck()
         {
             WinActivate    
         }
+        Send {Click 400, 390} ;sometimes you need to click on the XP VMs to make the client refresh
         ImageSearch, FoundX, FoundY, 676, 570, 783, 607, home.png
         if ErrorLevel ;could not find
             statsNotLoaded := true  
@@ -824,6 +819,8 @@ DoBattleTraining() ;run battle training automatically
         Sleep, 5000
         Send {Click right 300, 500}
         Sleep, 5000
+        MouseClick, left, 617, 472 ;dismiss afk window
+        Sleep, 1000
         nowTime := A_Now
         EnvSub, nowTime, %startTime%, Minutes
         if (nowTime > 17) ;surrender after 17 minutes (extra time is spent waiting for lady to talk)
@@ -853,6 +850,7 @@ DoBattleTraining() ;run battle training automatically
     statsNotLoaded := true
     while statsNotLoaded
     {
+        Send {Click 400, 390} ;sometimes you need to click on the XP VMs to make the client refresh
         ImageSearch, FoundX, FoundY, 676, 570, 783, 607, home.png
         if ErrorLevel ;could not find
             statsNotLoaded := true  
@@ -931,14 +929,14 @@ LogInManual(username, password) ;accountData should have account name on first l
 
     WinWait, PVP.net Patcher
     WinActivate
-    Sleep, 3000
+    Sleep, 10000
     Send {click 701, 549} ;click on orange "play" button
     Sleep, 2000
     Send {click 701, 549} ;tiny XP VM sometimes misses first click
 
     WinWait, PVP.net Client
     WinActivate
-    Sleep, 4000
+    Sleep, 12000
     Send {click 233,  255} ;username
     Sleep, 1000
     Send {ctrl down}a{ctrl up} ;select all previously existing text to overwrite

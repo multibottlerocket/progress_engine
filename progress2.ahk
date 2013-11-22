@@ -11,81 +11,49 @@ SetKeyDelay, 100, 30
 ;josh ref link:        "http://signup.leagueoflegends.com/?ref=525b4f68a0b5a519065718"
 ;tiffany ref link:     "http://signup.leagueoflegends.com/?ref=525b5a8594184160217873"
 ;golf ref link:        "http://signup.leagueoflegends.com/?ref=525f7133f4190108692822"
+;spamninja ref link:   "http://signup.leagueoflegends.com/?ref=4ce0a8276d57a105645474"
 
 ;"OK" for in-game afk notification that exits game 617, 472
 ;I think bug splats for battle trainning don't give you the orange "reconnect" button - 
 ;   they just put you on the normal client screen
 
+;globalReflink := "http://signup.leagueoflegends.com/?ref=4dc070d8d86a0397596492" ;george
+;globalReflink := "http://signup.leagueoflegends.com/?ref=4ce0a8276d57a105645474" ;spam ninja
+;globalReflink := "http://signup.leagueoflegends.com/?ref=4e0d1472cd21a929683971" ;aerial
+globalReflink := "http://signup.leagueoflegends.com/?ref=4df3022975a2d908834853" ;jlosh
 #s::Reload
 
 #t::Pause
 
 ;this is a utility testing method - feel free to swap it out for whatever function
 #v::
-MsgBox, %A_IPAddress1%
+CheckForPlayButton()
 return
 
 #z::
 ;Sleep, 120000
-AutoSmurf("random17", "http://signup.leagueoflegends.com/?ref=4dc070d8d86a0397596492") ;george
-AutoSmurf("random17", "http://signup.leagueoflegends.com/?ref=4dc070d8d86a0397596492") ;george
-AutoSmurf("random17", "http://signup.leagueoflegends.com/?ref=4dc070d8d86a0397596492") ;george
-;AutoSmurf("random17", "http://signup.leagueoflegends.com/?ref=525b4f68a0b5a519065718") ;josh
-;AutoSmurf("random17", "http://signup.leagueoflegends.com/?ref=525b4f68a0b5a519065718") ;josh
-;AutoSmurf("random17", "http://signup.leagueoflegends.com/?ref=525b5a8594184160217873") ;tiffany
-;AutoSmurf("random17", "http://signup.leagueoflegends.com/?ref=525b5a8594184160217873") ;tiffany
-;AutoSmurf("random17", "http://signup.leagueoflegends.com/?ref=525f7133f4190108692822") ;golf
-;AutoSmurf("random17", "http://signup.leagueoflegends.com/?ref=525f7133f4190108692822") ;golf
-;AutoSmurf("random17", "http://signup.leagueoflegends.com/?ref=4e0d1472cd21a929683971") ;aerial
+while true {
+    AutoSmurf("random17", globalReflink)
+}
 return
 
 #q::
-AutoSmurf("random17", "http://signup.leagueoflegends.com/?ref=4dc070d8d86a0397596492") ;george
+BoLFarm()
 return
 
 #w::
-;LogInManual("myengine5", "random17")
-;DoBattleTraining()
-;Sleep, 5000
-;CloseLoLClient()
-LogInManual("myclam8", "random17")
-DoBattleTraining()
-Sleep, 5000
-CloseLoLClient()
-LogInManual("myclam9", "random17")
-DoBattleTraining()
-Sleep, 5000
-CloseLoLClient()
-;AutoSmurf("random17", "http://signup.leagueoflegends.com/?ref=4dc070d8d86a0397596492") ;george
+Loop, 20
+{
+    MouseClick, left,  160,  406
+    Sleep, 4000
+}
 return
 
+;clean out current smurf state
 #x::
-;Sleep, 120000
-;LogInManual("picogolf5", "random17")
-;SmurfSetup("picogolf8", "random17")
-;Loop, 5
-;{
-;    DoBattleTraining()
-;    Sleep, 5000
-;}
-BuyXPBoost("small")
-while not CheckIfFive() 
-{
-    DoBattleTraining()
-    Sleep, 5000
-}
-CloseLoLClient()
-LogInManual("picogolf5", "random17")
-Loop, 1
-{
-    DoBattleTraining()
-    Sleep, 5000
-}
-CloseLoLClient()
-;AutoSmurf("random17", "http://signup.leagueoflegends.com/?ref=4dc070d8d86a0397596492") ;george
-;AutoSmurf("random17", "http://signup.leagueoflegends.com/?ref=525b4f68a0b5a519065718") ;josh
-;AutoSmurf("random17", "http://signup.leagueoflegends.com/?ref=525b5a8594184160217873") ;tiffany
-;AutoSmurf("random17", "http://signup.leagueoflegends.com/?ref=525f7133f4190108692822") ;golf
+smurfName := "smurfTest"
+password := "random17"
+CleanupSmurf("None", password, globalReflink)
 return
 
 ;TODO: add timeouts that restart lol client and game if we've been locked in one state for too long
@@ -104,7 +72,7 @@ AutoSmurf(password, reflink)
     {
         ;get smurf index from global smurf index file
         refCode := SubStr(reflink, -3)
-        smurfFile := "reflink" . refCode . ".txt" ;smurf file name is last 4 digits of reflnik
+        smurfFile := "reflink" . refCode . "Index.txt" ;smurf file name is last 4 digits of reflink
         FileReadLine, smurfIndex, %smurfFile%, 1 ;get current index of smurf, stored on SHARED space between VMs - this means run the ahk out of the shared github drive from the host!!
         if ErrorLevel ;smurf file for this reflink does not exist, so create it
         {
@@ -147,10 +115,27 @@ AutoSmurf(password, reflink)
     return
 }
 
-GetNumTrainings()
+CleanupSmurf(smurfName, password, reflink) ;clean up state
 {
-    FileReadLine, numTrainings, %currentSmurf%, 1 ;get current # of trainings, stored locally
-    return numTrainings
+    refCode := SubStr(reflink, -3)
+    currentSmurf := "C:\currentSmurf" . refCode . ".txt"
+    ;;;;; this part doesn't currently because of some weird error with FileAppend
+    ;if (smurfName != "None") ;store in case we need them later
+    ;{
+    ;    foo := "lvl5SmurfsReflink" . refCode . ".txt"
+    ;    MsgBox, %smurfName%
+    ;    FileAppend, %smurfName%, "lvl5SmurfsReflink" . refCode . ".txt" ;format is login \n summoner name \n pw
+    ;    ;TF_MakeFile(foo)
+    ;    ;if ErrorLevel
+    ;    ;{
+    ;    ;    MsgBox, error with FileAppend
+    ;    ;}
+    ;    FileAppend, %smurfName%, "lvl5SmurfsReflink" . refCode . ".txt"
+    ;    FileAppend, %password%, "lvl5SmurfsReflink" . refCode . ".txt"
+    ;}
+    ;;;;;;;;;;;;;;;;;;;;;
+    TF_ReplaceLine("!" . currentSmurf, "1", "1", "None") ;locally indicate we're not currently doing a smurf
+    TF_ReplaceLine("!" . currentSmurf, "2", "2", "None")
 }
 
 ;game creator for grinding honor
@@ -190,6 +175,38 @@ HonorFarmSlave(map)
         WaitGameStart()
         WinGameLoop(map)
         CleanupGame("slave")
+    }
+}
+
+BoLFarm()
+{
+    while true
+    {
+        joinGame:
+        JoinSoloBotGame("SR")
+        Sleep, 15000
+        SelectChamp("eem")
+        Sleep, 120000
+        IfWinExist ahk_class RiotWindowClass ;if game launches, focus on it
+        {
+            WinActivate
+        }
+        else
+        {
+            Goto, joinGame
+        }
+        while true
+        {
+            Sleep, 10000
+            Send {Click 510, 416} ;click on "continue' button after defeat/victory
+            IfWinExist, PVP.net Client
+            {
+                WinActivate
+                break      
+            }
+        }
+        CleanupGame("master")
+        Sleep, 10000
     }
 }
 
@@ -309,7 +326,9 @@ StatsCheck()
         {
             WinActivate    
         }
-        Send {Click 400, 390} ;sometimes you need to click on the XP VMs to make the client refresh
+        MouseClick, left,  645,  387 ;sometimes you need to click on the XP VMs to make the client refresh
+        Sleep, 1000                  ;
+        MouseClick, left,  645,  387 ;
         ImageSearch, FoundX, FoundY, 676, 570, 783, 607, home.png
         if ErrorLevel ;could not find
             statsNotLoaded := true  
@@ -526,33 +545,21 @@ SelectFirstChamp()
     Sleep, 30000 ;wait for load screen to pop up if successful
 }
 
-SelectYi()
+SelectChamp(champName)
 {
-;MouseClick, left,  480,  528 ;set to first mastery page - push masteries should have been set by SetPushMasteries()
-;Sleep, 1000
-;MouseClick, left,  436,  554
-;Sleep, 1000
-;MouseClick, left,  368,  497 ;set to Dat AS(S) super AS page from jungling
-;Sleep, 1000
-;MouseClick, left,  497,  530
-;Sleep, 1000
-;MouseClick, left,  403,  702
-;Sleep, 1000
     Send {Click 731, 110} ;click on search box
     Sleep, 500
-    Send {y}
-    Sleep, 100
-    Send {i}
-    Sleep, 2000
+    Send, %champName%
+    Sleep, 1000
     Send {click 274, 174} ;click on top left champ space
     Sleep, 2000
     Send {Click 702, 410} ;attempt to start game
     Sleep, 2000
     Send {click 517, 421} ;click on summoner spells
     Sleep, 1000
-    Send {click 393, 175} ;click on revive
+    Send {click 455, 175} ;click on ghost
     Sleep, 1000
-    Send {click 648, 175} ;click on ghost
+    Send {click 580, 175} ;click on heal
     Sleep, 1000
     Send {Click 702, 410} ;attempt to start game
     Sleep, 30000 ;wait for load screen to pop up if successful
@@ -561,6 +568,15 @@ SelectYi()
 CloseLoLClient()
 {
     IfWinExist, PVP.net Client
+    {
+        WinKill
+    }
+    return
+}
+
+CloseLoLGame()
+{
+    IfWinExist, League of Legends (TM) Client
     {
         WinKill
     }
@@ -608,6 +624,46 @@ LogIn(accountData, offset) ;accountData should have account name on first line a
     Sleep, 15000
     return username
 }
+
+JoinSoloBotGame(map)
+{
+    ;MsgBox %summoner1% %summoner2%
+    MouseClick, left,  511,  35 ;click orange "Play" button
+    Sleep, 2000
+    MouseClick, left,  278,  139 ;co-op vs ai
+    Sleep, 1000
+    MouseClick, left,  393,  119 ;classic
+    Sleep, 1000
+    if (map == "SR")
+    {
+        MouseClick, left,  592,  137 ;summoner's rift
+    }
+    else if (map == "TT")
+    {
+        MouseClick, left,  560,  160 ;twisted treeline
+    }
+    else ;default to SR
+    {
+        MouseClick, left,  592,  137 ;summoner's rift
+    }
+    Sleep, 1000
+    ;MouseClick, left,  710,  122 ;beginner
+    MouseClick, left,  691,  145 ;intermediate
+    Sleep, 1000
+    MouseClick, left,  610,  570 ;solo
+    Sleep, 2000
+    while True ;wait for queue to fire
+    {
+        Sleep, 1000
+        PixelSearch, FoundX, FoundY, 507, 324, 509, 326, 0xFFFFFF ;look for white of timer pie
+        if ErrorLevel ;could not find
+                Sleep, 10   
+        else
+            break   
+    }
+    MouseClick, left, 421, 364 ;click "accept" when match is made to go to champ select
+}
+return
 
 MasterCreateGame(map, summoner1, summoner2, summoner3, summoner4)
 {
@@ -759,7 +815,7 @@ DoBattleTraining() ;run battle training automatically
     MouseClick, left,  390,  165
     Sleep, 2000
     MouseClick, left,  679,  542
-    Sleep, 10000
+    Sleep, 20000
     MouseClick, left,  657,  384
     Sleep, 2000
     MouseClick, left,  651,  384
@@ -842,25 +898,14 @@ DoBattleTraining() ;run battle training automatically
             break       
         }
     }
-
-        Send {Click 510, 416} ;click on "continue' button after defeat
-        Sleep, 20000 ;let game close and pvp.net client load
+    Sleep, 20000 ;let game close and pvp.net client load
+    if CheckForPlayButton()
+    {
+        return ;exit training prematurely if client loads and there's the "play" button (implies it's not the game stats screen)
+    }
     MouseClick, left,  645,  387 ;click continue on post battle screen
     Sleep, 2000
-    statsNotLoaded := true
-    while statsNotLoaded
-    {
-        Send {Click 400, 390} ;sometimes you need to click on the XP VMs to make the client refresh
-        ImageSearch, FoundX, FoundY, 676, 570, 783, 607, home.png
-        if ErrorLevel ;could not find
-            statsNotLoaded := true  
-        else
-            statsNotLoaded := false
-        Sleep, 1000
-    }
-    MouseClick, left,  432,  313 ;click continue for ip
-    Sleep, 2000
-    MouseClick, left,  725,  592 ;click 'home'
+    CleanupGame("training")
     Sleep, 2000
     MouseClick, left,  561,  403 ;decline co op vs ai inv
     Sleep, 2000
@@ -969,7 +1014,7 @@ MakeNewSmurf(username, password, reflink)
     WinWait, Google Chrome, 
     IfWinNotActive, Google Chrome, , WinActivate, Google Chrome, 
     WinWaitActive, Google Chrome, 
-    Sleep, 20000
+    Sleep, 35000
     Send, {CTRLDOWN}l{CTRLUP}wg741.webgate.pl{ENTER}
     Sleep, 15000
     ;WinWait, wg741.webgate.pl - Google Chrome, 
@@ -1064,3 +1109,47 @@ CheckIfRich() ;check if acct has 400 RP for XP boost ;make sure you have 400RP.p
     }
     return
 }
+
+CheckForPlayButton()
+{
+    ImageSearch, FoundX, FoundY, 446, 4, 581, 64, play.png ;scan RP with image
+    if ErrorLevel ;could not find
+    {
+        ;MsgBox, not found
+        return false    
+    }
+    else
+    {
+        ;MsgBox, found
+        return true
+    }
+    return
+}
+
+CheckStateCounter:
+;read old state counter
+FileRead, oldCnt, C:\stateCounter.txt, 1
+;read current state counter
+FileRead, nowCnt, C:\stateCounter.txt, 2
+if ErrorLevel ;stateCounter.txt does not exist, so create it
+{
+    FileAppend, 0, C:\stateCounter.txt ;first line stores previous state count
+    FileAppend, 0, C:\stateCounter.txt ;second line stores current state count
+    oldCnt := 0
+    nowCnt := 1
+}
+if nowCnt > oldCnt ;progress churning along nicely
+{
+    TF_ReplaceLine("!C:\stateCounter.txt", "1", "1", nowCnt)  ;update old state counter 
+}
+else ;we're stalled out
+{
+    CloseLoLClient()
+    CloseLoLGame()
+    while true {
+    AutoSmurf("random17", globalReflink) ;george
+    }
+return
+}
+;   kill all LoL processes
+;   restart AutoSmurf()

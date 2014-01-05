@@ -31,7 +31,17 @@ function OnLoad()
 	 ----SendChat("My name is "..myName)
 	 
 end
+
+local lockVal = 0
 function OnTick()
+	if lockVal == 0 then
+		lockVal = 1
+		DoTick()
+		lockVal = 0
+	end
+end
+
+function DoTick()
 	local time = GetGameTimer()
 
 		

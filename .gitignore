@@ -1,5 +1,6 @@
-reflink*Index.txt
+reflink*.txt
 *.exe
 *.dll
 *.lnk
 *.save
+smurfs*.txt

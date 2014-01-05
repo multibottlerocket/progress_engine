@@ -59,7 +59,7 @@ function OnTick()
 		end
 		if myHero.x< 1100 and myHero.z < 1100 then
 		
-			if myHero.health > myHero.maxHealth * 0.9 then
+			if ((myHero.health > myHero.maxHealth * 0.9) and (myHero.mana > myHero.maxMana * 0.9)) then
 				backingFlag = 0
 				myHero:MoveTo(6000,6000)
 			end
@@ -325,8 +325,9 @@ function OnTick()
 					backingFlag = 1
 					CastSpell(RECALL)
 				else
+					backingFlag = 1
 					myHero:HoldPosition()
-					run(myHero.x, myHero.z,15.0)
+					run(myHero.x, myHero.z,10.0)
 				end
 				return
 			end

@@ -1,2 +1,5 @@
-BoL/
 reflink*Index.txt
+*.exe
+*.dll
+*.lnk
+*.save

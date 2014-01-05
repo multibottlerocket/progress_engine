@@ -27,7 +27,19 @@ globalReflink := "http://signup.leagueoflegends.com/?ref=4df3022975a2d908834853"
 
 ;this is a utility testing method - feel free to swap it out for whatever function
 #v::
-CheckForPlayButton()
+while true
+{
+    Sleep, 10000
+    Send {Click 510, 416} ;click on "continue' button after defeat/victory
+    IfWinExist, PVP.net Client
+    {
+        WinActivate
+        break      
+    }
+}
+CleanupGame("master")
+Sleep, 10000
+BoLFarm()
 return
 
 #z::
@@ -185,7 +197,7 @@ BoLFarm()
         joinGame:
         JoinSoloBotGame("SR")
         Sleep, 15000
-        SelectChamp("eem")
+        SelectChamp("ryz")
         Sleep, 120000
         IfWinExist ahk_class RiotWindowClass ;if game launches, focus on it
         {
@@ -559,7 +571,9 @@ SelectChamp(champName)
     Sleep, 1000
     Send {click 455, 175} ;click on ghost
     Sleep, 1000
-    Send {click 580, 175} ;click on heal
+    Send {click 523, 244} ;click on barrier
+    Sleep, 1000
+    Send {click 583, 171} ;click on heal in case barrier is not available
     Sleep, 1000
     Send {Click 702, 410} ;attempt to start game
     Sleep, 30000 ;wait for load screen to pop up if successful
@@ -647,8 +661,8 @@ JoinSoloBotGame(map)
         MouseClick, left,  592,  137 ;summoner's rift
     }
     Sleep, 1000
-    ;MouseClick, left,  710,  122 ;beginner
-    MouseClick, left,  691,  145 ;intermediate
+    MouseClick, left,  710,  122 ;beginner
+    ;MouseClick, left,  691,  145 ;intermediate
     Sleep, 1000
     MouseClick, left,  610,  570 ;solo
     Sleep, 2000
@@ -992,6 +1006,7 @@ LogInManual(username, password) ;accountData should have account name on first l
     Sleep, 1000
     Send {click 276,  338} ;log in
     Sleep, 25000
+    Send {click 1001,  87} ;dismiss overlay if it exists
     return
 }
 

@@ -298,7 +298,7 @@ function DoTick()
 			end
 			
 			--check self health
-			if ((myHero.health < myHero.maxHealth * 0.3) or (myHero.mana < 100)) then
+			if ((myHero.health < myHero.maxHealth * 0.3) or (myHero.mana < 100) or (backingFlag == 1)) then
 				PrintFloatText(myHero, 10,"less than 30% health, fleeing")
 				farmflag = 0
 				if mindist < AttackRange then

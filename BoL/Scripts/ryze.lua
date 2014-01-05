@@ -256,7 +256,7 @@ function OnTick()
 				theMinions:update()
 				for i,minionObject in ipairs(theMinions.objects) do
            			if minionObject.team ~=  player.team then
-						if ((GetDistance(minionObject) < min_minion_dist) and minionObject.canMove) then
+						if ((GetDistance(minionObject) < min_minion_dist) and minionObject.canMove and (minionObject.team ~= TEAM_NEUTRAL)) then
 							min_minion_dist = GetDistance(minionObject)
 							min_minion = minionObject
 						end

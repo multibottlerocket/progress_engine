@@ -64,7 +64,7 @@ function OnTick()
 				myHero:MoveTo(6000,6000)
 			end
 			if itemcounter<20 then
-				for i = 1,6,1 do
+				for i = 1,7,1 do
 					if myHero:getInventorySlot(_G["ITEM_"..i])==items[itemcounter] then
 						itemcounter = itemcounter + 1
 					end

@@ -257,7 +257,7 @@ function OnTick()
 				PrintFloatText(myHero, 10,"farming")
 				theMinions:update()
 				for i,minionObject in ipairs(theMinions.objects) do
-     			if minionObject.team ~=  player.team then
+					if minionObject.team ~=  player.team then
 						if ((GetDistance(minionObject) < min_minion_dist) and minionObject.canMove) then --check canMove to avoid trying to attack nid traps
 							if ((myHero.maxMana > 1800) or (minionObject.team ~= TEAM_NEUTRAL)) then --farm jungle late game and farm enemy minions always
 								min_minion_dist = GetDistance(minionObject)

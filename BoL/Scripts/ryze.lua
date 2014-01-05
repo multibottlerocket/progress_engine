@@ -13,9 +13,10 @@ local currentZ = 0
 local counter = 0
 local healTime = 0
 local theMinions
+local backingFlag = 0
 
-local items =     {1027,3070,1001,3158,1031,3024,3082,3110,1026,1011,3116,1027,1028,3010,1026,3027,1026,3003,3135}
-local itemsCost = {400 ,300 ,325 ,675 ,720 ,630 ,1000,550 ,860 ,1000,1040,400 ,475 ,325 ,860 ,740 ,860 ,1140,2295}
+local items =     {1027,3070,1001,3158,1031,3024,3082,3110,1011,1026,3116,1027,1028,3010,1026,3027,1026,3003,1026,3135}
+local itemsCost = {400 ,300 ,325 ,675 ,720 ,630 ,1000,550 ,1000,860 ,1040,400 ,475 ,325 ,860 ,740 ,860 ,1140,860 ,1435}
 
 -- abyssal
 -- 1057,1026,3001,
@@ -59,6 +60,7 @@ function OnTick()
 		if myHero.x< 1100 and myHero.z < 1100 then
 		
 			if myHero.health > myHero.maxHealth * 0.9 then
+				backingFlag = 0
 				myHero:MoveTo(6000,6000)
 			end
 			if itemcounter<20 then
@@ -140,7 +142,7 @@ function OnTick()
 			
 			local farmflag = 1
 			
-			if hero_i~= -1 then
+			if ((hero_i~= -1) and (backingFlag == 0)) then
 				-- do hero math
 				for i=1, heroManager.iCount do
 					if i == hero_i then
@@ -251,20 +253,34 @@ function OnTick()
 
 			local min_minion_dist = 20000
 			local min_minion
-			if farmflag == 1 then
+			if ((farmflag == 1) and (backingFlag == 0)) then
 				PrintFloatText(myHero, 10,"farming")
 				theMinions:update()
 				for i,minionObject in ipairs(theMinions.objects) do
            			if minionObject.team ~=  player.team then
-						if ((GetDistance(minionObject) < min_minion_dist) and minionObject.canMove and (minionObject.team ~= TEAM_NEUTRAL)) then
-							min_minion_dist = GetDistance(minionObject)
-							min_minion = minionObject
+						if ((GetDistance(minionObject) < min_minion_dist) and minionObject.canMove) then --check canMove to avoid trying to attack nid traps
+							if ((myHero.maxMana > 1800) or (minionObject.team ~= TEAM_NEUTRAL)) then --farm jungle late game and farm enemy minions always
+								min_minion_dist = GetDistance(minionObject)
+								min_minion = minionObject
+							end
 						end
 					end
 				end
 				if min_minion_dist < 20000 then
 					if myHero:CanUseSpell(_Q) == READY then
 						CastSpell(_Q, min_minion)
+						interleaveSpell = true
+					elseif myHero.mana > 700 then
+						if ((myHero:CanUseSpell(_R) == READY) and interleaveSpell) then
+							CastSpell(_R)
+							interleaveSpell = false
+						elseif ((myHero:CanUseSpell(_E) == READY) and interleaveSpell) then
+							CastSpell(_E, min_minion)
+							interleaveSpell = false
+						elseif ((myHero:CanUseSpell(_W) == READY) and interleaveSpell) then
+							CastSpell(_W, min_minion)
+							interleaveSpell = false
+						end
 					end
 					myHero:Attack(min_minion)
 					PrintFloatText(myHero, 10,"attacking "..min_minion.type)
@@ -272,7 +288,7 @@ function OnTick()
 			end
 			
 			--check self health
-			if myHero.health < myHero.maxHealth * 0.3 then
+			if ((myHero.health < myHero.maxHealth * 0.3) or (myHero.mana < 100)) then
 				PrintFloatText(myHero, 10,"less than 30% health, fleeing")
 				farmflag = 0
 				if mindist < AttackRange then
@@ -306,6 +322,7 @@ function OnTick()
 					end
 				end
 				if mindist >= AttackRange and min_minion_dist >= AttackRange then
+					backingFlag = 1
 					CastSpell(RECALL)
 				else
 					myHero:HoldPosition()

@@ -195,7 +195,7 @@ BoLFarm()
     while true
     {
         joinGame:
-        JoinSoloBotGame("SR")
+        JoinSoloBotGame("SR", "intermediate")
         Sleep, 15000
         SelectChamp("ryz")
         Sleep, 120000
@@ -639,7 +639,7 @@ LogIn(accountData, offset) ;accountData should have account name on first line a
     return username
 }
 
-JoinSoloBotGame(map)
+JoinSoloBotGame(map, difficulty)
 {
     ;MsgBox %summoner1% %summoner2%
     MouseClick, left,  511,  35 ;click orange "Play" button
@@ -661,8 +661,18 @@ JoinSoloBotGame(map)
         MouseClick, left,  592,  137 ;summoner's rift
     }
     Sleep, 1000
-    MouseClick, left,  710,  122 ;beginner
-    ;MouseClick, left,  691,  145 ;intermediate
+    if (difficulty == "beginner")
+    {
+        MouseClick, left,  710,  122 ;beginner
+    }
+    else if (difficulty == "intermediate")
+    {
+        MouseClick, left,  691,  145 ;intermediate
+    }
+    else ;default to intermediate
+    {
+        MouseClick, left,  691,  145 ;intermediate
+    }
     Sleep, 1000
     MouseClick, left,  610,  570 ;solo
     Sleep, 2000
@@ -675,7 +685,19 @@ JoinSoloBotGame(map)
         else
             break   
     }
+    accept:
     MouseClick, left, 421, 364 ;click "accept" when match is made to go to champ select
+    Sleep, 10000
+    while True ;catch cases where we get requeued
+    {
+        Sleep, 1000
+        PixelSearch, FoundX, FoundY, 507, 324, 509, 326, 0xFFFFFF ;look for white of timer pie
+        if ErrorLevel ;could not find, so we're good
+                break   
+        else
+            Sleep, 2000
+            Goto accept
+    }
 }
 return
 
@@ -1030,7 +1052,8 @@ MakeNewSmurf(username, password, reflink)
     IfWinNotActive, Google Chrome, , WinActivate, Google Chrome, 
     WinWaitActive, Google Chrome, 
     Sleep, 35000
-    Send, {CTRLDOWN}l{CTRLUP}wg741.webgate.pl{ENTER}
+    ;Send, {CTRLDOWN}l{CTRLUP}wg741.webgate.pl{ENTER}
+    Send, {CTRLDOWN}l{CTRLUP}http://arcane-escarpment-5381.herokuapp.com/index.php{ENTER}
     Sleep, 15000
     ;WinWait, wg741.webgate.pl - Google Chrome, 
     ;IfWinNotActive, wg741.webgate.pl - Google Chrome, , WinActivate, wg741.webgate.pl - Google Chrome, 

@@ -15,8 +15,8 @@ local healTime = 0
 local theMinions
 local backingFlag = 0
 
-local items =     {3340,1027,3070,1001,3158,1031,3024,3082,3110,1011,1026,3116,1027,1028,3010,1026,3027,1026,3003,1026,3135}
-local itemsCost = {0   ,400 ,300 ,325 ,675 ,720 ,630 ,1000,550 ,1000,860 ,1040,400 ,475 ,325 ,860 ,740 ,860 ,1140,860 ,1435}
+local items =     {1027,3340,3070,1001,3158,1031,3024,3082,3110,1011,1026,3116,1027,1028,3010,1026,3027,1026,3003,1026,3135}
+local itemsCost = {400 ,0   ,300 ,325 ,675 ,720 ,630 ,1000,550 ,1000,860 ,1040,400 ,475 ,325 ,860 ,740 ,860 ,1140,860 ,1435}
 
 -- abyssal
 -- 1057,1026,3001,
@@ -223,7 +223,7 @@ function DoTick()
 			local tank_flag = 0
 			for name, tow in pairs(GetTurrets()) do
 				if tow.team ~= myHero.team then
-					if GetDistance(tow)<1000 and mindist < 2000 then
+					if GetDistance(tow)<1000 and mindist < 1300 then
 						PrintFloatText(myHero, 10,"champ nearby; flee from "..name)
 						myHero:HoldPosition()
 						farmflag = 0
@@ -280,7 +280,7 @@ function DoTick()
 					if myHero:CanUseSpell(_Q) == READY then
 						CastSpell(_Q, min_minion)
 						interleaveSpell = true
-					elseif myHero.mana > 700 then
+					elseif myHero.mana > 110 then
 						if ((myHero:CanUseSpell(_R) == READY) and interleaveSpell) then
 							CastSpell(_R)
 							interleaveSpell = false

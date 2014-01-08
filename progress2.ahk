@@ -18,15 +18,43 @@ SetKeyDelay, 100, 30
 ;   they just put you on the normal client screen
 
 ;globalReflink := "http://signup.leagueoflegends.com/?ref=4dc070d8d86a0397596492" ;george
-;globalReflink := "http://signup.leagueoflegends.com/?ref=4ce0a8276d57a105645474" ;spam ninja
+globalReflink := "http://signup.leagueoflegends.com/?ref=4ce0a8276d57a105645474" ;spam ninja
 ;globalReflink := "http://signup.leagueoflegends.com/?ref=4e0d1472cd21a929683971" ;aerial
-globalReflink := "http://signup.leagueoflegends.com/?ref=4df3022975a2d908834853" ;jlosh
+;globalReflink := "http://signup.leagueoflegends.com/?ref=4df3022975a2d908834853" ;jlosh
 #s::Reload
 
 #t::Pause
 
 ;this is a utility testing method - feel free to swap it out for whatever function
 #v::
+;DoBattleTraining()
+;BuyChamp("ryze")
+;while not CheckIfFive()
+while true
+{
+    if CheckIfRich()
+    {
+        BuyXPBoost("small")
+    }
+    BoLFarm("beginner")
+    Sleep, 5000
+}
+return
+
+#z::
+;Sleep, 120000
+while true {
+    AutoSmurf("random17", globalReflink)
+}
+return
+
+#q::
+while true {
+    BoLFarm("intermediate")
+}
+return
+
+#w::
 while true
 {
     Sleep, 10000
@@ -39,25 +67,9 @@ while true
 }
 CleanupGame("master")
 Sleep, 10000
-BoLFarm()
-return
-
-#z::
-;Sleep, 120000
 while true {
-    AutoSmurf("random17", globalReflink)
-}
-return
-
-#q::
-BoLFarm()
-return
-
-#w::
-Loop, 20
-{
-    MouseClick, left,  160,  406
-    Sleep, 4000
+    ;BoLFarm("beginner")
+    BoLFarm("intermediate")
 }
 return
 
@@ -190,36 +202,32 @@ HonorFarmSlave(map)
     }
 }
 
-BoLFarm()
+BoLFarm(difficulty)
 {
+    joinGame:
+    JoinSoloBotGame("SR", difficulty)
+    SelectChamp("ryz")
+    Sleep, 120000
+    IfWinExist ahk_class RiotWindowClass ;if game launches, focus on it
+    {
+        WinActivate
+    }
+    else
+    {
+        Goto, joinGame
+    }
     while true
     {
-        joinGame:
-        JoinSoloBotGame("SR", "intermediate")
-        Sleep, 15000
-        SelectChamp("ryz")
-        Sleep, 120000
-        IfWinExist ahk_class RiotWindowClass ;if game launches, focus on it
+        Sleep, 10000
+        Send {Click 510, 416} ;click on "continue' button after defeat/victory
+        IfWinExist, PVP.net Client
         {
             WinActivate
+            break      
         }
-        else
-        {
-            Goto, joinGame
-        }
-        while true
-        {
-            Sleep, 10000
-            Send {Click 510, 416} ;click on "continue' button after defeat/victory
-            IfWinExist, PVP.net Client
-            {
-                WinActivate
-                break      
-            }
-        }
-        CleanupGame("master")
-        Sleep, 10000
     }
+    CleanupGame("master")
+    Sleep, 10000
 }
 
 ;game creator for co-op vs ai spam
@@ -676,7 +684,7 @@ JoinSoloBotGame(map, difficulty)
     Sleep, 1000
     MouseClick, left,  610,  570 ;solo
     Sleep, 2000
-    while True ;wait for queue to fire
+    Loop, 20 ;wait for queue to fire
     {
         Sleep, 1000
         PixelSearch, FoundX, FoundY, 507, 324, 509, 326, 0xFFFFFF ;look for white of timer pie
@@ -688,7 +696,7 @@ JoinSoloBotGame(map, difficulty)
     accept:
     MouseClick, left, 421, 364 ;click "accept" when match is made to go to champ select
     Sleep, 10000
-    while True ;catch cases where we get requeued
+    Loop, 20 ;catch cases where we get requeued
     {
         Sleep, 1000
         PixelSearch, FoundX, FoundY, 507, 324, 509, 326, 0xFFFFFF ;look for white of timer pie
@@ -866,7 +874,8 @@ DoBattleTraining() ;run battle training automatically
     Sleep, 2000
     MouseClick, left,  424,  382
     Sleep, 2000
-    MouseClick, left,  256,  167
+    MouseClick, left,  256,  167 ;ashe
+    ;MouseClick, left,  370,  167 ;ryze is a mage
     Sleep, 2000
     MouseClick, left,  392,  331
     Sleep, 2000
@@ -974,6 +983,22 @@ BuyXPBoost(size)
     Sleep, 2000
 }
 
+BuyChamp(champName)
+{
+    MouseClick, left,  695,  40 ;shop
+    Sleep, 10000
+    MouseClick, left,  83,  260 ;champs
+    Sleep, 5000
+    MouseClick, left,  278,  156 ;search
+    Sleep, 200
+    Send, %champName%
+    Sleep, 2000
+    MouseClick, left,  406,  288 ;unlock
+    Sleep, 2000
+    MouseClick, left,  705,  583 ;buy with IP
+    Sleep, 5000
+}
+
 NameChange(name)
 {
     MouseClick, left,  455,  387
@@ -1055,33 +1080,28 @@ MakeNewSmurf(username, password, reflink)
     ;Send, {CTRLDOWN}l{CTRLUP}wg741.webgate.pl{ENTER}
     Send, {CTRLDOWN}l{CTRLUP}http://arcane-escarpment-5381.herokuapp.com/index.php{ENTER}
     Sleep, 15000
-    ;WinWait, wg741.webgate.pl - Google Chrome, 
-    ;IfWinNotActive, wg741.webgate.pl - Google Chrome, , WinActivate, wg741.webgate.pl - Google Chrome, 
-    ;WinWaitActive, wg741.webgate.pl - Google Chrome, 
-    MouseClick, left,  340,  293 ;reflink box
+    MouseClick, left,  340,  208 ;reflink box
     Sleep, 100
     Send, %reflink%
-    MouseClick, left,  334,  339 
+    MouseClick, left,  334,  254
     Sleep, 100
     Send, {CTRLDOWN}a{CTRLUP}%username%
-    MouseClick, left,  325,  368
-    Sleep, 100
-    MouseClick, left,  325,  368
+    MouseClick, left,  325,  283
     Sleep, 100
     Send, {CTRLDOWN}a{CTRLUP}%password%
-    MouseClick, left,  233,  426
+    MouseClick, left,  233,  341
     Sleep, 100
     Random, day, 1, 28
     Send, {CTRLDOWN}a{CTRLUP}%day%
-    MouseClick, left,  300,  430
+    MouseClick, left,  300,  345
     Sleep, 100
     Random, month, 1, 12
     Send, {CTRLDOWN}a{CTRLUP}%month%
-    MouseClick, left,  384,  419
+    MouseClick, left,  384,  345
     Sleep, 100
     Random, year, 1981, 1992
     Send, {CTRLDOWN}a{CTRLUP}%year%
-    MouseClick, left,  261,  472 ;create!
+    MouseClick, left,  261,  387 ;create!
     Sleep, 30000 ;wait for account to create
     ;add new account to smurf list
     IfWinExist, Google Chrome

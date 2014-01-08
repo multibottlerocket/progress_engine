@@ -14,7 +14,7 @@ local counter = 0
 local healTime = 0
 local theMinions
 local backingFlag = 0
-local tickLock = 0
+local lockVal = 0
 
 local items =     {1027,3340,3070,1001,3158,1031,3024,3082,3110,1011,1026,3116,1027,3010,1026,3027,1026,3003,1026,3135}
 local itemsCost = {400 ,0   ,300 ,325 ,675 ,720 ,630 ,1000,550 ,1000,860 ,1040,400 ,800 ,860 ,740 ,860 ,1140,860 ,1435}
@@ -35,15 +35,23 @@ function OnLoad()
 	 theMinions = minionManager(MINION_ALL, 20000, player, MINION_SORT_HEALTH_ASC)
 	 --SendChat("My name is "..myName)
 	 if myName ~= "Ryze" then
-	 	tickLock = 2
+	 	lockVal = 2
 	 else
-	 	tickLock = 0
+	 	lockVal = 0
 	 end
 end
+
+
 function OnTick()
-	if tickLock == 0 then
-		--tickLock = 1
-		local time = GetGameTimer()
+	if lockVal == 0 then
+		lockVal = 1
+		DoTick()
+		lockVal = 0
+	end
+end
+
+function DoTick()
+	local time = GetGameTimer()
 
 		
 		local action = 0

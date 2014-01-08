@@ -33,7 +33,7 @@ local itemcounter = 1
 function OnLoad()
 	 myName = GetMyHero().charName
 	 theMinions = minionManager(MINION_ALL, 20000, player, MINION_SORT_HEALTH_ASC)
-	 --SendChat("My name is "..myName)
+	 -- SendChat("My name is "..myName)
 	 if myName ~= "Ryze" then
 	 	lockVal = 2
 	 else
@@ -350,8 +350,6 @@ function DoTick()
 				end
 				return
 			end
-		--tickLock = 0
-	end
 
 end
 

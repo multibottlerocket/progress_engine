@@ -17,8 +17,8 @@ SetKeyDelay, 100, 30
 ;I think bug splats for battle trainning don't give you the orange "reconnect" button - 
 ;   they just put you on the normal client screen
 
-;globalReflink := "http://signup.leagueoflegends.com/?ref=4dc070d8d86a0397596492" ;george
-globalReflink := "http://signup.leagueoflegends.com/?ref=4ce0a8276d57a105645474" ;spam ninja
+globalReflink := "4dc070d8d86a0397596492" ;george
+;globalReflink := "4ce0a8276d57a105645474" ;spam ninja
 ;globalReflink := "http://signup.leagueoflegends.com/?ref=4e0d1472cd21a929683971" ;aerial
 ;globalReflink := "http://signup.leagueoflegends.com/?ref=4df3022975a2d908834853" ;jlosh
 #s::Reload
@@ -108,8 +108,8 @@ AutoSmurf(password, reflink)
             smurfIndex += 1
         }
         ;append smurf index to username base
-        Random, smurfRand, 10000000, 99999999
-        smurfName := "eng" . smurfRand . "x" . smurfIndex 
+        Random, smurfRand, 10000, 99999
+        smurfName := "Prisoner" . smurfRand . smurfIndex 
         MakeNewSmurf(smurfName, password, reflink)
         ;ugh i really want feedback on whether an account got created successfully
         SmurfSetup(smurfName, password)
@@ -123,13 +123,19 @@ AutoSmurf(password, reflink)
         FileReadLine, password, %currentSmurf%, 2
         LogInManual(smurfName, password)
     }
+    if CheckIfOne()
+    {
+        DoBattleTraining()
+        BuyChamp("ryze")
+    }
     while not CheckIfFive()
     {
         if CheckIfRich()
         {
             BuyXPBoost("small")
         }
-        DoBattleTraining()
+        ;DoBattleTraining()
+        BoLFarm("beginner")
         Sleep, 5000
     }
     ;we're done, so do some cleanup
@@ -957,7 +963,6 @@ DoBattleTraining() ;run battle training automatically
     MouseClick, left,  561,  403 ;decline co op vs ai inv again
     Sleep, 2000 
     ;should be back at lobby again
-    ;BuyMasterYi()
 
 return
 }
@@ -1131,6 +1136,24 @@ SmurfSetup(username, password) ;fill out referral form on website - make sure ca
     MouseClick, left,  555,  405 ;decline battle trainig
     Sleep, 3000
     ;CloseLoLClient()
+    return
+}
+
+CheckIfOne() ;check if acct is level 1 ;make sure you have level1.png from the git repository in your working directory
+{
+    MouseClick, left, 769, 43 ;view profile
+    Sleep, 5000
+    ImageSearch, FoundX, FoundY, 357, 252, 426, 276, level1.png ;scan for "level 5" with image
+    if ErrorLevel ;could not find
+    {
+        ;MsgBox, not found
+        return false    
+    }
+    else
+    {
+        ;MsgBox, found
+        return true
+    }
     return
 }
 

@@ -17,8 +17,8 @@ SetKeyDelay, 100, 30
 ;I think bug splats for battle trainning don't give you the orange "reconnect" button - 
 ;   they just put you on the normal client screen
 
-globalReflink := "4dc070d8d86a0397596492" ;george
-;globalReflink := "4ce0a8276d57a105645474" ;spam ninja
+;globalReflink := "4dc070d8d86a0397596492" ;george
+globalReflink := "4ce0a8276d57a105645474" ;spam ninja
 ;globalReflink := "http://signup.leagueoflegends.com/?ref=4e0d1472cd21a929683971" ;aerial
 ;globalReflink := "http://signup.leagueoflegends.com/?ref=4df3022975a2d908834853" ;jlosh
 #s::Reload
@@ -1143,6 +1143,8 @@ CheckIfOne() ;check if acct is level 1 ;make sure you have level1.png from the g
 {
     MouseClick, left, 769, 43 ;view profile
     Sleep, 5000
+    MouseClick, left, 514, 358 ;dismiss "Unexpected Platform Error" if  it comes up
+    Sleep, 2000
     ImageSearch, FoundX, FoundY, 357, 252, 426, 276, level1.png ;scan for "level 5" with image
     if ErrorLevel ;could not find
     {
@@ -1161,6 +1163,8 @@ CheckIfFive() ;check if acct is level 5 ;make sure you have level5.png from the 
 {
     MouseClick, left, 769, 43 ;view profile
     Sleep, 5000
+    MouseClick, left, 514, 358 ;dismiss "Unexpected Platform Error" if  it comes up
+    Sleep, 2000
     ImageSearch, FoundX, FoundY, 357, 252, 426, 276, level5.png ;scan for "level 5" with image
     if ErrorLevel ;could not find
     {

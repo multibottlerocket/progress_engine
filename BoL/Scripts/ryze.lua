@@ -1,4 +1,5 @@
 local QRange = 600
+local autoRange = 550
 local interleaveSpell = false
 local AttackRange = 1000
 local towers = {}
@@ -16,12 +17,20 @@ local theMinions
 local backingFlag = 0
 local lockVal = 0
 
-local items =     {1027,3340,3070,1001,3158,1031,3024,3082,3110,1011,1026,3116,1027,3010,1026,3027,1026,3003,1026,3135}
-local itemsCost = {400 ,0   ,300 ,325 ,675 ,720 ,630 ,1000,550 ,1000,860 ,1040,400 ,800 ,860 ,740 ,860 ,1140,860 ,1435}
+local items =     {1027,3340,3070,1001,3108,1026,3060,3158,1011,1026,3116,3010,1026,3027,1026,3003,1026,3135}
+local itemsCost = {400 ,0   ,300 ,325 ,820 ,860 ,720 ,675 ,1000,860 ,1040,1200,860 ,740 ,860 ,1140,860 ,1435}
+
+-- frozen heart
+-- 1031,3024,3082,3110,
+-- 720 ,630 ,1000,550 ,
 
 -- abyssal
 -- 1057,1026,3001,
 -- 720 ,860 ,980 ,
+
+-- banner
+-- 3108,1026,3060,
+-- 820 ,860 ,720 ,
 
 -- health pot
 -- 2003,
@@ -80,7 +89,11 @@ function DoTick()
 		
 			if ((myHero.health > myHero.maxHealth * 0.9) and (myHero.mana > myHero.maxMana * 0.9)) then
 				backingFlag = 0
-				myHero:MoveTo(6000,6000)
+				if myHero.level > 10 then
+					myHero:MoveTo(13000,13000)
+				else
+					myHero:MoveTo(6000,6000)
+				end
 			end
 			if itemcounter<20 then
 				for i = 1,7,1 do
@@ -152,7 +165,7 @@ function DoTick()
 			end
 			
 			if teamCount < 0 then
-				PrintFloatText(myHero, 10,"outnumbered; flee")
+				PrintFloatText(myHero, 10, "outnumbered; flee")
 				myHero:HoldPosition()
 				farmflag = 0
 				run(myHero.x, myHero.z, 10.0)
@@ -165,11 +178,11 @@ function DoTick()
 				-- do hero math
 				for i=1, heroManager.iCount do
 					if i == hero_i then
-						enemy = heroManager:getHero(i) --JL_CHANGE removing "local" declaration might break stuff
+						enemy = heroManager:getHero(i) 
 					
 						-- --check enemy health
 						-- if enemy.health < enemy.maxHealth * 0.10 then
-						-- 	PrintFloatText(myHero, 10,"enemy low enough to all in")
+						-- 	PrintFloatText(myHero, 10, "enemy low enough to all in")
 						-- 	farmflag = 0
 						-- 	if myHero:CanUseSpell(_Q) == READY then
 						-- 		CastSpell(_Q, enemy)
@@ -188,8 +201,8 @@ function DoTick()
 						-- 	end
 						-- end
 					
-						if enemy.health / enemy.maxHealth < myHero.health/myHero.maxHealth + 0.1 then
-							PrintFloatText(myHero, 10,"health diff enough to trade")
+						if ((enemy.health / enemy.maxHealth < myHero.health/myHero.maxHealth + 0.1) and (myHero.level > 3)) then
+							PrintFloatText(myHero, 10, "health diff enough to trade")
 							farmflag = 0
 							if myHero:CanUseSpell(_Q) == READY then
 								CastSpell(_Q, enemy)
@@ -233,7 +246,7 @@ function DoTick()
 			for name, tow in pairs(GetTurrets()) do
 				if tow.team ~= myHero.team then
 					if GetDistance(tow)<1000 and mindist < 1300 then
-						PrintFloatText(myHero, 10,"champ nearby; flee from "..name)
+						PrintFloatText(myHero, 10, "champ nearby; flee from "..name)
 						myHero:HoldPosition()
 						farmflag = 0
 						run(myHero.x, myHero.z,3.0)
@@ -246,16 +259,21 @@ function DoTick()
 						for i,minionObject in ipairs(theMinions.objects) do
 		           			if minionObject.team ==  player.team then
 								if (GetDistance(minionObject) < tank_minion_dist) and (minionObject.x > myHero.x) and (minionObject.z > myHero.z) then
-									PrintFloatText(myHero, 10,"found tank minion")
+									PrintFloatText(myHero, 10, "found tank minion")
 									tank_flag = 1
 								end
 							end
 						end
 						if tank_flag == 1 then
 							farmflag = 1
-							return
+							--myHero:attack(tow)
+							-- if GetDistance(tow) > autoRange then
+							-- 	myHero:MoveTo(tow.x,tow.z)
+							-- 	myHero:HoldPosition()
+							-- 	return
+							-- end
 						else
-							PrintFloatText(myHero, 10,"flee from "..name)
+							PrintFloatText(myHero, 10, "flee from "..name)
 							myHero:HoldPosition()
 							farmflag = 0
 							run(myHero.x, myHero.z,3.0)
@@ -273,7 +291,7 @@ function DoTick()
 			local min_minion_dist = 20000
 			local min_minion
 			if ((farmflag == 1) and (backingFlag == 0)) then
-				PrintFloatText(myHero, 10,"farming")
+				PrintFloatText(myHero, 10, "farming")
 				theMinions:update()
 				for i,minionObject in ipairs(theMinions.objects) do
 					if minionObject.team ~=  player.team then
@@ -302,13 +320,13 @@ function DoTick()
 						end
 					end
 					myHero:Attack(min_minion)
-					PrintFloatText(myHero, 10,"attacking "..min_minion.type)
+					PrintFloatText(myHero, 10, "attacking "..min_minion.type)
 				end
 			end
 			
 			--check self health
 			if ((myHero.health < myHero.maxHealth * 0.3) or (myHero.mana < 100) or (backingFlag == 1)) then
-				PrintFloatText(myHero, 10,"less than 30% health, fleeing")
+				PrintFloatText(myHero, 10, "less than 30% health, fleeing")
 				farmflag = 0
 				if mindist < AttackRange then
 					myHero:HoldPosition()
@@ -316,17 +334,19 @@ function DoTick()
 						CastSpell(_W, enemy)
 					end
 					run(myHero.x, myHero.z,15.0)
-					if myHero:CanUseSpell(SUMMONER_1) == READY then
-						CastSpell(SUMMONER_1)
-					end
-					if myHero:CanUseSpell(SUMMONER_2) == READY then --TODO: need to remove this if i add ignite
-						CastSpell(SUMMONER_2)
-					end
-					if (seraphSlot ~= nil and myHero:CanUseSpell(seraphSlot) == READY) then
-						CastSpell(seraphSlot)
-					end
-					if myHero:CanUseSpell(_R) == READY then
-						CastSpell(_R)
+					if myHero.health < myHero.maxHealth * 0.3 then
+						if myHero:CanUseSpell(SUMMONER_1) == READY then
+							CastSpell(SUMMONER_1)
+						end
+						if myHero:CanUseSpell(SUMMONER_2) == READY then --TODO: need to remove this if i add ignite
+							CastSpell(SUMMONER_2)
+						end
+						if (seraphSlot ~= nil and myHero:CanUseSpell(seraphSlot) == READY) then
+							CastSpell(seraphSlot)
+						end
+						if myHero:CanUseSpell(_R) == READY then
+							CastSpell(_R)
+						end
 					end
 				end
 				local min_minion_dist = 20000

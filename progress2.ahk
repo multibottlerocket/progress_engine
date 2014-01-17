@@ -27,18 +27,11 @@ globalReflink := "4ce0a8276d57a105645474" ;spam ninja
 
 ;this is a utility testing method - feel free to swap it out for whatever function
 #v::
-;DoBattleTraining()
-;BuyChamp("ryze")
-;while not CheckIfFive()
-while true
-{
-    if CheckIfRich()
+    Loop, 30
     {
-        BuyXPBoost("small")
+        MouseClick, left,  167,  414
+        Sleep, 5000
     }
-    BoLFarm("beginner")
-    Sleep, 5000
-}
 return
 
 #z::
@@ -134,8 +127,8 @@ AutoSmurf(password, reflink)
         {
             BuyXPBoost("small")
         }
-        ;DoBattleTraining()
-        BoLFarm("beginner")
+        DoBattleTraining()
+        ;BoLFarm("beginner")
         Sleep, 5000
     }
     ;we're done, so do some cleanup
@@ -220,6 +213,10 @@ BoLFarm(difficulty)
     }
     else
     {
+        MouseClick, left, 769, 43 ;view profile
+        Sleep, 5000
+        MouseClick, left, 512, 363 ;dismiss queue dodge warning safely
+        Sleep, 2000
         Goto, joinGame
     }
     while true
@@ -578,8 +575,6 @@ SelectChamp(champName)
     Send, %champName%
     Sleep, 1000
     Send {click 274, 174} ;click on top left champ space
-    Sleep, 2000
-    Send {Click 702, 410} ;attempt to start game
     Sleep, 2000
     Send {click 517, 421} ;click on summoner spells
     Sleep, 1000
@@ -1057,7 +1052,7 @@ LogInManual(username, password) ;accountData should have account name on first l
     SendInput, %password%
     Sleep, 1000
     Send {click 276,  338} ;log in
-    Sleep, 25000
+    Sleep, 35000
     Send {click 1001,  87} ;dismiss overlay if it exists
     return
 }
@@ -1143,7 +1138,7 @@ CheckIfOne() ;check if acct is level 1 ;make sure you have level1.png from the g
 {
     MouseClick, left, 769, 43 ;view profile
     Sleep, 5000
-    MouseClick, left, 514, 358 ;dismiss "Unexpected Platform Error" if  it comes up
+    MouseClick, left, 512, 363 ;dismiss "Unexpected Platform Error" if  it comes up
     Sleep, 2000
     ImageSearch, FoundX, FoundY, 357, 252, 426, 276, level1.png ;scan for "level 5" with image
     if ErrorLevel ;could not find
@@ -1163,7 +1158,7 @@ CheckIfFive() ;check if acct is level 5 ;make sure you have level5.png from the 
 {
     MouseClick, left, 769, 43 ;view profile
     Sleep, 5000
-    MouseClick, left, 514, 358 ;dismiss "Unexpected Platform Error" if  it comes up
+    MouseClick, left, 512, 363 ;dismiss "Unexpected Platform Error" if  it comes up
     Sleep, 2000
     ImageSearch, FoundX, FoundY, 357, 252, 426, 276, level5.png ;scan for "level 5" with image
     if ErrorLevel ;could not find

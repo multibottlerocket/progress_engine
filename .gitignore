@@ -4,3 +4,6 @@ reflink*.txt
 *.lnk
 *.save
 smurfs*.txt
+declinedGames.PNG
+platformError.PNG
+postgameConnectionError.PNG

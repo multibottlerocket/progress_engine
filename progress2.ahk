@@ -17,21 +17,31 @@ SetKeyDelay, 100, 30
 ;I think bug splats for battle trainning don't give you the orange "reconnect" button - 
 ;   they just put you on the normal client screen
 
+
+
 ;globalReflink := "4dc070d8d86a0397596492" ;george
-globalReflink := "4ce0a8276d57a105645474" ;spam ninja
+;globalReflink := "4ce0a8276d57a105645474" ;spam ninja
+;globalReflink := "52d82c79c1c55823529937" ;vimmmmm
 ;globalReflink := "http://signup.leagueoflegends.com/?ref=4e0d1472cd21a929683971" ;aerial
-;globalReflink := "http://signup.leagueoflegends.com/?ref=4df3022975a2d908834853" ;jlosh
+globalReflink := "4df3022975a2d908834853" ;jlosh
 #s::Reload
 
 #t::Pause
 
 ;this is a utility testing method - feel free to swap it out for whatever function
 #v::
-    Loop, 30
-    {
-        MouseClick, left,  167,  414
-        Sleep, 5000
-    }
+;;redeem boosts - press spacebar once to move down to correct spacing
+;Loop, 15
+;{
+;    MouseClick, left,  167,  414
+;    Sleep, 5000
+;}
+
+
+while true {
+    AutoSmurf("random17", globalReflink)
+}
+
 return
 
 #z::
@@ -61,8 +71,7 @@ while true
 CleanupGame("master")
 Sleep, 10000
 while true {
-    ;BoLFarm("beginner")
-    BoLFarm("intermediate")
+    AutoSmurf("random17", globalReflink)
 }
 return
 
@@ -127,8 +136,8 @@ AutoSmurf(password, reflink)
         {
             BuyXPBoost("small")
         }
-        DoBattleTraining()
-        ;BoLFarm("beginner")
+        ;DoBattleTraining()
+        BoLFarm("beginner")
         Sleep, 5000
     }
     ;we're done, so do some cleanup
@@ -221,6 +230,7 @@ BoLFarm(difficulty)
     }
     while true
     {
+        ;Shop("SR")
         Sleep, 10000
         Send {Click 510, 416} ;click on "continue' button after defeat/victory
         IfWinExist, PVP.net Client
@@ -349,9 +359,8 @@ StatsCheck()
         {
             WinActivate    
         }
-        MouseClick, left,  645,  387 ;sometimes you need to click on the XP VMs to make the client refresh
+        MouseClick, left,  665,  130 ;sometimes you need to click on the XP VMs to make the client refresh
         Sleep, 1000                  ;
-        MouseClick, left,  645,  387 ;
         ImageSearch, FoundX, FoundY, 676, 570, 783, 607, home.png
         if ErrorLevel ;could not find
             statsNotLoaded := true  
@@ -448,26 +457,30 @@ Sleep, 100
 
 Shop(map)
 {
-    MouseClick, left, 137,  754 ;click to open shop
-    Sleep, 100
-    MouseClick, left, 137,  754 ;click to open shop
-    Sleep, 100
+    ;MouseClick, left, 137,  754 ;click to open shop
+    ;Sleep, 100
+    ;MouseClick, left, 137,  754 ;click to open shop
+    ;Sleep, 100
     MouseClick, left, 137,  754 ;click to open shop
     Sleep, 1000
     if (map == "SR")
     {
-        Send, {CTRLDOWN}l{CTRLUP}kk ;loo
+        Send, {CTRLDOWN}l{CTRLUP}rod ;roa
         Sleep, 500
-        MouseClick, left,  203, 189 ;select BT
+        MouseClick, left,  375, 184 ;select roa
         Sleep, 300
-        MouseClick, left,  737,  233 ;try to buy BT
+        MouseClick, left,  737,  233 ;try to buy roa
         MouseClick, left,  737,  233
         Sleep, 300
-        MouseClick, left,  625,  293 ;try to buy BF sword
+        MouseClick, left,  815,  290 ;try to buy blasting wand
+        MouseClick, left,  815,  290        
+        Sleep, 300
+        MouseClick, left,  625,  293 ;try to buy catalyst
         MouseClick, left,  625,  293
         Sleep, 300
-        MouseClick, left,  815,  290 ;try to buy vamp scepter
-        MouseClick, left,  815,  290
+        MouseClick, left,  679,  376 ;try to buy sapphire
+        MouseClick, left,  679,  376
+
     }
     else if (map == "TT")
     {
@@ -1052,8 +1065,10 @@ LogInManual(username, password) ;accountData should have account name on first l
     SendInput, %password%
     Sleep, 1000
     Send {click 276,  338} ;log in
-    Sleep, 35000
+    Sleep, 50000
     Send {click 1001,  87} ;dismiss overlay if it exists
+    Sleep, 2000
+    Send {click 1001,  87} ;so many fucking overlays
     return
 }
 

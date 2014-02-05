@@ -23,7 +23,9 @@ SetKeyDelay, 100, 30
 ;globalReflink := "4ce0a8276d57a105645474" ;spam ninja
 ;globalReflink := "52d82c79c1c55823529937" ;vimmmmm
 ;globalReflink := "http://signup.leagueoflegends.com/?ref=4e0d1472cd21a929683971" ;aerial
-globalReflink := "4df3022975a2d908834853" ;jlosh
+;globalReflink := "4df3022975a2d908834853" ;jlosh
+;globalReflink := "52ee65df8d405041134169" ;andykat1
+globalReflink := "52ee661a7fee1529378415" ;andykat2
 #s::Reload
 
 #t::Pause
@@ -347,6 +349,10 @@ CleanupGame(role)
     }
     Send {Click 700, 590} ;click on 'return to lobby' button 
     Sleep, 5000
+    Send {click 1001,  87} ;dismiss overlay if it exists
+    Sleep, 2000
+    Send {click 1001,  87} ;so many fucking overlays
+    Sleep, 1000
 }
 
 StatsCheck()
@@ -1070,18 +1076,6 @@ LogInManual(username, password) ;accountData should have account name on first l
     Sleep, 2000
     Send {click 1001,  87} ;so many fucking overlays
     return
-}
-
-UpdateNames()
-{
-    trollNum := 1
-    while true
-    {
-        trollName := "mybotmybot" . trollNum
-        LogInManual(trollName, "randomer17")
-        NameChange(trollName)
-        trollNum := trollNum + 1
-    }
 }
 
 MakeNewSmurf(username, password, reflink)

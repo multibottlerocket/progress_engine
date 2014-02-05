@@ -1,4 +1,4 @@
-local QRange = 600
+local QRange = 700
 local autoRange = 550
 local interleaveSpell = false
 local AttackRange = 1000

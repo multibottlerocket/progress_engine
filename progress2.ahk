@@ -17,15 +17,15 @@ SetKeyDelay, 100, 30
 ;I think bug splats for battle trainning don't give you the orange "reconnect" button - 
 ;   they just put you on the normal client screen
 
-
+globalGameLogic := "INTRO_AHK"
 
 ;globalReflink := "4dc070d8d86a0397596492" ;george
 ;globalReflink := "4ce0a8276d57a105645474" ;spam ninja
 ;globalReflink := "52d82c79c1c55823529937" ;vimmmmm
-;globalReflink := "http://signup.leagueoflegends.com/?ref=4e0d1472cd21a929683971" ;aerial
-;globalReflink := "4df3022975a2d908834853" ;jlosh
+;globalReflink := "4e0d1472cd21a929683971" ;aerial
+globalReflink := "4df3022975a2d908834853" ;jlosh
 ;globalReflink := "52ee65df8d405041134169" ;andykat1
-globalReflink := "52ee661a7fee1529378415" ;andykat2
+;globalReflink := "52ee661a7fee1529378415" ;andykat2
 #s::Reload
 
 #t::Pause
@@ -41,7 +41,7 @@ globalReflink := "52ee661a7fee1529378415" ;andykat2
 
 
 while true {
-    AutoSmurf("random17", globalReflink)
+    AutoSmurf("random17", globalReflink, globalGameLogic)
 }
 
 return
@@ -49,21 +49,22 @@ return
 #z::
 ;Sleep, 120000
 while true {
-    AutoSmurf("random17", globalReflink)
+    AutoSmurf("random17", globalReflink, globalGameLogic)
 }
 return
 
 #q::
-while true {
-    BoLFarm("intermediate")
-}
+WinGameLoop("SR")
+;CheckIfOne()
+;BotGameFarm("intro", globalGameLogic)
+;DoBattleTraining()
 return
 
 #w::
 while true
 {
     Sleep, 10000
-    Send {Click 510, 416} ;click on "continue' button after defeat/victory
+    ClickEndGameContinue()
     IfWinExist, PVP.net Client
     {
         WinActivate
@@ -73,7 +74,7 @@ while true
 CleanupGame("master")
 Sleep, 10000
 while true {
-    AutoSmurf("random17", globalReflink)
+    AutoSmurf("random17", globalReflink, globalGameLogic)
 }
 return
 
@@ -85,7 +86,7 @@ CleanupSmurf("None", password, globalReflink)
 return
 
 ;TODO: add timeouts that restart lol client and game if we've been locked in one state for too long
-AutoSmurf(password, reflink) 
+AutoSmurf(password, reflink, inGameLogic) 
 {
     refCode := SubStr(reflink, -3)
     currentSmurf := "C:\currentSmurf" . refCode . ".txt"
@@ -130,7 +131,12 @@ AutoSmurf(password, reflink)
     if CheckIfOne()
     {
         DoBattleTraining()
-        BuyChamp("ryze")
+        if (inGameLogic == "BOT_OF_LEGENDS") {
+            BuyChamp("ryze") 
+        }
+        else {
+            BuyChamp("sivir") 
+        }
     }
     while not CheckIfFive()
     {
@@ -138,8 +144,18 @@ AutoSmurf(password, reflink)
         {
             BuyXPBoost("small")
         }
-        ;DoBattleTraining()
-        BoLFarm("beginner")
+        if (inGameLogic == "INTRO_AHK") {
+            BotGameFarm("intro", inGameLogic)
+        }
+        else if (inGameLogic == "BOT_OF_LEGENDS") {
+            BotGameFarm("beginner", inGameLogic)
+        }
+        else if (inGameLogic == "BATTLE_TRAINING") {
+            DoBattleTraining()
+        }
+        else { ;revert to battle training as safest case
+            DoBattleTraining() 
+        }
         Sleep, 5000
     }
     ;we're done, so do some cleanup
@@ -214,7 +230,7 @@ HonorFarmSlave(map)
 
 BoLFarm(difficulty)
 {
-    joinGame:
+    joinGameBoL:
     JoinSoloBotGame("SR", difficulty)
     SelectChamp("ryz")
     Sleep, 120000
@@ -228,18 +244,58 @@ BoLFarm(difficulty)
         Sleep, 5000
         MouseClick, left, 512, 363 ;dismiss queue dodge warning safely
         Sleep, 2000
-        Goto, joinGame
+        Goto, joinGameBoL
     }
     while true
     {
         ;Shop("SR")
         Sleep, 10000
-        Send {Click 510, 416} ;click on "continue' button after defeat/victory
+        ClickEndGameContinue()
         IfWinExist, PVP.net Client
         {
             WinActivate
             break      
         }
+    }
+    CleanupGame("master")
+    Sleep, 10000
+}
+
+BotGameFarm(difficulty, inGameLogic)  ;i wouldn't recommend anything besides intro
+{
+    map = "SR"
+    joinGame:
+    JoinSoloBotGame(map, difficulty)
+    if (inGameLogic == "INTRO_AHK") {
+        SelectChamp("sivir")
+    }
+    else if (inGameLogic == "BOT_OF_LEGENDS") {
+        SelectChamp("ryze")
+    }
+    else { ; revert to safest champ
+        SelectChamp("sivir")
+    }
+    Sleep, 120000
+    IfWinExist ahk_class RiotWindowClass ;if game launches, focus on it
+    {
+        WinActivate
+    }
+    else
+    {
+        MouseClick, left, 769, 43 ;view profile
+        Sleep, 5000
+        MouseClick, left, 512, 363 ;dismiss queue dodge warning safely
+        Sleep, 2000
+        Goto, joinGame
+    }
+    if (inGameLogic == "INTRO_AHK") {
+        WinGameLoop(map)
+    }
+    else if (inGameLogic == "BOT_OF_LEGENDS") {
+        SelectChamp("ryze")
+    }
+    else { ; revert to safest champ
+        WinGameLoop(map)
     }
     CleanupGame("master")
     Sleep, 10000
@@ -311,7 +367,7 @@ LoseGameLoop()
             Sleep, 100
             Send {Enter}
         }
-        Send {Click 510, 416} ;click on "continue' button after defeat
+        ClickEndGameContinue()
         IfWinExist, PVP.net Client
         {
             WinActivate
@@ -321,15 +377,14 @@ LoseGameLoop()
 }
 
 ;In-game loop of pushing/shopping.
-WinGameLoop(map)
-{
+WinGameLoop(map) {
     while true
     {
         Suicide(map)
         ;SkillUp()   ;removed until we know what champs we're using
         ;Abilities() ;
         Sleep, 1000
-        Send {Click 510, 416} ;click on "continue' button after defeat/victory
+        ClickEndGameContinue()
         IfWinExist, PVP.net Client
         {
             WinActivate
@@ -337,6 +392,21 @@ WinGameLoop(map)
         }
         Sleep, 2000
         Shop(map)
+    }
+}
+
+;In-game logic when using bot of legends
+BoLLoop() {
+    while true
+    {
+        ;Shop("SR")
+        Sleep, 10000
+        ClickEndGameContinue()
+        IfWinExist, PVP.net Client
+        {
+            WinActivate
+            break      
+        }
     }
 }
 
@@ -367,13 +437,14 @@ StatsCheck()
         }
         MouseClick, left,  665,  130 ;sometimes you need to click on the XP VMs to make the client refresh
         Sleep, 1000                  ;
-        ImageSearch, FoundX, FoundY, 676, 570, 783, 607, home.png
+        ImageSearch, FoundX, FoundY, 676, 540, 783, 607, home.png
         if ErrorLevel ;could not find
             statsNotLoaded := true  
         else
             statsNotLoaded := false
         Sleep, 1000
     }
+    ;MsgBox, stats loaded
 }
 
 SpamHonor()
@@ -424,7 +495,14 @@ Suicide(map)
     {
         MouseClick, left, 992, 685
     }
+    else {
+        MouseClick, left, 1011, 598        
+    }
     Sleep, 300
+}
+
+ClickEndGameContinue() {
+    Send {Click 522, 562} ;click on "continue' button after defeat/victory
 }
 
 SkillUp()
@@ -471,28 +549,46 @@ Shop(map)
     Sleep, 1000
     if (map == "SR")
     {
-        Send, {CTRLDOWN}l{CTRLUP}rod ;roa
+        Send, {CTRLDOWN}l{CTRLUP}do
         Sleep, 500
-        MouseClick, left,  375, 184 ;select roa
+        MouseClick, left,  380, 240 ;select doran's blade
         Sleep, 300
-        MouseClick, left,  737,  233 ;try to buy roa
-        MouseClick, left,  737,  233
-        Sleep, 300
-        MouseClick, left,  815,  290 ;try to buy blasting wand
-        MouseClick, left,  815,  290        
-        Sleep, 300
-        MouseClick, left,  625,  293 ;try to buy catalyst
-        MouseClick, left,  625,  293
-        Sleep, 300
-        MouseClick, left,  679,  376 ;try to buy sapphire
-        MouseClick, left,  679,  376
+        MouseClick, left, 813, 464 ;try to buy doran's blade
+        MouseClick, left, 813, 464 ;
+        MouseClick, left, 813, 464 ;
+        MouseClick, left, 813, 464 ;
+        ; Send, {CTRLDOWN}l{CTRLUP}rod ;roa
+        ; Sleep, 500
+        ; MouseClick, left,  375, 184 ;select roa
+        ; Sleep, 300
+        ; MouseClick, left,  737,  233 ;try to buy roa
+        ; MouseClick, left,  737,  233
+        ; Sleep, 300
+        ; MouseClick, left,  815,  290 ;try to buy blasting wand
+        ; MouseClick, left,  815,  290        
+        ; Sleep, 300
+        ; MouseClick, left,  625,  293 ;try to buy catalyst
+        ; MouseClick, left,  625,  293
+        ; Sleep, 300
+        ; MouseClick, left,  679,  376 ;try to buy sapphire
+        ; MouseClick, left,  679,  376
 
     }
     else if (map == "TT")
     {
         Send, {CTRLDOWN}l{CTRLUP}do
         Sleep, 500
-        MouseClick, left,  207, 240 ;select doran's blade
+        MouseClick, left,  380, 240 ;select doran's blade
+        Sleep, 300
+        MouseClick, left, 813, 464 ;try to buy doran's blade
+        MouseClick, left, 813, 464 ;
+        MouseClick, left, 813, 464 ;
+        MouseClick, left, 813, 464 ;
+    }
+    else {
+        Send, {CTRLDOWN}l{CTRLUP}do
+        Sleep, 500
+        MouseClick, left,  380, 240 ;select doran's blade
         Sleep, 300
         MouseClick, left, 813, 464 ;try to buy doran's blade
         MouseClick, left, 813, 464 ;
@@ -676,30 +772,30 @@ JoinSoloBotGame(map, difficulty)
     Sleep, 1000
     MouseClick, left,  393,  119 ;classic
     Sleep, 1000
-    if (map == "SR")
-    {
+    if (map == "SR") {
         MouseClick, left,  592,  137 ;summoner's rift
     }
-    else if (map == "TT")
-    {
+    else if (map == "TT") {
         MouseClick, left,  560,  160 ;twisted treeline
     }
-    else ;default to SR
-    {
+    else { ;default to SR
         MouseClick, left,  592,  137 ;summoner's rift
     }
     Sleep, 1000
-    if (difficulty == "beginner")
+    if (difficulty == "intro") {
+        MouseClick, left,  710,  120 ;intro
+    }
+    else if (difficulty == "beginner")
     {
-        MouseClick, left,  710,  122 ;beginner
+        MouseClick, left,  710,  145 ;beginner
     }
     else if (difficulty == "intermediate")
     {
-        MouseClick, left,  691,  145 ;intermediate
+        MouseClick, left,  691,  165 ;intermediate
     }
-    else ;default to intermediate
+    else ;default to intro
     {
-        MouseClick, left,  691,  145 ;intermediate
+        MouseClick, left,  691,  120 ;intro
     }
     Sleep, 1000
     MouseClick, left,  610,  570 ;solo
@@ -956,7 +1052,7 @@ DoBattleTraining() ;run battle training automatically
             Sleep, 100
             Send {Enter}
         }
-        Send {Click 510, 416} ;click on "continue' button after defeat
+        ClickEndGameContinue()
         IfWinExist, PVP.net Client
         {
             WinActivate
@@ -1149,7 +1245,7 @@ CheckIfOne() ;check if acct is level 1 ;make sure you have level1.png from the g
     Sleep, 5000
     MouseClick, left, 512, 363 ;dismiss "Unexpected Platform Error" if  it comes up
     Sleep, 2000
-    ImageSearch, FoundX, FoundY, 357, 252, 426, 276, level1.png ;scan for "level 5" with image
+    ImageSearch, FoundX, FoundY, 350, 250, 436, 276, level1.png ;scan for "level 5" with image
     if ErrorLevel ;could not find
     {
         ;MsgBox, not found
@@ -1169,7 +1265,7 @@ CheckIfFive() ;check if acct is level 5 ;make sure you have level5.png from the 
     Sleep, 5000
     MouseClick, left, 512, 363 ;dismiss "Unexpected Platform Error" if  it comes up
     Sleep, 2000
-    ImageSearch, FoundX, FoundY, 357, 252, 426, 276, level5.png ;scan for "level 5" with image
+    ImageSearch, FoundX, FoundY, 350, 250, 436, 276, level5.png ;scan for "level 5" with image
     if ErrorLevel ;could not find
     {
         ;MsgBox, not found
@@ -1236,7 +1332,7 @@ else ;we're stalled out
     CloseLoLClient()
     CloseLoLGame()
     while true {
-    AutoSmurf("random17", globalReflink) ;george
+    AutoSmurf("random17", globalReflink, globalGameLogic) ;george
     }
 return
 }

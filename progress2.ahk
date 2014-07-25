@@ -126,7 +126,7 @@ AutoSmurf(password, reflink, inGameLogic)
     {
         FileReadLine, smurfName, %currentSmurf%, 1
         FileReadLine, password, %currentSmurf%, 2
-        LogInManual(smurfName, password)
+        LogIn(smurfName, password)
     }
     if CheckIfOne()
     {
@@ -169,96 +169,8 @@ CleanupSmurf(smurfName, password, reflink) ;clean up state
 {
     refCode := SubStr(reflink, -3)
     currentSmurf := "C:\currentSmurf" . refCode . ".txt"
-    ;;;;; this part doesn't currently because of some weird error with FileAppend
-    ;if (smurfName != "None") ;store in case we need them later
-    ;{
-    ;    foo := "lvl5SmurfsReflink" . refCode . ".txt"
-    ;    MsgBox, %smurfName%
-    ;    FileAppend, %smurfName%, "lvl5SmurfsReflink" . refCode . ".txt" ;format is login \n summoner name \n pw
-    ;    ;TF_MakeFile(foo)
-    ;    ;if ErrorLevel
-    ;    ;{
-    ;    ;    MsgBox, error with FileAppend
-    ;    ;}
-    ;    FileAppend, %smurfName%, "lvl5SmurfsReflink" . refCode . ".txt"
-    ;    FileAppend, %password%, "lvl5SmurfsReflink" . refCode . ".txt"
-    ;}
-    ;;;;;;;;;;;;;;;;;;;;;
     TF_ReplaceLine("!" . currentSmurf, "1", "1", "None") ;locally indicate we're not currently doing a smurf
     TF_ReplaceLine("!" . currentSmurf, "2", "2", "None")
-}
-
-;game creator for grinding honor
-HonorFarmMaster(map)
-{
-    while true
-    {
-        FileReadLine, masterOffset, masterOffset.txt, 1 ;get current position in smurf list
-        FileReadLine, smurf1, smurfs.txt, masterOffset+2 ;!!! currently hard-coded for TT!
-        FileReadLine, smurf2, smurfs.txt, masterOffset+5 ;
-        Sleep, 40000 ;wait for slaves to log in
-        MasterCreateGame(map, smurf1, smurf2, "", "")
-        Sleep, 10000
-        SelectFirstChamp()
-        Sleep, 80000
-        WaitGameStart()
-        WinGameLoop(map)
-        CleanupGame("master")
-        newOffset := masterOffset+6 ;!!! currently hard-coded for TT!
-        TF_ReplaceLine("!masterOffset.txt", "1", "1", newOffset)
-        Sleep, 20000 ;give ample time for everyone to align
-    }
-}
-
-;game slave for grinding honor
-HonorFarmSlave(map)
-{
-    while true
-    {
-        FileReadLine, masterOffset, masterOffset.txt, 1 ;get current position in smurf list
-        FileReadLine, slaveNumber, C:\slaveNumber.txt, 1 ;get current position in smurf list
-        LogIn("smurfs.txt", masterOffset+(slaveNumber*3))
-        SlaveJoinGame()
-        Sleep, 10000
-        SelectFirstChamp()
-        Sleep, 80000
-        WaitGameStart()
-        WinGameLoop(map)
-        CleanupGame("slave")
-    }
-}
-
-BoLFarm(difficulty)
-{
-    joinGameBoL:
-    JoinSoloBotGame("SR", difficulty)
-    SelectChamp("ryz")
-    Sleep, 120000
-    IfWinExist ahk_class RiotWindowClass ;if game launches, focus on it
-    {
-        WinActivate
-    }
-    else
-    {
-        MouseClick, left, 769, 43 ;view profile
-        Sleep, 5000
-        MouseClick, left, 512, 363 ;dismiss queue dodge warning safely
-        Sleep, 2000
-        Goto, joinGameBoL
-    }
-    while true
-    {
-        ;Shop("SR")
-        Sleep, 10000
-        ClickEndGameContinue()
-        IfWinExist, PVP.net Client
-        {
-            WinActivate
-            break      
-        }
-    }
-    CleanupGame("master")
-    Sleep, 10000
 }
 
 BotGameFarm(difficulty, inGameLogic)  ;i wouldn't recommend anything besides intro
@@ -299,37 +211,6 @@ BotGameFarm(difficulty, inGameLogic)  ;i wouldn't recommend anything besides int
     }
     CleanupGame("master")
     Sleep, 10000
-}
-
-;game creator for co-op vs ai spam
-BotGameMaster(map)
-{
-    while true
-    {
-        MasterCreateGame(map, "fatmattplatcat", "platplatmattmatt", "", "")
-        Sleep, 10000
-        SelectFirstChamp()
-        Sleep, 80000
-        WaitGameStart()
-        WinGameLoop(map)
-        CleanupGame("master")
-        Sleep, 20000 ;give ample time for everyone to align
-    }
-}
-
-;game slave for co-op vs ai spam
-BotGameSlave(map)
-{
-    while true
-    {
-        SlaveJoinGame()
-        Sleep, 10000
-        SelectFirstChamp()
-        Sleep, 80000
-        WaitGameStart()
-        WinGameLoop(map)
-        CleanupGame("master") ;set to master to not spam honor
-    }
 }
 
 ;waits for game to start
@@ -447,28 +328,6 @@ StatsCheck()
     ;MsgBox, stats loaded
 }
 
-SpamHonor()
-{
-    ;position variables
-    yOffset := 21 ;same UI for all 4 summoners, just shifted downards for each one
-    honorButtonX := 981     ;for the green thumbs up button
-    honorButtonYBase := 81  ;
-    honorSelectX := 828     ;for friendly, the honor on top
-    honorSelectYBase := 117 ;
-    honorSelectYOffset := 63 ;approx y distance between middle of honor type buttons
-
-    Loop, 4 ;spam for each allied summoner
-    {
-        yShift := (A_index-1)*yOffset ;everything shifts down as we move down through the summunoers
-        MouseClick, left, honorButtonX, honorButtonYBase+yShift
-        Sleep, 1000
-        Random, honorType, 0, 2 ;give different kinds of honor uniformly
-        ;honorType := 1 ;temporarily give all helpful
-        MouseClick, left, honorSelectX, honorSelectYBase+yShift+(honorType*honorSelectYOffset)
-        Sleep, 1000
-    }
-}
-
 Retreat(map)
 {
     if (map == "SR")
@@ -523,20 +382,6 @@ Send {d} ;revive
 Sleep, 100
 Send {f} ;heal
 Sleep, 100
-/*
-Send {1} ;spam all item actives to eat elixirs
-Sleep, 100
-Send {2} 
-Sleep, 100
-Send {3} 
-Sleep, 100
-Send {4} 
-Sleep, 100
-Send {5} 
-Sleep, 100
-Send {6} 
-Sleep, 100
-*/
 }
 
 Shop(map)
@@ -557,22 +402,6 @@ Shop(map)
         MouseClick, left, 813, 464 ;
         MouseClick, left, 813, 464 ;
         MouseClick, left, 813, 464 ;
-        ; Send, {CTRLDOWN}l{CTRLUP}rod ;roa
-        ; Sleep, 500
-        ; MouseClick, left,  375, 184 ;select roa
-        ; Sleep, 300
-        ; MouseClick, left,  737,  233 ;try to buy roa
-        ; MouseClick, left,  737,  233
-        ; Sleep, 300
-        ; MouseClick, left,  815,  290 ;try to buy blasting wand
-        ; MouseClick, left,  815,  290        
-        ; Sleep, 300
-        ; MouseClick, left,  625,  293 ;try to buy catalyst
-        ; MouseClick, left,  625,  293
-        ; Sleep, 300
-        ; MouseClick, left,  679,  376 ;try to buy sapphire
-        ; MouseClick, left,  679,  376
-
     }
     else if (map == "TT")
     {
@@ -598,81 +427,6 @@ Shop(map)
     Sleep, 300
     MouseClick, left,  923, 64 ;click to close shop
     Sleep, 100
-
-    ;Send, {CTRLDOWN}l{CTRLUP}ydr ;old hydra-buying logic
-    ;Sleep, 500
-    ;MouseClick, left,  203, 189
-    ;Sleep, 300
-    ;MouseClick, left,  730,  253
-    ;MouseClick, left,  730,  253
-    ;Sleep, 300
-    ;MouseClick, left,  640,  311
-    ;MouseClick, left,  640,  311
-    ;Sleep, 300
-    ;MouseClick, left,  570,  375
-    ;MouseClick, left,  570,  375
-    ;Sleep, 300
-    ;MouseClick, left,  923, 64
-    ;Sleep, 100
-    return
-}
-
-;Starting from client, create a custom game.
-CreateCustomGame()
-{
-    Send {Click 478, 32} ;click 'Play' button
-    Sleep, 2000
-    Send {Click 238, 186} ;click 'Custom' button
-    Sleep, 2000
-    Send {Click 753, 562} ;Create Game
-    Sleep, 2000
-    Send {Click 353, 516} ;select game name entry box
-    Sleep, 2000
-    Random, stupidName, 11111111, 99999999
-    SendInput, %stupidName%
-    Sleep, 2000
-    Send {Click 353, 546} ;and for password
-    Send {z 4}
-    Send {r 2}
-    Send {e 2}
-    Sleep, 3000
-    Send {Click 476, 588} ;go to add bots screen
-        ;Sleep, 2000
-        ;Send {Click 980, 120} ;click 'x' on rune alert
-        ;Sleep, 1000        
-        ;Send {Click 1010, 120} ;click 'x' on new champ alert
-        ;Sleep, 1000
-        ;Send {Click 1100, 120} ;click 'x' on level up alert
-        ;Sleep, 1000
-        ;Send {Click 1010, 120} ;click 'x' on new champ alert
-        ;Sleep, 1000
-        ;Send {Click 1100, 120} ;click 'x' on level up alert
-        ;Sleep, 1000
-    Sleep, 2000
-    Send {Click 727, 130} ;add random bot
-    Sleep, 2000
-    Send {Click 576, 126} ;click dropdown menu
-    Sleep, 2000
-    Send {Click 582, 153} ;scroll to top
-    Sleep, 400
-    Send {Click 582, 153} ;scroll to top
-    Sleep, 400
-    Send {Click 582, 153} ;scroll to top
-    Sleep, 400
-    Send {Click 582, 153} ;scroll to top
-    Sleep, 400
-    Send {Click 582, 153} ;scroll to top
-    Sleep, 400
-    Send {Click 554, 155} ;pick annie
-    Sleep, 4000
-    Send {Click 584, 132} ;click dropdown menu
-    Sleep, 2000
-    Send {Click 584, 248} ;scroll to leona
-    Sleep, 1000
-    Send {Click 520, 193} ;pick leona (worst pusher)
-    Sleep, 4000
-    Send {Click 687, 392} ;go to champ select
-    Sleep, 5000
 }
 
 SelectFirstChamp()
@@ -719,48 +473,6 @@ CloseLoLGame()
         WinKill
     }
     return
-}
-
-LogIn(accountData, offset) ;accountData should have account name on first line and pw on second
-{
-    FileReadLine, username, %accountData%, 1+offset
-    FileReadLine, password, %accountData%, 3+offset
-
-    ;MsgBox, %username% %password%
-
-    Run, C:\Riot Games\League of Legends\lol.launcher.exe
-    Sleep, 15000
-    While 1
-    {
-        IfWinExist, Error ;silly hack to dismiss the "another instance of LoL is running" box
-        {
-            WinActivate
-            Send {Enter}
-            Break
-        }
-        IfWinExist, PVP.net Patcher
-            Break
-    }
-
-    WinWait, PVP.net Patcher
-    WinActivate
-    Sleep, 5000
-    Send {click 701, 549} ;click on orange "play" button
-
-    WinWait, PVP.net Client
-    WinActivate
-    Sleep, 7000
-    Send {click 233,  255} ;username
-    Sleep, 1000
-    Send {ctrl down}a{ctrl up} ;select all previously existing text to overwrite
-    SendInput, %username%
-    Sleep, 2000
-    Send {click 239, 315} ;pw
-    SendInput, %password%
-    Sleep, 2000
-    Send {click 276,  338} ;log in
-    Sleep, 15000
-    return username
 }
 
 JoinSoloBotGame(map, difficulty)
@@ -822,147 +534,6 @@ JoinSoloBotGame(map, difficulty)
             Sleep, 2000
             Goto accept
     }
-}
-return
-
-MasterCreateGame(map, summoner1, summoner2, summoner3, summoner4)
-{
-    ;MsgBox %summoner1% %summoner2%
-    MouseClick, left,  511,  35 ;click orange "Play" button
-    Sleep, 2000
-    MouseClick, left,  278,  139 ;co-op vs ai
-    Sleep, 1000
-    MouseClick, left,  393,  119 ;classic
-    Sleep, 1000
-    if (map == "SR")
-    {
-        MouseClick, left,  592,  137 ;summoner's rift
-    }
-    else if (map == "TT")
-    {
-        MouseClick, left,  560,  160 ;twisted treeline
-    }
-    else ;default to SR
-    {
-        MouseClick, left,  592,  137 ;summoner's rift
-    }
-    Sleep, 1000
-    ;MouseClick, left,  710,  122 ;beginner
-    MouseClick, left,  691,  145 ;intermediate
-    Sleep, 1000
-    MouseClick, left,  765,  570 ;invite my own teammates
-    Sleep, 2000
-    MouseClick, left,  781,  439 ;invite
-    Sleep, 2000
-    MouseClick, left,  722,  168 ;click on text box
-    Sleep, 500
-    Send {ctrl down}a{ctrl up} ;select all previously existing text to overwrite
-    Sleep, 500
-    Send, %summoner1%   ;type in summoner1's name
-    Sleep, 500
-    MouseClick, left,  902,  157 ;add to invite list
-    Sleep, 500
-    MouseClick, left,  722,  168 ;click on text box
-    Sleep, 500
-    Send {ctrl down}a{ctrl up} ;select all previously existing text to overwrite
-    Sleep, 500
-    Send, %summoner2%   ;type in summoner2's name
-    Sleep, 500
-    MouseClick, left,  902,  157 ;add to invite list
-    Sleep, 500
-    MouseClick, left,  722,  168 ;click on text box
-    Sleep, 500
-    Send {ctrl down}a{ctrl up} ;select all previously existing text to overwrite
-    Sleep, 500
-    Send, %summoner3%   ;type in summoner3's name
-    Sleep, 500
-    MouseClick, left,  902,  157 ;add to invite list
-    Sleep, 500
-    MouseClick, left,  722,  168 ;click on text box
-    Sleep, 500
-    Send {ctrl down}a{ctrl up} ;select all previously existing text to overwrite
-    Sleep, 500
-    Send, %summoner4%   ;type in summoner4's name
-    Sleep, 500
-    MouseClick, left,  902,  157 ;add to invite list
-    Sleep, 500
-    MouseClick, left,  735,  566 ;click "Invite players"
-    Sleep, 1000
-    if (map == "SR")
-    {
-        while True      ;check that fifth player has joined
-        {
-            Sleep, 500
-            PixelSearch, FoundX, FoundY, 191, 389, 193, 391, 0xA2E7F9 ;search for yellow of 'x' in kick button where fifth player shows up
-            if ErrorLevel ;could not find
-                    Sleep, 10   
-            else
-                break   
-        }
-    }
-    else if (map == "TT")
-    {
-        while True      ;check that fifth player has joined
-        {
-            Sleep, 500
-            PixelSearch, FoundX, FoundY, 191, 264, 193, 265, 0xA2E7F9 ;search for yellow of 'x' in kick button where third player shows up
-            if ErrorLevel ;could not find
-                    Sleep, 10   
-            else
-                break   
-        }
-    }
-    else ;default to SR
-    {
-        while True      ;check that fifth player has joined
-        {
-            Sleep, 500
-            PixelSearch, FoundX, FoundY, 191, 389, 193, 391, 0xA2E7F9 ;search for yellow of 'x' in kick button where fifth player shows up
-            if ErrorLevel ;could not find
-                    Sleep, 10   
-            else
-                break   
-        }
-    }
-
-    Sleep, 1000
-    MouseClick, left, 529, 436 ;start game
-    while True ;wait for queue to fire
-    {
-        Sleep, 1000
-        PixelSearch, FoundX, FoundY, 507, 324, 509, 326, 0xFFFFFF ;look for white of timer pie
-        if ErrorLevel ;could not find
-                Sleep, 10   
-        else
-            break   
-    }
-    MouseClick, left, 421, 364 ;click "accept" when match is made to go to champ select
-}
-return
-
-SlaveJoinGame()
-{
-    while True ;wait for invite
-    {
-        Sleep, 1000
-        PixelSearch, FoundX, FoundY, 912, 536, 912, 536, 0xFBFBFB ;look for white in "-" of "co-op"
-                                                                  ;**KNOWN BUG** - make sure the inviting summoner's name is short enough that it's one line!
-        if ErrorLevel ;could not find
-                Sleep, 10   
-        else
-            break   
-    }
-    MouseClick, left, 865, 590 ;accept invite
-    while True ;wait for queue to fire
-    { 
-        Sleep, 1000
-        PixelSearch, FoundX, FoundY, 507, 324, 509, 326, 0xFFFFFF ;look for white of timer pie
-        if ErrorLevel ;could not find
-                Sleep, 10   
-        else
-            break   
-    }
-    MouseClick, left, 421, 364 ;click "accept" when match is made to go to champ select
 }
 return
 
@@ -1114,25 +685,7 @@ BuyChamp(champName)
     Sleep, 5000
 }
 
-NameChange(name)
-{
-    MouseClick, left,  455,  387
-    Sleep, 100
-    Send, %name%
-    MouseClick, left,  508,  457
-    Sleep, 600
-    MouseClick, left,  494,  356
-    Sleep, 600
-    FileAppend, `n%name%, smurfs.txt
-    FileAppend, `n%name%, smurfs.txt
-    FileAppend, `ntrivial11p, smurfs.txt
-    MouseClick, left,  1013,  12
-    Sleep, 600
-    MouseClick, left,  440,  348
-    Sleep, 600   
-}
-
-LogInManual(username, password) ;accountData should have account name on first line and pw on second
+LogIn(username, password) ;accountData should have account name on first line and pw on second
 {
     Run, C:\Riot Games\League of Legends\lol.launcher.exe
     Sleep, 3000
@@ -1217,7 +770,7 @@ MakeNewSmurf(username, password, reflink)
 
 SmurfSetup(username, password) ;fill out referral form on website - make sure captcha is typed in first!
 {
-    smurfName := LogInManual(username, password)
+    smurfName := LogIn(username, password)
     MouseClick, left,  470,  392 ;click name entry box
     Sleep, 500
     Send, %username%
@@ -1279,6 +832,7 @@ CheckIfFive() ;check if acct is level 5 ;make sure you have level5.png from the 
     return
 }
 
+;currently does not work 7/24/14
 CheckIfRich() ;check if acct has 400 RP for XP boost ;make sure you have 400RP.png from the git repository in your working directory
 {
     ImageSearch, FoundX, FoundY, 818, 16, 845, 33, 400RP.png ;scan RP with image
@@ -1295,6 +849,7 @@ CheckIfRich() ;check if acct has 400 RP for XP boost ;make sure you have 400RP.p
     return
 }
 
+;currently not tested 7/24/14
 CheckForPlayButton()
 {
     ImageSearch, FoundX, FoundY, 446, 4, 581, 64, play.png ;scan RP with image

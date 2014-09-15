@@ -13,13 +13,17 @@ SetKeyDelay, 100, 30
 ;golf ref link:        "http://signup.leagueoflegends.com/?ref=525f7133f4190108692822"
 ;spamninja ref link:   "http://signup.leagueoflegends.com/?ref=4ce0a8276d57a105645474"
 
+;TODO's:
 ;"OK" for in-game afk notification that exits game 617, 472
-;I think bug splats for battle trainning don't give you the orange "reconnect" button - 
+;I think bug splats for battle training don't give you the orange "reconnect" button - 
 ;   they just put you on the normal client screen
+; add lvl 10 support (250 RP XP boost, lvl 10 picture)
+; relog after every game to refresh RP? (lvl 3 bug)
 
 globalGameLogic := "INTRO_AHK"
+globalAccountSourceType := "LIST"
 
-;globalReflink := "4dc070d8d86a0397596492" ;george
+georgeReflink := "4dc070d8d86a0397596492" ;george
 ;globalReflink := "4ce0a8276d57a105645474" ;spam ninja
 ;globalReflink := "52d82c79c1c55823529937" ;vimmmmm
 ;globalReflink := "4e0d1472cd21a929683971" ;aerial
@@ -32,49 +36,40 @@ globalReflink := "4df3022975a2d908834853" ;jlosh
 
 ;this is a utility testing method - feel free to swap it out for whatever function
 #v::
-;;redeem boosts - press spacebar once to move down to correct spacing
-;Loop, 15
-;{
-;    MouseClick, left,  167,  414
-;    Sleep, 5000
-;}
-
-
-while true {
-    AutoSmurf("random17", globalReflink, globalGameLogic)
-}
-
+CheckForPlayButton()
+;RedeemSmurfs()
 return
 
 #z::
 ;Sleep, 120000
 while true {
-    AutoSmurf("random17", globalReflink, globalGameLogic)
+    AutoSmurf("random17", globalGameLogic, globalAccountSourceType, 10, globalReflink)
 }
 return
 
 #q::
-WinGameLoop("SR")
-;CheckIfOne()
-;BotGameFarm("intro", globalGameLogic)
-;DoBattleTraining()
+while true {
+    AutoSmurf("random17", globalGameLogic, globalAccountSourceType, 5, georgeReflink)
+}
+;CheckIfRich()
+
 return
 
 #w::
 while true
 {
     Sleep, 10000
-    ClickEndGameContinue()
+    WinGameLoop("SR")
     IfWinExist, PVP.net Client
     {
         WinActivate
         break      
     }
 }
-CleanupGame("master")
+CleanupGame()
 Sleep, 10000
 while true {
-    AutoSmurf("random17", globalReflink, globalGameLogic)
+    AutoSmurf("random17", globalGameLogic, globalAccountSourceType, 10, georgeReflink)
 }
 return
 
@@ -86,41 +81,46 @@ CleanupSmurf("None", password, globalReflink)
 return
 
 ;TODO: add timeouts that restart lol client and game if we've been locked in one state for too long
-AutoSmurf(password, reflink, inGameLogic) 
+AutoSmurf(password, inGameLogic, accountSource, smurfLevel, reflink = "None") 
 {
-    refCode := SubStr(reflink, -3)
+    refCode := SubStr(reflink, -3) ; get last 4 digits of reflink to identify who the smurf is for
     currentSmurf := "C:\currentSmurf" . refCode . ".txt"
     FileReadLine, smurfName, %currentSmurf%, 1 ;get current smurf name, stored locally
     if ErrorLevel ;currentSmurf.txt does not exist, so create it
     {
         FileAppend, None, %currentSmurf% ;first line stores name of smurf
         FileAppend, `nNone, %currentSmurf% ;second line stores password of smurf
-        smurfName = None
+        smurfName = "None"
     }
-    if (smurfName == "None") ;make fresh smurf
+    if (smurfName == "None") ; get new smurf
     {
         ;get smurf index from global smurf index file
         refCode := SubStr(reflink, -3)
-        smurfFile := "reflink" . refCode . "Index.txt" ;smurf file name is last 4 digits of reflink
-        FileReadLine, smurfIndex, %smurfFile%, 1 ;get current index of smurf, stored on SHARED space between VMs - this means run the ahk out of the shared github drive from the host!!
-        if ErrorLevel ;smurf file for this reflink does not exist, so create it
-        {
-            FileAppend, 0, %smurfFile%
-            smurfIndex = 0
+        if (accountSource == "AUTOMATIC") { ; only works if the auto account maker/captcha breaker is operational
+            ;append smurf index to username base
+            Random, smurfRand, 1000000, 9999999
+            smurfName := "Prisoner" . smurfRand 
+            MakeNewSmurf(smurfName, password, reflink)
+            ;ugh i really want feedback on whether an account got created successfully
+        } else if (accountSource == "LIST") {
+            if (smurfLevel == 5) {
+                smurfList := "smurfListRefCode" . refCode ".txt" ; put fresh accounts in file with this name
+                PopAccountData(smurfList, smurfName, password)
+            }
+            else if (smurfLevel == 10) {
+                smurfList := "smurfListLvl10RefCode" . refCode ".txt" ; put fresh accounts in file with this name
+                PopAccountData(smurfList, smurfName, password)
+            }
+            else {
+                MsgBox, "Error: smurfLevel not supported!"
+            }
+        } else {
+            MsgBox, "Error: accountSource not supported!"
         }
-        else
-        {
-            smurfIndex += 1
-        }
-        ;append smurf index to username base
-        Random, smurfRand, 10000, 99999
-        smurfName := "Prisoner" . smurfRand . smurfIndex 
-        MakeNewSmurf(smurfName, password, reflink)
-        ;ugh i really want feedback on whether an account got created successfully
+
         SmurfSetup(smurfName, password)
         TF_ReplaceLine("!" . currentSmurf, "1", "1", smurfName) ;store current smurfs login info
         TF_ReplaceLine("!" . currentSmurf, "2", "2", password)
-        TF_ReplaceLine("!" . smurfFile, "1", "1", smurfIndex)
     }
     else ;resume where we left off
     {
@@ -138,30 +138,58 @@ AutoSmurf(password, reflink, inGameLogic)
             BuyChamp("sivir") 
         }
     }
-    while not CheckIfFive()
-    {
-        if CheckIfRich()
+    if (smurfLevel == 5) {
+        while not CheckIfFive()
         {
-            BuyXPBoost("small")
+            if CheckIfRich()
+            {
+                BuyXPBoost()
+            }
+            if (inGameLogic == "INTRO_AHK") {
+                BotGameFarm("intro", inGameLogic)
+            }
+            else if (inGameLogic == "BOT_OF_LEGENDS") {
+                BotGameFarm("beginner", inGameLogic)
+            }
+            else if (inGameLogic == "BATTLE_TRAINING") {
+                DoBattleTraining()
+            }
+            else { ;revert to battle training as safest case
+                DoBattleTraining() 
+            }
+            Sleep, 5000
         }
-        if (inGameLogic == "INTRO_AHK") {
-            BotGameFarm("intro", inGameLogic)
-        }
-        else if (inGameLogic == "BOT_OF_LEGENDS") {
-            BotGameFarm("beginner", inGameLogic)
-        }
-        else if (inGameLogic == "BATTLE_TRAINING") {
-            DoBattleTraining()
-        }
-        else { ;revert to battle training as safest case
-            DoBattleTraining() 
-        }
-        Sleep, 5000
+    } else if (smurfLevel == 10) {
+        while not CheckIfTen()
+        {
+            if CheckIfRich()
+            {
+                BuyXPBoost()
+            }
+            if Check250RP()
+            {
+                BuyXPBoost()
+            }
+            if (inGameLogic == "INTRO_AHK") {
+                BotGameFarm("intro", inGameLogic)
+            }
+            else if (inGameLogic == "BOT_OF_LEGENDS") {
+                BotGameFarm("beginner", inGameLogic)
+            }
+            else if (inGameLogic == "BATTLE_TRAINING") {
+                DoBattleTraining()
+            }
+            else { ;revert to battle training as safest case
+                DoBattleTraining() 
+            }
+            Sleep, 5000
+        }        
     }
     ;we're done, so do some cleanup
     TF_ReplaceLine("!" . currentSmurf, "1", "1", "None") ;indicate we're not currently doing a smurf
     TF_ReplaceLine("!" . currentSmurf, "2", "2", "None")
     CloseLoLClient()
+    Sleep, 5000
     return
 }
 
@@ -172,6 +200,8 @@ CleanupSmurf(smurfName, password, reflink) ;clean up state
     TF_ReplaceLine("!" . currentSmurf, "1", "1", "None") ;locally indicate we're not currently doing a smurf
     TF_ReplaceLine("!" . currentSmurf, "2", "2", "None")
 }
+
+
 
 BotGameFarm(difficulty, inGameLogic)  ;i wouldn't recommend anything besides intro
 {
@@ -187,43 +217,49 @@ BotGameFarm(difficulty, inGameLogic)  ;i wouldn't recommend anything besides int
     else { ; revert to safest champ
         SelectChamp("sivir")
     }
-    Sleep, 120000
+    Sleep, 90000
     IfWinExist ahk_class RiotWindowClass ;if game launches, focus on it
     {
         WinActivate
-    }
-    else
-    {
-        MouseClick, left, 769, 43 ;view profile
+    }   
+    else {
+        CloseChrome()
+        IfWinExist, PVP.net Client
+        {
+            WinActivate
+        }
+        ViewProfile()
         Sleep, 5000
         MouseClick, left, 512, 363 ;dismiss queue dodge warning safely
-        Sleep, 2000
+        Sleep, 1000
+        MouseClick, left, 985, 50 ;horrible kludge to get rid of skin screen - don't ask
         Goto, joinGame
     }
+    WaitGameLoad()
+    Sleep, 90000 ; wait until minions spawn to do shit
     if (inGameLogic == "INTRO_AHK") {
         WinGameLoop(map)
     }
     else if (inGameLogic == "BOT_OF_LEGENDS") {
-        SelectChamp("ryze")
+        BoLLoop()
+        CleanupGame()
     }
     else { ; revert to safest champ
         WinGameLoop(map)
     }
-    CleanupGame("master")
     Sleep, 10000
 }
 
-;waits for game to start
-WaitGameStart()
-{
-    while (true)
+;waits for all summoners to load
+WaitGameLoad() {
+    while true
     {
-        IfWinExist ahk_class RiotWindowClass ;if game launches, focus on it
-        {
-            WinActivate
-            return
-        }
-        Sleep, 2000
+        Sleep, 3000
+        PixelSearch, FoundX, FoundY, 504, 382, 504, 382, 0x599ED5 ;look for bright gold in "V" of "VS"
+        if ErrorLevel ;could not find, hopefully we're in the game now
+            break
+        else
+            Sleep, 10   
     }
 }
 
@@ -266,9 +302,26 @@ WinGameLoop(map) {
         ;Abilities() ;
         Sleep, 1000
         ClickEndGameContinue()
+        IfWinExist, Error Report ; check for bug splat
+        {
+            WinActivate
+            Sleep, 1000
+            MouseClick, left, 215, 401 ;dismiss bug splat 
+        }
+        CoordMode, Mouse, Screen
+        MouseClick, left, 878, 753 ; click client in system tray
+        CoordMode, Mouse, Relative
         IfWinExist, PVP.net Client
         {
             WinActivate
+            Sleep, 5000
+            if CheckForReconnect()
+            {
+                MouseClick, left, 518, 364 ;click reconnect
+                Sleep, 60000 ; let game load
+                continue
+            }
+            CleanupGame() ; no reconnect, so game must be done
             return      
         }
         Sleep, 2000
@@ -291,41 +344,35 @@ BoLLoop() {
     }
 }
 
-CleanupGame(role)
-{
-    StatsCheck()
-    if (role == "slave")
-    {
-        SpamHonor()
-    }
-    Send {Click 700, 590} ;click on 'return to lobby' button 
-    Sleep, 5000
-    Send {click 1001,  87} ;dismiss overlay if it exists
-    Sleep, 2000
-    Send {click 1001,  87} ;so many fucking overlays
-    Sleep, 1000
-}
 
-StatsCheck()
+
+CleanupGame()
 {
-    ;wait for stats to load
-    statsNotLoaded := true
-    while statsNotLoaded
+    ; keep clicking 'return to lobby' button until we see the red of the "Play" button
+    while true
     {
-        IfWinExist, PVP.net Client
+        Send {Click 700, 590} ;click on 'return to lobby' button 
+        Sleep, 5000
+        CloseChrome()
+        IfWinExist, PvP.net Client
         {
-            WinActivate    
+            WinActivate
         }
-        MouseClick, left,  665,  130 ;sometimes you need to click on the XP VMs to make the client refresh
-        Sleep, 1000                  ;
-        ImageSearch, FoundX, FoundY, 676, 540, 783, 607, home.png
-        if ErrorLevel ;could not find
-            statsNotLoaded := true  
-        else
-            statsNotLoaded := false
+        ViewProfile()
+        Sleep, 2000
+        MouseClick, left,  561,  403 ;decline co op vs ai inv
         Sleep, 1000
+        MouseClick, left,  561,  403 ;decline co op vs ai inv again
+        if CheckForPlayButton()
+        {
+            break
+        }
+        else
+        {
+            Sleep, 1000
+        }
     }
-    ;MsgBox, stats loaded
+
 }
 
 Retreat(map)
@@ -453,8 +500,14 @@ SelectChamp(champName)
     Sleep, 1000
     Send {click 583, 171} ;click on heal in case barrier is not available
     Sleep, 1000
-    Send {Click 702, 410} ;attempt to start game
-    Sleep, 30000 ;wait for load screen to pop up if successful
+    Send {Click 702, 410} ;attempt to ready up
+    Sleep, 1000
+    Send {Click 731, 110} ;click on search box (which also clears it, apparently)
+    Sleep, 2000
+    Send {click 274, 174} ;click on top left champ space (random)
+    Sleep, 1000
+    Send {Click 702, 410} ;attempt to ready up
+    ;Sleep, 30000 ;wait for load screen to pop up if successful
 }
 
 CloseLoLClient()
@@ -471,6 +524,16 @@ CloseLoLGame()
     IfWinExist, League of Legends (TM) Client
     {
         WinKill
+    }
+    return
+}
+
+CloseChrome()
+{
+    SetTitleMatchMode, 2
+    IfWinExist, Google Chrome 
+    {
+        Process, Close, chrome.exe
     }
     return
 }
@@ -637,18 +700,14 @@ DoBattleTraining() ;run battle training automatically
     }
     MouseClick, left,  645,  387 ;click continue on post battle screen
     Sleep, 2000
-    CleanupGame("training")
-    Sleep, 2000
-    MouseClick, left,  561,  403 ;decline co op vs ai inv
-    Sleep, 2000
-    MouseClick, left,  561,  403 ;decline co op vs ai inv again
+    CleanupGame()
     Sleep, 2000 
     ;should be back at lobby again
 
 return
 }
 
-BuyXPBoost(size)
+BuyXPBoost()
 {
     MouseClick, left,  704,  40 ;open shop
     Sleep, 15000
@@ -658,12 +717,9 @@ BuyXPBoost(size)
     Sleep, 100
     Send, xp
     Sleep, 1000
-    if (size == "big")
-        MouseClick, left,  576,  286 ;3 day boost
-    else if (size == "small")
-        MouseClick, left,  763,  287 ;1 day boost
-    else
-        MouseClick, left,  763,  287 ;1 day boost    
+    MouseClick, left, 188, 369 ;sort by RP
+    Sleep, 1000
+    MouseClick, left, 419, 288 ;1 day boost
     Sleep, 3000
     MouseClick, left,  593,  574 ;purchase
     Sleep, 2000
@@ -697,16 +753,16 @@ LogIn(username, password) ;accountData should have account name on first line an
             Send {Enter}
             Break
         }
-        IfWinExist, PVP.net Patcher
+        IfWinExist, LoL Patcher
             Break
     }
 
-    WinWait, PVP.net Patcher
+    WinWait, LoL Patcher
     WinActivate
     Sleep, 10000
-    Send {click 701, 549} ;click on orange "play" button
+    Send {click 488, 29} ;click on orange "launch" button
     Sleep, 2000
-    Send {click 701, 549} ;tiny XP VM sometimes misses first click
+    Send {click 488, 29} ;tiny XP VM sometimes misses first click
 
     WinWait, PVP.net Client
     WinActivate
@@ -720,11 +776,29 @@ LogIn(username, password) ;accountData should have account name on first line an
     SendInput, %password%
     Sleep, 1000
     Send {click 276,  338} ;log in
-    Sleep, 50000
+    Sleep, 15000
+    ViewProfile() ;get to safe place with no clickables
+    Sleep, 1000
+    MouseClick, left, 555, 378 ;dismiss mastery update notification
+    ViewProfile()
+    Sleep, 1000
     Send {click 1001,  87} ;dismiss overlay if it exists
     Sleep, 2000
     Send {click 1001,  87} ;so many fucking overlays
+    Sleep, 3000
+    Loop, 26 { ;dismiss random popup notifications
+        MouseClick, left, 600+A_Index*15, 95
+        Sleep, 200
+    }
     return
+}
+
+;accountsFile should have account name on first line and pw on second
+PopAccountData(accountsFile ;inputs
+             , byRef username, byRef password) { ;outputs
+    FileReadLine, username, %accountsFile%, 1
+    FileReadLine, password, %accountsFile%, 2
+    TF_RemoveLines("!" . accountsFile, 1, 2)
 }
 
 MakeNewSmurf(username, password, reflink)
@@ -768,7 +842,60 @@ MakeNewSmurf(username, password, reflink)
     }
 }
 
-SmurfSetup(username, password) ;fill out referral form on website - make sure captcha is typed in first!
+FillReferralForm(password, reflinkURL) {
+    Random, nameSuffix, 10000000, 99999999
+    Random, month, 1, 12
+    Random, day, 1, 28
+    Random, year, 1981, 1992
+    username := "Prisoner" . nameSuffix
+    Clipboard = %reflinkURL% ; put URL on clipboard for faster entry
+
+    Send, {CTRLDOWN}l{CTRLUP} ; select address bar
+    Sleep, 100
+    Send, {CTRLDOWN}a{CTRLUP}{CTRLDOWN}v{CTRLUP}{ENTER} ; go to signup page
+    Sleep, 3000
+    MouseClick, left,  722,  301 ; select username box
+    Sleep, 100
+    Clipboard = %username%
+    Send, {CTRLDOWN}v{CTRLUP}{TAB}
+    Clipboard = %password%
+    Send, {CTRLDOWN}v{CTRLUP}{TAB}{CTRLDOWN}v{CTRLUP}{TAB}
+    Clipboard = %username%@gmail.com
+    Send, {CTRLDOWN}v{CTRLUP}{TAB}%month%{TAB}%day%{TAB}%year%
+    Sleep, 300
+    MouseClick, left,  691,  580 ; agree to terms of use (heh)
+    Sleep, 300
+    MouseClick, left,  696,  602 ; un-sign up for newsletter
+    Sleep, 300
+    MsgBox, "Input captcha, then dismiss this box"
+    Sleep, 300
+    MouseClick, left,  858,  677 ; create account
+    Sleep, 100
+    ; add new accounts info to fresh account list
+    freshAccountList := "smurfListRefCode" . refCode := SubStr(reflinkURL, -3) . ".txt"
+    FileAppend, `n%username%, %freshAccountList%
+    FileAppend, `n%password%, %freshAccountList%
+}
+
+RedeemSmurfs() { ;redeem the IP bonus from completed smurfs - must be already logged into lol website
+    Clipboard = http://rewards.na.leagueoflegends.com/ ; put URL on clipboard for faster entry
+
+    while true
+    {
+        Send, {CTRLDOWN}l{CTRLUP} ; select address bar
+        Sleep, 100
+        Send, {CTRLDOWN}a{CTRLUP}{CTRLDOWN}v{CTRLUP}{ENTER} ; go to rewards page
+        Sleep, 5000
+        Loop, 4
+        {
+            Sleep, 2000
+            MouseClick, left, 924, 678
+        }
+        Sleep, 500
+    }
+}
+
+SmurfSetup(username, password) ; do setup for accounts that have never logged in before
 {
     smurfName := LogIn(username, password)
     MouseClick, left,  470,  392 ;click name entry box
@@ -786,15 +913,19 @@ SmurfSetup(username, password) ;fill out referral form on website - make sure ca
     Sleep, 2000
     MouseClick, left,  555,  405 ;decline tutorial
     Sleep, 1000
-    MouseClick, left,  555,  405 ;decline battle trainig
-    Sleep, 3000
+    MouseClick, left,  555,  405 ;decline battle training
+    Sleep, 1000
     ;CloseLoLClient()
     return
 }
 
+ViewProfile() { ; a safe place where there are less evil hyperlinks that will derail the engine
+    MouseClick, left, 842, 43
+}
+
 CheckIfOne() ;check if acct is level 1 ;make sure you have level1.png from the git repository in your working directory
 {
-    MouseClick, left, 769, 43 ;view profile
+    ViewProfile()
     Sleep, 5000
     MouseClick, left, 512, 363 ;dismiss "Unexpected Platform Error" if  it comes up
     Sleep, 2000
@@ -814,8 +945,10 @@ CheckIfOne() ;check if acct is level 1 ;make sure you have level1.png from the g
 
 CheckIfFive() ;check if acct is level 5 ;make sure you have level5.png from the git repository in your working directory
 {
-    MouseClick, left, 769, 43 ;view profile
+    ViewProfile()
     Sleep, 5000
+    MouseClick, left, 648, 207 ;dismiss out of place level up notification
+    Sleep, 1000
     MouseClick, left, 512, 363 ;dismiss "Unexpected Platform Error" if  it comes up
     Sleep, 2000
     ImageSearch, FoundX, FoundY, 350, 250, 436, 276, level5.png ;scan for "level 5" with image
@@ -832,10 +965,13 @@ CheckIfFive() ;check if acct is level 5 ;make sure you have level5.png from the 
     return
 }
 
-;currently does not work 7/24/14
-CheckIfRich() ;check if acct has 400 RP for XP boost ;make sure you have 400RP.png from the git repository in your working directory
+CheckIfTen() ;check if acct is level 10 ;make sure you have level10.png from the git repository in your working directory
 {
-    ImageSearch, FoundX, FoundY, 818, 16, 845, 33, 400RP.png ;scan RP with image
+    ViewProfile()
+    Sleep, 5000
+    MouseClick, left, 512, 363 ;dismiss "Unexpected Platform Error" if  it comes up
+    Sleep, 2000
+    ImageSearch, FoundX, FoundY, 350, 250, 436, 276, level10.png ;scan for "level 10" with image
     if ErrorLevel ;could not find
     {
         ;MsgBox, not found
@@ -849,10 +985,58 @@ CheckIfRich() ;check if acct has 400 RP for XP boost ;make sure you have 400RP.p
     return
 }
 
-;currently not tested 7/24/14
+
+CheckIfRich() ;check if acct has 400 RP for XP boost ;make sure you have 400RP.png from the git repository in your working directory
+{
+    ImageSearch, FoundX, FoundY, 840, 12, 870, 24, 400RP2.png ;scan RP with image
+    if ErrorLevel ;could not find
+    {
+        ;MsgBox, not found
+        return false    
+    }
+    else
+    {
+        ;MsgBox, found
+        return true
+    }
+    return
+}
+
+Check250RP() ;check if acct has 250 RP for XP boost ;make sure you have 250RP.png from the git repository in your working directory
+{
+    ImageSearch, FoundX, FoundY, 840, 12, 870, 24, 250RP.png ;scan RP with image
+    if ErrorLevel ;could not find
+    {
+        ;MsgBox, not found
+        return false    
+    }
+    else
+    {
+        ;MsgBox, found
+        return true
+    }
+    return
+}
+
 CheckForPlayButton()
 {
-    ImageSearch, FoundX, FoundY, 446, 4, 581, 64, play.png ;scan RP with image
+    ImageSearch, FoundX, FoundY, 446, 4, 581, 64, play2.png ;scan RP with image
+    if ErrorLevel ;could not find
+    {
+        ;MsgBox, not found
+        return false    
+    }
+    else
+    {
+        ;MsgBox, found
+        return true
+    }
+    return
+}
+
+CheckForReconnect()
+{
+    ImageSearch, OutputVarX, OutputVarY, 440, 351, 587, 390, reconnect.png
     if ErrorLevel ;could not find
     {
         ;MsgBox, not found
@@ -887,7 +1071,7 @@ else ;we're stalled out
     CloseLoLClient()
     CloseLoLGame()
     while true {
-    AutoSmurf("random17", globalReflink, globalGameLogic) ;george
+    AutoSmurf("random17", globalGameLogic, globalAccountSourceType, 5, globalReflink) ;george
     }
 return
 }
